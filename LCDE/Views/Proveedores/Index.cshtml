@@ -1,0 +1,81 @@
+﻿@model List<Proveedor>
+
+@{
+    ViewData["Title"] = "Proveedores";
+}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 encabezado-card">
+            <h6 class="m-0 font-weight-bold text-white">Lista de Proveedores</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <a asp-action="Crear" class="btn btn-primary mb-3">
+                        <i class="bi bi-plus-circle-dotted" style="font-size:1rem; color: white; margin-right:10px"></i>
+                        Crear nuevo
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-bordered" id="tbdata" cellspacing="0" style="width:100%">
+                        <thead>
+                            <tr class="encabezado-tabla">
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Direccion</th>
+                                <th scope="col">Telefono</th>
+                                <th scope="col">Correo</th>
+                                <th scope="col">NIT</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var proveedor in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @proveedor.Nombre
+                                    </td>
+                                    <td>
+                                        @proveedor.Direccion
+                                    </td>
+                                    <td>
+                                        @proveedor.Telefono
+                                    </td>
+                                    <td>
+                                        @proveedor.Correo
+                                    </td>
+                                    <td>
+                                        @proveedor.NIT
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-primary" asp-action="Editar" asp-route-id="@proveedor.Id">
+                                            <i class="bi bi-pencil-fill" style="font-size:1rem; color: white; margin-right:10px"></i>
+                                            Editar
+                                        </a>
+                                        <button class="btn btn-danger" onclick="showDeleteConfirmation(@proveedor.Id,'proveedor')">
+                                            <i class="bi bi-trash" style="font-size:1rem; color: white; margin-right:10px"></i>
+                                            Borrar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $("#cantidadRecordsPorPagina").change(function () {
+            const recordsPorPagina = $(this).val();
+            location.href = `/clientes/?pagina=1&recordsPorPagina=${recordsPorPagina}`;
+        });
+    </script>
+    <script src="~/js/borradoRegistro.js">
+    </script>
+}

@@ -1,0 +1,63 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Reporte";
+}
+<style>
+    .select2 {
+        width: 100% !important;
+    }
+</style>
+<!-- URL de acciones -->
+<input type="hidden" id="CorteCajaPorTurno" value="@Url.Action("CorteCajaPorTurno", "Reportes")" />
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 encabezado-card">
+                            <h6 class="m-0 font-weight-bold text-white">Registros de cortes de caja</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mt-5">
+                                <div class="col-sm-12">
+                                    <table class="table table-sm" id="tbProducto">
+                                        <thead>
+                                            <tr class="encabezado-tabla">
+                                                <th>Fecha</th>
+                                                <th>Turno</th>
+                                                <th>Caja</th>
+                                                <th>Total Vendido</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var data in Model)
+                                            {
+                                                <tr>
+                                                    <td>@data.Fecha</td>
+                                                    <td>@data.Turno</td>
+                                                    <td>@data.NumeroDeCaja</td>
+                                                    <td>@data.MontoVendido</td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- /.container-fluid -->
+@section Scripts {
+    <script src="~/js/vistas/corteCajaPorTurno.js">
+
+    </script>
+}

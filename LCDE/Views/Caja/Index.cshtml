@@ -1,0 +1,56 @@
+﻿@model RegistroCaja
+
+@{
+    ViewData["Title"] = "Caja";
+}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 encabezado-card">
+            <h6 class="m-0 font-weight-bold text-white">Corte de caja</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <form asp-action="Crear">
+                    <div class="mb-3">
+                        <label asp-for="Turno" class="form-label"></label>
+                        <select asp-for="Turno" class="form-select">
+                            <option value="1">Turno 1</option>
+                            <option value="2">Turno 2</option>
+                        </select>
+                        <span asp-validation-for="Turno" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TipoRegistro" class="form-label"></label>
+                        <select asp-for="TipoRegistro" class="form-select">
+                            <option value="Corte final">Corte final</option>
+                            <option value="Corte parcial">Corte parcial</option>
+                        </select>
+                        <span asp-validation-for="TipoRegistro" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="btn btn-primary mb-3">
+                            <i class="bi bi-plus-circle-dotted" style="font-size:1rem; color: white; margin-right:10px"></i>
+                            Realizar Cierre
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#cantidadRecordsPorPagina").change(function () {
+            const recordsPorPagina = $(this).val();
+            location.href = `/clientes/?pagina=1&recordsPorPagina=${recordsPorPagina}`;
+        });
+    </script>
+    <script src="~/js/borradoRegistro.js">
+    </script>
+}

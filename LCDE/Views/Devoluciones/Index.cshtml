@@ -1,0 +1,78 @@
+﻿@model List<DevolucionCrear>
+
+@{
+    ViewData["Title"] = "Devoluciones";
+}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 encabezado-card">
+            <h6 class="m-0 font-weight-bold text-white">Lista de Devoluciones</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <a asp-action="Crear" class="btn btn-primary mb-3">
+                        <i class="bi bi-plus-circle-dotted" style="font-size:1rem; color: white; margin-right:10px"></i>
+                        Crear nuevo
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-bordered" id="tbdata" cellspacing="0" style="width:100%">
+                        <thead>
+                            <tr class="encabezado-tabla">
+                                <th scope="col">Producto</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Motivo</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Tipo de devolución</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var devolucion in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @devolucion.NombreProducto
+                                    </td>
+                                    <td>
+                                        @devolucion.Cantidad
+                                    </td>
+                                    <td>
+                                        @devolucion.Motivo
+                                    </td>
+                                    <td>
+                                        @devolucion.Fecha
+                                    </td>
+                                    <td>
+                                        @devolucion.Tipo_devolucion
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="showDeleteConfirmation(@devolucion.Id,'devolucion')">
+                                            <i class="bi bi-trash" style="font-size:1rem; color: white; margin-right:10px"></i>
+                                            Borrar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#cantidadRecordsPorPagina").change(function () {
+            const recordsPorPagina = $(this).val();
+            location.href = `/clientes/?pagina=1&recordsPorPagina=${recordsPorPagina}`;
+        });
+    </script>
+    <script src="~/js/borradoRegistro.js">
+    </script>
+}

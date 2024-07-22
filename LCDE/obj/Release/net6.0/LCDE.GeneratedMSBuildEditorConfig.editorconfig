@@ -1,0 +1,128 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = LCDE
+build_property.RootNamespace = LCDE
+build_property.ProjectDir = C:\Users\ferna\source\repos\UMG\PROYECTO-LCDE\LCDE\LCDE\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\ferna\source\repos\UMG\PROYECTO-LCDE\LCDE\LCDE
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Clientes/Borrar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcQm9ycmFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Clientes/Crear.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcQ3JlYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Clientes/Editar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcRWRpdGFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Clientes/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Home/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxFcnJvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Home/NoEncontrado.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxOb0VuY29udHJhZG8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/PDF/Show.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUERGXFNob3cuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Productos/Borrar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXEJvcnJhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Productos/Crear.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXENyZWFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Productos/Editar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXEVkaXRhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Productos/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdG9zXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Promos/PromoFactura.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvbW9zXFByb21vRmFjdHVyYS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Proveedores/Borrar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yZXNcQm9ycmFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Proveedores/Crear.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yZXNcQ3JlYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Proveedores/Editar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yZXNcRWRpdGFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Proveedores/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmVlZG9yZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Shared/_LinksLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MaW5rc0xvZ2luLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Usuarios/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb3NcTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Usuarios/Registro.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb3NcUmVnaXN0cm8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Usuarios/_layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb3NcX2xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Ventas/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVmVudGFzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ferna/source/repos/UMG/PROYECTO-LCDE/LCDE/LCDE/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-9goheansxe

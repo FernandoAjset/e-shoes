@@ -1,0 +1,135 @@
+﻿@{
+    ViewData["Title"] = "Nueva venta";
+}
+<style>
+    .select2 {
+        width: 100% !important;
+    }
+</style>
+<!-- URL de acciones -->
+<input type="hidden" id="urlObtenerProductos" value="@Url.Action("ObtenerProductos", "Ventas")" />
+<input type="hidden" id="urlObtenerClientes" value="@Url.Action("ObtenerClientes", "Ventas")" />
+<input type="hidden" id="urlObtenerTiposPago" value="@Url.Action("ObtenerTiposPago", "Ventas")" />
+<input type="hidden" id="urlValidarExistencia" value="@Url.Action("ValidarExistenciaSuficiente", "Productos")" />
+<input type="hidden" id="urlRegistrarVenta" value="@Url.Action("RegistrarVenta", "Ventas")" />
+<input type="hidden" id="urlPDFShowPDF" value="@Url.Action("ShowPDF", "PDF")" />
+
+
+
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 encabezado-card">
+                            <h6 class="m-0 font-weight-bold text-white">Cliente</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <select class="form-control form-control-sm"
+                                        id="cboBuscarCliente">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 encabezado-card">
+                            <h6 class="m-0 font-weight-bold text-white">Productos</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <select class="form-control form-control-sm" id="cboBuscarProducto">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="table table-sm" id="tbProducto">
+                                        <thead>
+                                            <tr class="encabezado-tabla">
+                                                <th></th>
+                                                <th>Producto</th>
+                                                <th>Promoción</th>
+                                                <th>Cantidad</th>
+                                                <th>Precio por unidad</th>
+                                                <th>Descuento por unidad</th>
+                                                <th>Descuento total</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-4">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 encabezado-card">
+                            <h6 class="m-0 font-weight-bold text-white">Detalle</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="cboTipoDocumentoVenta">Tipo</label>
+                                </div>
+                                <select class="form-control form-control-sm"
+                                        id="cboIdTipoPago">
+                                </select>
+                            </div>
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroupIGV">Descuentos</span>
+                                </div>
+                                <input type="text" class="form-control text-right" aria-label="Small" aria-describedby="inputDescuentos" id="txtDescuento" disabled>
+                            </div>
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroupTotal">Total</span>
+                                </div>
+                                <input type="text" class="form-control text-right" aria-label="Small" aria-describedby="inputGroupTotal" id="txtTotal" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="form-group mb-0">
+                                <button class="btn btn-primary btn-sm btn-block" id="btnTerminarVenta">Terminar Venta</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.container-fluid -->
+@section Scripts {
+    <script src="~/js/vistas/Nueva_Venta.js">
+
+    </script>
+}

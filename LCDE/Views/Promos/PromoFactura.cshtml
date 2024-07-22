@@ -1,0 +1,61 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Promociones";
+}
+<style>
+    .select2 {
+        width: 100% !important;
+    }
+</style>
+<!-- URL de acciones -->
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 encabezado-card">
+                            <h6 class="m-0 font-weight-bold text-white">Promociones aplicadas a la Factura No.@ViewBag.IdFactura</h6>
+                        </div>
+                        <div class="card-body">
+  
+                            <div class="row mt-5">
+                                <div class="col-sm-12">
+                                    <table class="table table-sm" id="tbProducto">
+                                        <thead>
+                                            <tr class="encabezado-tabla">
+                                                <th>Producto</th>
+                                                <th>Cantidad</th>
+                                                <th>Promoción</th>
+                                                <th>Descuento aplicado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach(var data in Model){
+                                                <tr>
+                                                    <td>@data.detalle</td>
+                                                    <td>@data.cantidad</td>
+                                                    <td>@data.descripcion</td>
+                                                    <td>@data.descuento</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- /.container-fluid -->
+@section Scripts {
+    <script src="~/js/vistas/devolucionesPorCategoria.js">
+
+    </script>
+}

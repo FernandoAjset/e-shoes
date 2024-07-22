@@ -1,0 +1,86 @@
+﻿@model List<ProductoListarDTO>
+
+@{
+    ViewData["Title"] = "Productos";
+}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 encabezado-card">
+            <h6 class="m-0 font-weight-bold text-white">Lista de Productos</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <a asp-action="Crear" class="btn btn-primary mb-3">
+                        <i class="bi bi-plus-circle-dotted" style="font-size:1rem; color: white; margin-right:10px"></i>
+                        Crear nuevo
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-bordered" id="tbdata" cellspacing="0" style="width:100%">
+                        <thead>
+                            <tr class="encabezado-tabla">
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Existencia</th>
+                                <th scope="col">Categoria</th>
+                                <th scope="col">Proveedor</th>
+                                <th scope="col">Precio Unidad</th>
+                                <th scope="col">Promoción</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var producto in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @producto.Detalle
+                                    </td>
+                                    <td>
+                                        @producto.Existencia
+                                    </td>
+                                    <td>
+                                        @producto.NombreCategoria
+                                    </td>
+                                    <td>
+                                        @producto.NombreProveedor
+                                    </td>
+                                    <td>
+                                        Q. @producto.PrecioUnidad
+                                    </td>
+                                    <td>
+                                        @producto.Promocion
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-primary" asp-action="Editar" asp-route-id="@producto.Id">
+                                            <i class="bi bi-pencil-fill" style="font-size:1rem; color: white; margin-right:10px"></i>
+                                            Editar
+                                        </a>
+                                        <button class="btn btn-danger" onclick="showDeleteConfirmation(@producto.Id,'producto')">
+                                            <i class="bi bi-trash" style="font-size:1rem; color: white; margin-right:10px"></i>
+                                            Borrar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#cantidadRecordsPorPagina").change(function () {
+            const recordsPorPagina = $(this).val();
+            location.href = `/clientes/?pagina=1&recordsPorPagina=${recordsPorPagina}`;
+        });
+    </script>
+    <script src="~/js/borradoRegistro.js">
+    </script>
+}

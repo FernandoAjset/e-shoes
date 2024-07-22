@@ -1,0 +1,57 @@
+﻿@model DevolucionCrear
+
+@{
+    ViewData["Title"] = "Crear Devolución";
+}
+
+<!-- Begin Page Content -->
+<div class="container-fluid col-6">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 encabezado-card">
+            <h6 class="m-0 font-weight-bold text-white">Crear devolución</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <h5>
+                    Registre los datos de la devolución
+                </h5>
+
+                <form asp-action="Crear">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="Id" class="form-control" hidden />
+
+                    <div class="mb-3">
+                        <label asp-for="Id_producto" class="form-label"></label>
+                        <select asp-for="Id_producto" asp-items="Model.Productos" class="form-select"></select>
+                        <span asp-validation-for="Id_producto" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Cantidad" class="form-label"></label>
+                        <input asp-for="Cantidad" class="form-control" />
+                        <span asp-validation-for="Cantidad" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Motivo" class="form-label"></label>
+                        <input asp-for="Motivo" class="form-control" />
+                        <span asp-validation-for="Motivo" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Tipo_devolucion" class="form-label"></label>
+                        <select asp-for="Tipo_devolucion" class="form-select">
+                            <option value="Empaque roto">Empaque roto</option>
+                            <option value="Vencido">Vencido</option>
+                        </select>
+                        <span asp-validation-for="Tipo_devolucion" class="text-danger"></span>
+                    </div>
+                    <button class="btn btn-primary">Enviar</button>
+                    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

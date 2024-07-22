@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>C:\Aplicaciones\LCDE</_PublishTargetUrl>
+    <History>True|2023-10-21T13:24:02.4770054Z;True|2023-06-03T02:59:23.8823778-06:00;True|2023-06-03T02:47:48.0836178-06:00;True|2023-06-02T18:18:07.3036705-06:00;True|2023-06-02T13:11:02.2172817-06:00;True|2023-06-02T10:28:09.6283936-06:00;False|2023-06-02T10:27:31.3750211-06:00;True|2023-06-02T10:25:07.4602543-06:00;True|2023-06-02T10:19:26.1005134-06:00;True|2023-06-02T10:12:40.0797392-06:00;True|2023-06-02T10:09:06.2694545-06:00;True|2023-06-02T08:05:53.2355857-06:00;True|2023-06-02T01:08:25.0019625-06:00;True|2023-06-02T01:05:00.5811300-06:00;True|2023-06-02T00:59:33.0297068-06:00;True|2023-06-02T00:54:25.7374472-06:00;False|2023-06-02T00:54:02.9970174-06:00;True|2023-06-02T00:51:22.7147828-06:00;True|2023-06-02T00:33:32.6529322-06:00;True|2023-06-02T00:16:09.1674488-06:00;True|2023-06-02T00:04:05.9531084-06:00;False|2023-06-02T00:03:36.7302438-06:00;True|2023-06-01T23:59:48.2669482-06:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="ConnectionLCDE">
+      <Value>Server=desarrollo1.cnlxgrqp8gv9.us-east-2.rds.amazonaws.com%3bDatabase=tiendaLCDE%3bUser Id=sa%3bPassword=12345678%2a%3bEncrypt=False%3b TrustServerCertificate=False%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>
