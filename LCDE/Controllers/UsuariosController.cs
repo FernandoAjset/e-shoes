@@ -1,9 +1,11 @@
-﻿using LCDE.Models;
+﻿using AspNetCore;
+using LCDE.Models;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Reflection;
 using System.Security.Claims;
@@ -25,7 +27,7 @@ namespace LCDE.Controllers
         }
 
         [AllowAnonymous]
-        public async Task< IActionResult> Registro()
+        public async Task<IActionResult> Registro()
         {
             UsuarioDTO usuario = new UsuarioDTO();
             usuario.Roles = await ObtenerRoles();
@@ -38,7 +40,7 @@ namespace LCDE.Controllers
         {
             if (!ModelState.IsValid)
             {
-                modelo.Roles= await ObtenerRoles();
+                modelo.Roles = await ObtenerRoles();
                 return View(modelo);
             }
 
@@ -135,7 +137,15 @@ namespace LCDE.Controllers
                 {
                     return RedirectToAction("NoEncontrado", "Home");
                 }
-                return View(usuario);
+                UsuarioDTO user = new UsuarioDTO()
+                {
+                    Id = usuario.Id,
+                    Nombre_usuario = usuario.Nombre_usuario,
+                    Correo = usuario.Correo,
+                    IdRole = usuario.IdRole,
+                    Roles = await ObtenerRoles()
+                };
+                return View(user);
             }
             catch (Exception ex)
             {
@@ -146,11 +156,32 @@ namespace LCDE.Controllers
         // POST: ClientesController1/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Editar(Usuario usuario)
+        public async Task<ActionResult> Editar(UsuarioDTO usuario)
         {
             try
             {
-                bool codigoResult = await repositorioUsuarios.EditarUsuario(usuario);
+                if (!ModelState.IsValid)
+                {
+                    usuario.Roles = await ObtenerRoles();
+                    return View(usuario);
+                }
+
+                var userExist = await repositorioUsuarios.BuscarUsuarioPorEmail(usuario.Correo);
+                if (userExist.Id!=usuario.Id)
+                {
+                    ModelState.AddModelError(string.Empty, "Correo ya existe.");
+                    return View(usuario);
+                }
+
+                var nuevoUsuario = new Usuario()
+                {
+                    Id = usuario.Id ?? 0,
+                    Nombre_usuario = usuario.Nombre_usuario,
+                    Correo = usuario.Correo,
+                    IdRole = usuario.IdRole
+                };
+
+                bool codigoResult = await repositorioUsuarios.EditarUsuario(nuevoUsuario);
                 if (codigoResult)
                 {
                     return RedirectToAction("Index");

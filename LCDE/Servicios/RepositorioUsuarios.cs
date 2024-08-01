@@ -48,11 +48,11 @@ namespace LCDE.Servicios
         }
 
         //AQUI FALTA EL SP PARA OBTENER TODOS LOS USUARIOS
-        public async Task <List<Usuario>> VerUsuarios()
+        public async Task<List<Usuario>> VerUsuarios()
         {
             using var connection = new SqlConnection(connectionString);
             IEnumerable<Usuario> user = await connection.QueryAsync<Usuario>(@"
-                        select * from usuarios 
+                        EXEC SP_OBTENER_TODOS 
                         ");
             return user.ToList();
         }
@@ -62,9 +62,11 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             IEnumerable<Usuario> user = await connection.QueryAsync<Usuario>(@"
-                        select * from usuarios  @id 
-                        ", new { id,
-                                Operacion = "select"});
+                        EXEC SP_OBTENER_OBTENER_POR_ID @idusuario 
+                        ", new
+            {
+                idusuario = id
+            });
             return user.FirstOrDefault();
         }
         //SP PARA EDITAR USUARIO
