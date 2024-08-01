@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LCDE.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 
 namespace LCDE.Servicios
@@ -12,6 +13,7 @@ namespace LCDE.Servicios
         Task<Usuario> BuscarUsuarioId(int id);
         Task<bool> EditarUsuario(Usuario usuario);
         Task<bool> BorrarUsuario(int id);
+        Task<IEnumerable<SelectListItem>> ObtenerRoles();
     }
 
     public class RepositorioUsuarios : IRepositorioUsuarios
@@ -115,5 +117,13 @@ namespace LCDE.Servicios
             }
         }
 
+        public async Task<IEnumerable<SelectListItem>> ObtenerRoles()
+        {
+            using var connection = new SqlConnection(connectionString);
+            IEnumerable<SelectListItem> user = await connection.QueryAsync<SelectListItem>(@"
+                        select Nombre AS Text, Id AS Value from rol 
+                        ");
+            return user.ToList();
+        }
     }
 }

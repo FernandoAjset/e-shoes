@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Reflection;
 using System.Security.Claims;
 
@@ -24,23 +25,26 @@ namespace LCDE.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult Registro()
+        public async Task< IActionResult> Registro()
         {
-            return View();
+            UsuarioDTO usuario = new UsuarioDTO();
+            usuario.Roles = await ObtenerRoles();
+            return View(usuario);
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Registro(RegistroViewModel modelo)
+        public async Task<IActionResult> Registro(UsuarioDTO modelo)
         {
             if (!ModelState.IsValid)
             {
+                modelo.Roles= await ObtenerRoles();
                 return View(modelo);
             }
 
-            var usuario = new Usuario() { Correo = modelo.Email, Nombre_usuario = modelo.Nombre_usuario };
+            var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario };
 
-            var resultado = await userManager.CreateAsync(usuario, password: modelo.Password);
+            var resultado = await userManager.CreateAsync(usuario, password: modelo.Contrasennia);
 
             if (resultado.Succeeded)
             {
@@ -49,6 +53,8 @@ namespace LCDE.Controllers
             }
             else
             {
+                modelo.Roles = await ObtenerRoles();
+
                 foreach (var error in resultado.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -56,7 +62,6 @@ namespace LCDE.Controllers
 
                 return View(modelo);
             }
-
         }
 
         [AllowAnonymous]
@@ -189,6 +194,11 @@ namespace LCDE.Controllers
                 return Ok(new { success = true });
             }
             return BadRequest();
+        }
+
+        private async Task<IEnumerable<SelectListItem>> ObtenerRoles()
+        {
+            return await repositorioUsuarios.ObtenerRoles();
         }
     }
 

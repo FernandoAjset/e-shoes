@@ -1,4 +1,4 @@
-﻿@model RegistroViewModel
+﻿@model UsuarioDTO
 
 @{
     ViewData["Title"] = "Registro";
@@ -17,15 +17,21 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+                <label asp-for="Correo" class="form-label"></label>
+                <input asp-for="Correo" class="form-control" />
+                <span asp-validation-for="Correo" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+                <label asp-for="IdRole"></label>
+                <select asp-for="IdRole" asp-items="Model.Roles"></select>
+                <span asp-validation-for="IdRole" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Contrasennia" class="form-label"></label>
+                <input asp-for="Contrasennia" class="form-control" type="password"/>
+                <span asp-validation-for="Contrasennia" class="text-danger"></span>
             </div>
 
             <button class="btn-primary btn">Regístrate</button>
