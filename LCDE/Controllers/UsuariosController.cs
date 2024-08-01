@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Reflection;
-using System.Security.Claims;
 
 namespace LCDE.Controllers
 {
@@ -28,14 +25,14 @@ namespace LCDE.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Registro()
         {
-            UsuarioDTO usuario = new UsuarioDTO();
+            UsuarioCrearDTO usuario = new UsuarioCrearDTO();
             usuario.Roles = await ObtenerRoles();
             return View(usuario);
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Registro(UsuarioDTO modelo)
+        public async Task<IActionResult> Registro(UsuarioCrearDTO modelo)
         {
             if (!ModelState.IsValid)
             {
@@ -43,14 +40,13 @@ namespace LCDE.Controllers
                 return View(modelo);
             }
 
-            var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario };
+            var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario, IdRole = modelo.IdRole };
 
             var resultado = await userManager.CreateAsync(usuario, password: modelo.Contrasennia);
 
             if (resultado.Succeeded)
             {
-                await signInManager.SignInAsync(usuario, isPersistent: true);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Usuarios");
             }
             else
             {
@@ -65,7 +61,7 @@ namespace LCDE.Controllers
             }
         }
 
-     
+
 
         [AllowAnonymous] //Se agrega para poder ingresar a esta acción sin estar registrado
         [HttpPost]
@@ -102,7 +98,7 @@ namespace LCDE.Controllers
                 {
                     return RedirectToAction("NoEncontrado", "Home");
                 }
-                UsuarioDTO user = new UsuarioDTO()
+                UsuarioActualizarDTO user = new UsuarioActualizarDTO()
                 {
                     Id = usuario.Id,
                     Nombre_usuario = usuario.Nombre_usuario,
@@ -121,7 +117,7 @@ namespace LCDE.Controllers
         // POST: ClientesController1/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Editar(UsuarioDTO usuario)
+        public async Task<ActionResult> Editar(UsuarioActualizarDTO usuario)
         {
             try
             {
@@ -132,29 +128,41 @@ namespace LCDE.Controllers
                 }
 
                 var userExist = await repositorioUsuarios.BuscarUsuarioPorEmail(usuario.Correo);
-                if (userExist.Id!=usuario.Id)
+                if (userExist!=null && userExist.Id != usuario.Id)
                 {
                     ModelState.AddModelError(string.Empty, "Correo ya existe.");
                     return View(usuario);
                 }
 
-                var nuevoUsuario = new Usuario()
+                var usuarioExistente = await userManager.FindByIdAsync(usuario.Id.ToString());
+                if (usuarioExistente == null)
                 {
-                    Id = usuario.Id ?? 0,
-                    Nombre_usuario = usuario.Nombre_usuario,
-                    Correo = usuario.Correo,
-                    IdRole = usuario.IdRole
-                };
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
 
-                bool codigoResult = await repositorioUsuarios.EditarUsuario(nuevoUsuario);
+                usuarioExistente.Nombre_usuario = usuario.Nombre_usuario;
+                usuarioExistente.Correo = usuario.Correo;
+                usuarioExistente.IdRole = usuario.IdRole;
+
+                // Actualizar propiedades de usuario
+                bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExistente);
                 if (codigoResult)
                 {
-                    return RedirectToAction("Index");
+                    if (!string.IsNullOrEmpty(usuario.Contrasennia))
+                    {
+                        var removePasswordResult = await userManager.RemovePasswordAsync(usuarioExistente);
+                        if (removePasswordResult.Succeeded)
+                        {
+                            var addPasswordResult = await userManager.AddPasswordAsync(usuarioExistente, usuario.Contrasennia);
+                        }
+                    }
                 }
                 else
                 {
                     return RedirectToAction("Error", "Home");
                 }
+
+                return RedirectToAction("Index");
             }
             catch
             {

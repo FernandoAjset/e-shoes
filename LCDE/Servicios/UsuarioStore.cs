@@ -33,9 +33,9 @@ namespace LCDE.Servicios
             return await repositorioUsuarios.BuscarUsuarioPorEmail(normalizedEmail);
         }
 
-        public Task<Usuario> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<Usuario> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await repositorioUsuarios.BuscarUsuarioId(int.Parse(userId));
         }
 
         public async Task<Usuario> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
@@ -115,9 +115,9 @@ namespace LCDE.Servicios
             throw new NotImplementedException();
         }
 
-        public Task<IdentityResult> UpdateAsync(Usuario user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(Usuario user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await repositorioUsuarios.EditarUsuario(user) ? IdentityResult.Success : IdentityResult.Failed();
         }
     }
 }

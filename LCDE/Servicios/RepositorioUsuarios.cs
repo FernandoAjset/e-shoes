@@ -53,7 +53,7 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             IEnumerable<Usuario> user = await connection.QueryAsync<Usuario>(@"
-                        EXEC SP_OBTENER_TODOS 
+                        EXEC SP_OBTENER_TODOS_USUARIOS 
                         ");
             return user.ToList();
         }
@@ -78,18 +78,19 @@ namespace LCDE.Servicios
                 using var connection = new SqlConnection(connectionString);//Yaaaaaaaaa
                 await connection.ExecuteAsync(@"
                        EXEC SP_EDITAR_USUARIO @idusuario, @nombre_usuario, @contrasennia, @correo, @Id_role
-                        ", new{
-                            idusuario= usuario.Id,
-                            nombre_usuario = usuario.Nombre_usuario,
-                            contrasennia=usuario.Contrasennia,
-                            correo=usuario.Correo,
-                            Id_role = usuario.Id
+                        ", new
+                {
+                    idusuario = usuario.Id,
+                    nombre_usuario = usuario.Nombre_usuario,
+                    contrasennia = usuario.Contrasennia??"",
+                    correo = usuario.Correo,
+                    Id_role = usuario.IdRole
                 });
                 return true;
             }
             catch (Exception ex)
             {
-                return false;
+                throw;
             }
         }
 
@@ -102,7 +103,7 @@ namespace LCDE.Servicios
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
                         EXEC SP_ELIMINAR_USUARIOS @idusuario
-                        ", new{ idusuario = IdUser });
+                        ", new { idusuario = IdUser });
                 return true;
             }
             catch (Exception ex)

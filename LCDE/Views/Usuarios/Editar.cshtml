@@ -1,4 +1,4 @@
-﻿@model UsuarioDTO
+﻿@model UsuarioActualizarDTO
 
 @{
     ViewData["Title"] = "Editar usuario";
@@ -28,14 +28,14 @@
                         <input asp-for="Correo" class="form-control" />
                         <span asp-validation-for="Correo" class="text-danger"></span>
                     </div>
-@*                     <div class="mb-3">
+                    <div class="mb-3">
                         <label asp-for="IdRole" class="form-label">Tipo de Rol:</label>
-                        <select asp-for="IdRole" asp-items="Model.Roles"></select>
+                        <select asp-for="IdRole" asp-items="Model.Roles" class="form-select"></select>
                         <span asp-validation-for="IdRole" class="text-danger"></span>
-                    </div> *@
+                    </div>
                     <div class="mb-3">
                         <label asp-for="Contrasennia" class="form-label"></label>
-                        <input asp-for="Contrasennia" class="form-control" />
+                        <input asp-for="Contrasennia" class="form-control" type="password"/>
                         <span asp-validation-for="Correo" class="text-danger"></span>
                     </div>
 
