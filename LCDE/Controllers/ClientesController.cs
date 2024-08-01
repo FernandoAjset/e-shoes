@@ -89,7 +89,7 @@ namespace LCDE.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
-
+        //quien chingados pone un post en un Put
         // POST: ClientesController1/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]

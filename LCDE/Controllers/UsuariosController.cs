@@ -1,8 +1,10 @@
 ﻿using LCDE.Models;
+using LCDE.Servicios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace LCDE.Controllers
@@ -11,12 +13,14 @@ namespace LCDE.Controllers
     {
         private readonly UserManager<Usuario> userManager;
         private readonly SignInManager<Usuario> signInManager;
+        private IRepositorioUsuarios repositorioUsuarios;
 
-        public UsuariosController(UserManager<Usuario> userManager,
+        public UsuariosController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios,
             SignInManager<Usuario> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.repositorioUsuarios = repositorioUsuarios;
         }
 
         [AllowAnonymous]
@@ -98,5 +102,94 @@ namespace LCDE.Controllers
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             return RedirectToAction("Index", "Home");
         }
+        //Obtener todos los usuarios
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            List<Usuario> respuesta = await repositorioUsuarios.VerUsuarios();
+            return View(respuesta);
+        }
+
+        //Obtener Usuarios por ID
+        [HttpGet]
+        public async Task<IActionResult> Usuarios(int id)
+        {
+            Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+            return View(usuario);
+        }
+
+        //editar Uusario
+        //aqui deben de crear una vista para mostrar en el formulario la info del usuario pa editar chtm
+        [HttpGet]
+        public async Task<ActionResult> Editar(int Id)
+        {
+            try
+            {
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(Id);
+                if (usuario == null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        // POST: ClientesController1/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Editar(Usuario usuario)
+        {
+            try
+            {
+                bool codigoResult = await repositorioUsuarios.EditarUsuario(usuario);
+                if (codigoResult)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            catch
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        //BORRAR USUARIO
+        [HttpGet]
+        public async Task<IActionResult> Borrar(int id)
+        {
+            Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+
+            if (usuario is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            return View(usuario);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BorrarUsuario(int id)
+        {
+            Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+            if (usuario is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            if (await repositorioUsuarios.BorrarUsuario(id))
+            {
+                return Ok(new { success = true });
+            }
+            return BadRequest();
+        }
     }
+
 }
