@@ -1,0 +1,52 @@
+﻿@model UsuarioDTO
+
+@{
+    ViewData["Title"] = "Editar usuario";
+}
+
+<!-- Begin Page Content -->
+<div class="container-fluid col-6">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 encabezado-card">
+            <h6 class="m-0 font-weight-bold text-white">Editar cliente</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <h5>
+                    Registre los datos del usuario
+                </h5>
+                <form asp-action="Editar">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="Id" class="form-control" hidden />
+                    <div class="mb-3">
+                        <label asp-for="Nombre_usuario" class="form-label"></label>
+                        <input asp-for="Nombre_usuario" class="form-control" />
+                        <span asp-validation-for="Nombre_usuario" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Correo" class="form-label"></label>
+                        <input asp-for="Correo" class="form-control" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+@*                     <div class="mb-3">
+                        <label asp-for="IdRole" class="form-label">Tipo de Rol:</label>
+                        <select asp-for="IdRole" asp-items="Model.Roles"></select>
+                        <span asp-validation-for="IdRole" class="text-danger"></span>
+                    </div> *@
+                    <div class="mb-3">
+                        <label asp-for="Contrasennia" class="form-label"></label>
+                        <input asp-for="Contrasennia" class="form-control" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+
+                    <button class="btn btn-primary">Enviar</button>
+                    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
