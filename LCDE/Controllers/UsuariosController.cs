@@ -25,40 +25,57 @@ namespace LCDE.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Registro()
         {
-            UsuarioCrearDTO usuario = new UsuarioCrearDTO();
-            usuario.Roles = await ObtenerRoles();
-            return View(usuario);
+            try
+            {
+                UsuarioCrearDTO usuario = new UsuarioCrearDTO();
+                usuario.Roles = await ObtenerRoles();
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
         }
 
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Registro(UsuarioCrearDTO modelo)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                modelo.Roles = await ObtenerRoles();
-                return View(modelo);
-            }
-
-            var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario, Id_Role = modelo.Id_Role };
-
-            var resultado = await userManager.CreateAsync(usuario, password: modelo.Contrasennia);
-
-            if (resultado.Succeeded)
-            {
-                return RedirectToAction("Index", "Usuarios");
-            }
-            else
-            {
-                modelo.Roles = await ObtenerRoles();
-
-                foreach (var error in resultado.Errors)
+                if (!ModelState.IsValid)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    modelo.Roles = await ObtenerRoles();
+                    return View(modelo);
                 }
 
-                return View(modelo);
+
+                var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario, Id_Role = modelo.Id_Role };
+
+                var resultado = await userManager.CreateAsync(usuario, password: modelo.Contrasennia);
+
+                if (resultado.Succeeded)
+                {
+                    return RedirectToAction("Index", "Usuarios");
+                }
+                else
+                {
+                    modelo.Roles = await ObtenerRoles();
+
+                    foreach (var error in resultado.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    return View(modelo);
+                }
             }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
         }
 
 
@@ -67,23 +84,46 @@ namespace LCDE.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
+
+
         //Obtener todos los usuarios
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            List<Usuario> respuesta = await repositorioUsuarios.VerUsuarios();
-            return View(respuesta);
+            try
+            {
+                List<Usuario> respuesta = await repositorioUsuarios.VerUsuarios();
+                return View(respuesta);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         //Obtener Usuarios por ID
         [HttpGet]
         public async Task<IActionResult> Usuarios(int id)
         {
-            Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
-            return View(usuario);
+            try
+            {
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         //editar Uusario
@@ -174,14 +214,21 @@ namespace LCDE.Controllers
         [HttpGet]
         public async Task<IActionResult> Borrar(int id)
         {
-            Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
-
-            if (usuario is null)
+            try
             {
-                return RedirectToAction("NoEncontrado", "Home");
-            }
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
 
-            return View(usuario);
+                if (usuario is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [HttpPost]
