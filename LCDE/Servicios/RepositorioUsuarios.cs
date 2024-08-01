@@ -24,16 +24,17 @@ namespace LCDE.Servicios
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
         }
 
-        public async Task<int> CrearUsuario(Usuario usuario)
-        {
+        public async Task<int> CrearUsuario(Usuario usuario)///////////////////////////////////////
+        {//EXEC SP_CREAR_USUARIO @NombreUsuario, @Contrasennia, @Correo
             using var connection = new SqlConnection(connectionString);
             var usuarioId = await connection.QuerySingleAsync<int>(@"
-                        EXEC SP_CREAR_USUARIO @NombreUsuario, @Contrasennia, @Correo
+                        EXEC SP_CREAR_USUARIOS @nombre_usuario, @contrasennia, @correo, @id_role
                         ", new
             {
-                NombreUsuario = usuario.Nombre_usuario,
+                nombre_usuario = usuario.Nombre_usuario,
                 Contrasennia = usuario.Contrasennia,
-                Correo = usuario.Correo
+                correo = usuario.Correo,
+                id_role = usuario.IdRole
             });
             return usuarioId;
         }
@@ -74,15 +75,15 @@ namespace LCDE.Servicios
         {
             try
             {
-                using var connection = new SqlConnection(connectionString);
+                using var connection = new SqlConnection(connectionString);//Yaaaaaaaaa
                 await connection.ExecuteAsync(@"
-                        EXEC  @id, @NombreUsuario, @correo, @Operacion
-                        ", new
-                {
-                    id = usuario.Id,
-                    NombreUsuario = usuario.Nombre_usuario,
-                    correo = usuario.Correo,
-                    Operacion = "update"
+                       EXEC SP_EDITAR_USUARIO @idusuario, @nombre_usuario, @contrasennia, @correo, @Id_role
+                        ", new{
+                            idusuario= usuario.Id,
+                            nombre_usuario = usuario.Nombre_usuario,
+                            contrasennia=usuario.Contrasennia,
+                            correo=usuario.Correo,
+                            Id_role = usuario.Id
                 });
                 return true;
             }
@@ -100,17 +101,8 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC  @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
-                        ", new
-                {
-                    NombreCliente = "",
-                    DireccionCliente = "",
-                    TelefonoCliente = "",
-                    CorreoCliente = "",
-                    NIT = "",
-                    IdUser,
-                    Operacion = "delete"
-                });
+                        EXEC SP_ELIMINAR_USUARIOS @idusuario
+                        ", new{ idusuario = IdUser });
                 return true;
             }
             catch (Exception ex)
