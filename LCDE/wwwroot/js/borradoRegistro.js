@@ -22,6 +22,9 @@
                 case 'devolucion':
                     deleteDevolucion(id);
                     break;
+                case 'usuario':
+                    deleteUser(id);
+                    break;
             }
         }
     })
@@ -50,6 +53,40 @@ function deleteClient(id) {
             }
             setTimeout(function () {
                 window.location.href = 'Clientes';
+            }, 1500);
+        },
+        error: function () {
+            Swal.fire(
+                '¡Error!',
+                'Ocurrió un error en la petición AJAX',
+                'error'
+            );
+        }
+    });
+}
+
+function deleteUser(id) {
+    $.ajax({
+        url: 'Usuarios/BorrarUsuario',
+        type: 'POST',
+        data: { id: id },
+        success: function (response) {
+            // Manejar la respuesta del servidor
+            if (response.success) {
+                Swal.fire(
+                    '¡Eliminado!',
+                    'El registro ha sido eliminado.',
+                    'success'
+                );
+            } else {
+                Swal.fire(
+                    '¡Error!',
+                    'Ocurrió un error durante la operación',
+                    'error'
+                );
+            }
+            setTimeout(function () {
+                window.location.href = 'Usuarios';
             }, 1500);
         },
         error: function () {

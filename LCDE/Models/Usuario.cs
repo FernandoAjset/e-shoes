@@ -7,5 +7,7 @@
         public string Contrasennia { get; set; }
         public string Correo { get; set; }
         public int IdRole { get; set; }
+        public string Rol { get; set; }
+
     }
 }

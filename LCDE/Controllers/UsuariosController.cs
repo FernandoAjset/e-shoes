@@ -1,5 +1,4 @@
-﻿using AspNetCore;
-using LCDE.Models;
+﻿using LCDE.Models;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -66,41 +65,7 @@ namespace LCDE.Controllers
             }
         }
 
-        [AllowAnonymous]
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel modelo)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return View(modelo);
-                }
-
-                var resultado = await signInManager.PasswordSignInAsync(modelo.Email,
-                    modelo.Password, modelo.Recuerdame, lockoutOnFailure: false);
-
-                if (resultado.Succeeded)
-                {
-                    return RedirectToAction("Index", "Ventas");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Nombre de usuario o password incorrecto.");
-                    return View(modelo);
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
-        }
+     
 
         [AllowAnonymous] //Se agrega para poder ingresar a esta acción sin estar registrado
         [HttpPost]
