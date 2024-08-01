@@ -40,7 +40,7 @@ namespace LCDE.Controllers
                 return View(modelo);
             }
 
-            var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario, IdRole = modelo.IdRole };
+            var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario, Id_Role = modelo.Id_Role };
 
             var resultado = await userManager.CreateAsync(usuario, password: modelo.Contrasennia);
 
@@ -103,7 +103,7 @@ namespace LCDE.Controllers
                     Id = usuario.Id,
                     Nombre_usuario = usuario.Nombre_usuario,
                     Correo = usuario.Correo,
-                    IdRole = usuario.IdRole,
+                    Id_Role = usuario.Id_Role,
                     Roles = await ObtenerRoles()
                 };
                 return View(user);
@@ -142,7 +142,7 @@ namespace LCDE.Controllers
 
                 usuarioExistente.Nombre_usuario = usuario.Nombre_usuario;
                 usuarioExistente.Correo = usuario.Correo;
-                usuarioExistente.IdRole = usuario.IdRole;
+                usuarioExistente.Id_Role = usuario.Id_Role;
 
                 // Actualizar propiedades de usuario
                 bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExistente);
@@ -187,17 +187,25 @@ namespace LCDE.Controllers
         [HttpPost]
         public async Task<IActionResult> BorrarUsuario(int id)
         {
-            Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
-            if (usuario is null)
+            try
             {
-                return RedirectToAction("NoEncontrado", "Home");
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+                if (usuario is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                if (await repositorioUsuarios.BorrarUsuario(id))
+                {
+                    return Ok(new { success = true });
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
             }
 
-            if (await repositorioUsuarios.BorrarUsuario(id))
-            {
-                return Ok(new { success = true });
-            }
-            return BadRequest();
         }
 
         private async Task<IEnumerable<SelectListItem>> ObtenerRoles()

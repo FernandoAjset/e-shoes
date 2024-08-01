@@ -7,7 +7,7 @@ namespace LCDE.Models
         public int? Id { get; set; }
         public string Nombre_usuario { get; set; }
         public string Correo { get; set; }
-        public int IdRole { get; set; }
+        public int Id_Role { get; set; }
         public IEnumerable<SelectListItem>? Roles { get; set; }
     }
 }

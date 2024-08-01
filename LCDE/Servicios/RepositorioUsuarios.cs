@@ -34,7 +34,7 @@ namespace LCDE.Servicios
                 nombre_usuario = usuario.Nombre_usuario,
                 Contrasennia = usuario.Contrasennia,
                 correo = usuario.Correo,
-                id_role = usuario.IdRole
+                id_role = usuario.Id_Role
             });
             return usuarioId;
         }
@@ -84,7 +84,7 @@ namespace LCDE.Servicios
                     nombre_usuario = usuario.Nombre_usuario,
                     contrasennia = usuario.Contrasennia??"",
                     correo = usuario.Correo,
-                    Id_role = usuario.IdRole
+                    Id_role = usuario.Id_Role
                 });
                 return true;
             }
