@@ -23,7 +23,7 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore LCDE_no_report.sln
 
     - name: Create environment file
       run: |
@@ -43,10 +43,10 @@ jobs:
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build LCDE_no_report.sln --no-restore
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test LCDE_no_report.sln --no-build --verbosity normal
 
     - name: Publish
       run: dotnet publish -c Release -o ./publish
