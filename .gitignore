@@ -354,6 +354,3 @@ MigrationBackup/
 LCDE/.vs
 LCDE/LCDE/bin
 LCDE/LCDE/obj
-
-LCDE/appsettings.json
-LCDE/appsettings.Development.json
