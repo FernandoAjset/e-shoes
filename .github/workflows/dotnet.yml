@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -76,11 +76,16 @@ jobs:
         fi
         mv ./publish/LCDE.runtimeconfig.json ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}.runtimeconfig.json
 
-    - name: List files in publish directory
-      run: ls -la ./publish
+    - name: Create application directory and move files
+      run: |
+        mkdir -p ./deployment/${{ secrets.AWS_EB_APPLICATION_NAME }}
+        cp -r ./publish/* ./deployment/${{ secrets.AWS_EB_APPLICATION_NAME }}
+
+    - name: List files in deployment directory
+      run: ls -la ./deployment/${{ secrets.AWS_EB_APPLICATION_NAME }}
 
     - name: Compress deployment package
-      run: zip -r deploy.zip ./publish
+      run: zip -r deploy.zip ./deployment
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v3
