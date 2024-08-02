@@ -34,9 +34,6 @@ jobs:
     - name: Install envsubst
       run: sudo apt-get update && sudo apt-get install -y gettext
 
-    - name: Show original appsettings.json
-      run: cat ${{ env.APPSETTINGS_PATH }}
-
     - name: Replace placeholders in appsettings.json
       run: |
         export DB_SERVER=${{ secrets.DB_SERVER }}
@@ -45,9 +42,6 @@ jobs:
         export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
         envsubst < ${{ env.APPSETTINGS_PATH }} > ${{ env.APPSETTINGS_PATH }}.temp
         mv ${{ env.APPSETTINGS_PATH }}.temp ${{ env.APPSETTINGS_PATH }}
-
-    - name: Show modified appsettings.json
-      run: cat ${{ env.APPSETTINGS_PATH }}
 
     - name: Build
       run: dotnet build --no-restore ${{ env.PROJECT_LOCATION }}
