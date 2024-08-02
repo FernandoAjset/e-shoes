@@ -1,9 +1,10 @@
 ﻿using LCDE.Models;
+using LCDE.Servicios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LCDE.Controllers
 {
@@ -11,92 +12,253 @@ namespace LCDE.Controllers
     {
         private readonly UserManager<Usuario> userManager;
         private readonly SignInManager<Usuario> signInManager;
+        private IRepositorioUsuarios repositorioUsuarios;
 
-        public UsuariosController(UserManager<Usuario> userManager,
+        public UsuariosController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios,
             SignInManager<Usuario> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.repositorioUsuarios = repositorioUsuarios;
         }
 
         [AllowAnonymous]
-        public IActionResult Registro()
+        public async Task<IActionResult> Registro()
         {
-            return View();
+            try
+            {
+                UsuarioCrearDTO usuario = new UsuarioCrearDTO();
+                usuario.Roles = await ObtenerRoles();
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Registro(RegistroViewModel modelo)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(modelo);
-            }
-
-            var usuario = new Usuario() { Correo = modelo.Email, Nombre_usuario = modelo.Nombre_usuario };
-
-            var resultado = await userManager.CreateAsync(usuario, password: modelo.Password);
-
-            if (resultado.Succeeded)
-            {
-                await signInManager.SignInAsync(usuario, isPersistent: true);
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                foreach (var error in resultado.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-
-                return View(modelo);
-            }
-
-        }
-
-        [AllowAnonymous]
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel modelo)
+        public async Task<IActionResult> Registro(UsuarioCrearDTO modelo)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
+                    modelo.Roles = await ObtenerRoles();
                     return View(modelo);
                 }
 
-                var resultado = await signInManager.PasswordSignInAsync(modelo.Email,
-                    modelo.Password, modelo.Recuerdame, lockoutOnFailure: false);
+
+                var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario, Id_Role = modelo.Id_Role };
+
+                var resultado = await userManager.CreateAsync(usuario, password: modelo.Contrasennia);
 
                 if (resultado.Succeeded)
                 {
-                    return RedirectToAction("Index", "Ventas");
+                    return RedirectToAction("Index", "Usuarios");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Nombre de usuario o password incorrecto.");
+                    modelo.Roles = await ObtenerRoles();
+
+                    foreach (var error in resultado.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
                     return View(modelo);
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.ToString());
+                return RedirectToAction("Error", "Home");
             }
+
         }
+
+
 
         [AllowAnonymous] //Se agrega para poder ingresar a esta acción sin estar registrado
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+
+        //Obtener todos los usuarios
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            try
+            {
+                List<Usuario> respuesta = await repositorioUsuarios.VerUsuarios();
+                return View(respuesta);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        //Obtener Usuarios por ID
+        [HttpGet]
+        public async Task<IActionResult> Usuarios(int id)
+        {
+            try
+            {
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        //editar Uusario
+        //aqui deben de crear una vista para mostrar en el formulario la info del usuario pa editar chtm
+        [HttpGet]
+        public async Task<ActionResult> Editar(int Id)
+        {
+            try
+            {
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(Id);
+                if (usuario == null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+                UsuarioActualizarDTO user = new UsuarioActualizarDTO()
+                {
+                    Id = usuario.Id,
+                    Nombre_usuario = usuario.Nombre_usuario,
+                    Correo = usuario.Correo,
+                    Id_Role = usuario.Id_Role,
+                    Roles = await ObtenerRoles()
+                };
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        // POST: ClientesController1/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Editar(UsuarioActualizarDTO usuario)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    usuario.Roles = await ObtenerRoles();
+                    return View(usuario);
+                }
+
+                var userExist = await repositorioUsuarios.BuscarUsuarioPorEmail(usuario.Correo);
+                if (userExist!=null && userExist.Id != usuario.Id)
+                {
+                    ModelState.AddModelError(string.Empty, "Correo ya existe.");
+                    return View(usuario);
+                }
+
+                var usuarioExistente = await userManager.FindByIdAsync(usuario.Id.ToString());
+                if (usuarioExistente == null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                usuarioExistente.Nombre_usuario = usuario.Nombre_usuario;
+                usuarioExistente.Correo = usuario.Correo;
+                usuarioExistente.Id_Role = usuario.Id_Role;
+
+                // Actualizar propiedades de usuario
+                bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExistente);
+                if (codigoResult)
+                {
+                    if (!string.IsNullOrEmpty(usuario.Contrasennia))
+                    {
+                        var removePasswordResult = await userManager.RemovePasswordAsync(usuarioExistente);
+                        if (removePasswordResult.Succeeded)
+                        {
+                            var addPasswordResult = await userManager.AddPasswordAsync(usuarioExistente, usuario.Contrasennia);
+                        }
+                    }
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        //BORRAR USUARIO
+        [HttpGet]
+        public async Task<IActionResult> Borrar(int id)
+        {
+            try
+            {
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+
+                if (usuario is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BorrarUsuario(int id)
+        {
+            try
+            {
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(id);
+                if (usuario is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                if (await repositorioUsuarios.BorrarUsuario(id))
+                {
+                    return Ok(new { success = true });
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
+        }
+
+        private async Task<IEnumerable<SelectListItem>> ObtenerRoles()
+        {
+            return await repositorioUsuarios.ObtenerRoles();
         }
     }
+
 }

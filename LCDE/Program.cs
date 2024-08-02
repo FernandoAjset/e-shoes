@@ -40,7 +40,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
 }).AddCookie(IdentityConstants.ApplicationScheme, opciones =>
 {
-    opciones.LoginPath = "/usuarios/login";
+    opciones.LoginPath = "/Auth/login";
 });
 
 
