@@ -78,11 +78,10 @@ jobs:
 
     - name: Create application directory and move files
       run: |
+        mkdir -p ./${{ secrets.AWS_EB_APPLICATION_NAME }}
         mkdir -p ./${{ secrets.AWS_EB_APPLICATION_NAME }}/${{ secrets.AWS_EB_APPLICATION_NAME }}
+        cp -r ./publish/* ./${{ secrets.AWS_EB_APPLICATION_NAME }}
         cp -r ./publish/* ./${{ secrets.AWS_EB_APPLICATION_NAME }}/${{ secrets.AWS_EB_APPLICATION_NAME }}
-
-    - name: List files in deployment directory
-      run: ls -la ./${{ secrets.AWS_EB_APPLICATION_NAME }}/${{ secrets.AWS_EB_APPLICATION_NAME }}
 
     - name: Compress deployment package
       run: zip -r deploy.zip ./${{ secrets.AWS_EB_APPLICATION_NAME }}
