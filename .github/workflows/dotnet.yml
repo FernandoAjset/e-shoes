@@ -75,7 +75,8 @@ jobs:
 
     - name: Deploy to Elastic Beanstalk
       run: |
-        aws s3 cp "deploy-files/${{github.run_id}}.zip" s3://elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/artifact/dotnet-mvc-app/
-        aws elasticbeanstalk create-application-version --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --version-label ${{ github.run_id }} --description ${{ github.run_id }} --source-bundle S3Bucket="elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="artifact/dotnet-mvc-app/${{ github.run_id }}.zip"
-        aws elasticbeanstalk update-environment --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }} --version-label ${{ github.run_id }}
+        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        aws s3 cp "deploy-files/${{github.run_id}}.zip" s3://elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/artifact/dotnet-mvc-app/${{github.run_id}}-${TIMESTAMP}.zip
+        aws elasticbeanstalk create-application-version --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --version-label ${{ github.run_id }}-${TIMESTAMP} --description ${{ github.run_id }}-${TIMESTAMP} --source-bundle S3Bucket="elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="artifact/dotnet-mvc-app/${{ github.run_id }}-${TIMESTAMP}.zip"
+        aws elasticbeanstalk update-environment --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }} --version-label ${{ github.run_id }}-${TIMESTAMP}
         aws elasticbeanstalk wait environment-updated --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }}
