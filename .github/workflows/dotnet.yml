@@ -11,6 +11,7 @@ on:
 
 env:
   PROJECT_LOCATION: LCDE_no_report.sln
+  APPSETTINGS_PATH: LCDE/appsettings.json
   ELASTIC_BEANSTALK_NAME: ${{ secrets.AWS_EB_APPLICATION_NAME }}
   ELASTIC_BEANSTALK_ENV_NAME: ${{ secrets.AWS_EB_ENVIRONMENT_NAME }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -33,21 +34,14 @@ jobs:
     - name: Install envsubst
       run: sudo apt-get update && sudo apt-get install -y gettext
 
-    - name: Create environment file
-      run: |
-        echo "DB_SERVER=${{ secrets.DB_SERVER }}" >> .env
-        echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
-        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-
     - name: Replace placeholders in appsettings.json
       run: |
         export DB_SERVER=${{ secrets.DB_SERVER }}
         export DB_DATABASE=${{ secrets.DB_DATABASE }}
         export DB_USER=${{ secrets.DB_USER }}
         export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-        cat LCDE/appsettings.json | envsubst > LCDE/appsettings.temp.json
-        mv LCDE/appsettings.temp.json LCDE/appsettings.json
+        envsubst < ${{ env.APPSETTINGS_PATH }} > ${{ env.APPSETTINGS_PATH }}.temp
+        mv ${{ env.APPSETTINGS_PATH }}.temp ${{ env.APPSETTINGS_PATH }}
 
     - name: Build
       run: dotnet build --no-restore ${{ env.PROJECT_LOCATION }}
