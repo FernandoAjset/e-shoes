@@ -1,13 +1,13 @@
 # This workflow will build and deploy a .NET project to AWS Elastic Beanstalk
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: Deploy-Production
+name: Deploy-QA
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "dev" ]
 
 jobs:
   build:
@@ -23,33 +23,23 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Restore dependencies
-      run: dotnet restore LCDE_no_report.sln
-
-    - name: Create environment file
-      run: |
-        echo "DB_SERVER=${{ secrets.DB_SERVER }}" >> .env
-        echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
-        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+      run: dotnet restore
 
     - name: Replace placeholders in appsettings.json
       run: |
-        cat appsettings.json | envsubst > appsettings.temp.json
-        mv appsettings.temp.json appsettings.json
-      env:
-        DB_SERVER: ${{ secrets.DB_SERVER }}
-        DB_DATABASE: ${{ secrets.DB_DATABASE }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        sed -i 's/{DB_SERVER}/'${{ secrets.DB_SERVER }}'/' appsettings.json
+        sed -i 's/{DB_DATABASE}/'${{ secrets.DB_DATABASE }}'/' appsettings.json
+        sed -i 's/{DB_USER}/'${{ secrets.DB_USER }}'/' appsettings.json
+        sed -i 's/{DB_PASSWORD}/'${{ secrets.DB_PASSWORD }}'/' appsettings.json
 
     - name: Build
-      run: dotnet build LCDE_no_report.sln --no-restore
+      run: dotnet build --no-restore
 
     - name: Test
-      run: dotnet test LCDE_no_report.sln --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
 
     - name: Publish
-      run: dotnet publish LCDE_no_report.sln -c Release -o ./publish
+      run: dotnet publish -c Release -o ./publish
 
     - name: Compress deployment package
       run: zip -r deploy.zip ./publish
@@ -59,15 +49,15 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: us-east-1
 
     - name: Deploy to Elastic Beanstalk
       run: |
-        aws s3 cp deploy.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/deploy-${{ github.sha }}.zip
+        zip -r deploy.zip ./publish
         aws elasticbeanstalk create-application-version \
           --application-name ${{ secrets.AWS_EB_APPLICATION_NAME }} \
           --version-label ${{ github.sha }} \
-          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="deploy-${{ github.sha }}.zip"
+          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-{{ secrets.AWS_ACCOUNT_ID }}",S3Key="deploy-${{ github.sha }}.zip"
 
         aws elasticbeanstalk update-environment \
           --application-name ${{ secrets.AWS_EB_APPLICATION_NAME }} \
