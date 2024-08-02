@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -50,6 +49,34 @@ jobs:
 
     - name: Publish
       run: dotnet publish LCDE_no_report.sln -c Release -o ./publish
+
+    - name: Ensure .runtimeconfig.json is included
+      run: |
+        if [ ! -f ./publish/*.runtimeconfig.json ]; then
+          echo '{
+            "runtimeOptions": {
+              "tfm": "net6.0",
+              "includedFrameworks": [
+                {
+                  "name": "Microsoft.NETCore.App",
+                  "version": "6.0.30"
+                },
+                {
+                  "name": "Microsoft.AspNetCore.App",
+                  "version": "6.0.30"
+                }
+              ],
+              "configProperties": {
+                "System.GC.Server": true,
+                "System.Reflection.Metadata.MetadataUpdater.IsSupported": false,
+                "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false
+              }
+            }
+          }' > ./publish/LCDE.runtimeconfig.json
+        fi
+
+    - name: List files in publish directory
+      run: ls -la ./publish
 
     - name: Compress deployment package
       run: zip -r deploy.zip ./publish
