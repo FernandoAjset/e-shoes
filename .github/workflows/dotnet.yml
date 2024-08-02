@@ -44,11 +44,13 @@ jobs:
         mv ${{ env.APPSETTINGS_PATH }}.temp ${{ env.APPSETTINGS_PATH }}
 
     - name: Build
-      run: dotnet build --no-restore ${{ env.PROJECT_LOCATION }}
+      run: dotnet build ${{ env.PROJECT_LOCATION }} --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish ${{ env.PROJECT_LOCATION }} --configuration Release --output "${{ github.workspace }}/${{github.run_id}}"
 
     - name: Pack
       run: |
-        dotnet publish ${{ env.PROJECT_LOCATION }} -c Release --output "${{ github.workspace }}/${{github.run_id}}"
         cd ${{github.run_id}}
         zip -r ../${{github.run_id}}.zip .
 
