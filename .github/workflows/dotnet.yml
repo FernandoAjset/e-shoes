@@ -59,15 +59,15 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Deploy to Elastic Beanstalk
       run: |
-        aws s3 cp deploy.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-{{ secrets.AWS_ACCOUNT_ID }}/deploy-${{ github.sha }}.zip
+        aws s3 cp deploy.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/deploy-${{ github.sha }}.zip
         aws elasticbeanstalk create-application-version \
           --application-name ${{ secrets.AWS_EB_APPLICATION_NAME }} \
           --version-label ${{ github.sha }} \
-          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-{{ secrets.AWS_ACCOUNT_ID }}",S3Key="deploy-${{ github.sha }}.zip"
+          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="deploy-${{ github.sha }}.zip"
 
         aws elasticbeanstalk update-environment \
           --application-name ${{ secrets.AWS_EB_APPLICATION_NAME }} \
