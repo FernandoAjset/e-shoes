@@ -76,17 +76,17 @@ jobs:
         fi
         mv ./publish/LCDE.runtimeconfig.json ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}.runtimeconfig.json
 
-    - name: Move files to subdirectory with application name
+    - name: Create subdirectory and move files
       run: |
-        mkdir ./publish/temp
-        mv ./publish/* ./publish/temp/
-        mv ./publish/temp ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}
+        mkdir -p ./output/${{ secrets.AWS_EB_APPLICATION_NAME }}
+        shopt -s dotglob
+        mv ./publish/* ./output/${{ secrets.AWS_EB_APPLICATION_NAME }}/
 
     - name: List files in publish directory
-      run: ls -la ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}
+      run: ls -la ./output/${{ secrets.AWS_EB_APPLICATION_NAME }}
 
     - name: Compress deployment package
-      run: zip -r deploy.zip ./publish
+      run: zip -r deploy.zip ./output
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v3
