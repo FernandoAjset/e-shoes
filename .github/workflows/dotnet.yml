@@ -78,14 +78,14 @@ jobs:
 
     - name: Create application directory and move files
       run: |
-        mkdir -p ./deployment/${{ secrets.AWS_EB_APPLICATION_NAME }}
-        cp -r ./publish/* ./deployment/${{ secrets.AWS_EB_APPLICATION_NAME }}
+        mkdir -p ./${{ secrets.AWS_EB_APPLICATION_NAME }}
+        cp -r ./publish/* ./${{ secrets.AWS_EB_APPLICATION_NAME }}
 
     - name: List files in deployment directory
-      run: ls -la ./deployment/${{ secrets.AWS_EB_APPLICATION_NAME }}
+      run: ls -la ./${{ secrets.AWS_EB_APPLICATION_NAME }}
 
     - name: Compress deployment package
-      run: zip -r deploy.zip ./deployment
+      run: zip -r deploy.zip ./${{ secrets.AWS_EB_APPLICATION_NAME }}
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v3
