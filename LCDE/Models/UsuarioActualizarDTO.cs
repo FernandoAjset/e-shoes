@@ -6,6 +6,7 @@ namespace LCDE.Models
     {
         [DataType(DataType.Password)]
         [MinLength(8, ErrorMessage = "El campo debe tener al menos 8 caracteres")]
+        [Display(Name = "Contraseña")]
         public string? Contrasennia { get; set; }
     }
 }
