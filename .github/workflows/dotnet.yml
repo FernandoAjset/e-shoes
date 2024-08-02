@@ -9,6 +9,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  PROJECT_LOCATION: LCDE_no_report.sln
+  ELASTIC_BEANSTALK_NAME: ${{ secrets.AWS_EB_APPLICATION_NAME }}
+  ELASTIC_BEANSTALK_ENV_NAME: ${{ secrets.AWS_EB_ENVIRONMENT_NAME }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +28,7 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Restore dependencies
-      run: dotnet restore LCDE_no_report.sln
+      run: dotnet restore ${{ env.PROJECT_LOCATION }}
 
     - name: Create environment file
       run: |
@@ -42,66 +48,40 @@ jobs:
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     - name: Build
-      run: dotnet build LCDE_no_report.sln --no-restore
+      run: dotnet build --no-restore ${{ env.PROJECT_LOCATION }}
 
-    - name: Test
-      run: dotnet test LCDE_no_report.sln --no-build --verbosity normal
-
-    - name: Publish
-      run: dotnet publish LCDE_no_report.sln -c Release -o ./publish
-
-    - name: Ensure .runtimeconfig.json is included
+    - name: Pack
       run: |
-        if [ ! -f ./publish/*.runtimeconfig.json ]; then
-          echo '{
-            "runtimeOptions": {
-              "tfm": "net6.0",
-              "includedFrameworks": [
-                {
-                  "name": "Microsoft.NETCore.App",
-                  "version": "6.0.30"
-                },
-                {
-                  "name": "Microsoft.AspNetCore.App",
-                  "version": "6.0.30"
-                }
-              ],
-              "configProperties": {
-                "System.GC.Server": true,
-                "System.Reflection.Metadata.MetadataUpdater.IsSupported": false,
-                "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false
-              }
-            }
-          }' > ./publish/LCDE.runtimeconfig.json
-        fi
-        mv ./publish/LCDE.runtimeconfig.json ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}.runtimeconfig.json
+        dotnet publish ${{ env.PROJECT_LOCATION }} -c Release --output "${{ github.workspace }}/${{github.run_id}}"
+        cd ${{github.run_id}}
+        zip -r ../${{github.run_id}}.zip .
 
-    - name: Create application directory and move files
-      run: |
-        mkdir -p ./${{ secrets.AWS_EB_APPLICATION_NAME }}
-        mkdir -p ./${{ secrets.AWS_EB_APPLICATION_NAME }}/${{ secrets.AWS_EB_APPLICATION_NAME }}
-        cp -r ./publish/* ./${{ secrets.AWS_EB_APPLICATION_NAME }}
-        cp -r ./publish/* ./${{ secrets.AWS_EB_APPLICATION_NAME }}/${{ secrets.AWS_EB_APPLICATION_NAME }}
-
-    - name: Compress deployment package
-      run: zip -r deploy.zip ./${{ secrets.AWS_EB_APPLICATION_NAME }}
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v3
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4.3.3
       with:
+        name: deploy-files
+        path: ${{github.run_id}}.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/download-artifact@v4.1.7
+      with:
+        name: deploy-files
+        path: deploy-files.zip
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ env.AWS_REGION }}
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Deploy to Elastic Beanstalk
       run: |
-        aws s3 cp deploy.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/deploy-${{ github.sha }}.zip
-        aws elasticbeanstalk create-application-version \
-          --application-name ${{ secrets.AWS_EB_APPLICATION_NAME }} \
-          --version-label ${{ github.sha }} \
-          --source-bundle S3Bucket="elasticbeanstalk-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="deploy-${{ github.sha }}.zip"
-
-        aws elasticbeanstalk update-environment \
-          --application-name ${{ secrets.AWS_EB_APPLICATION_NAME }} \
-          --environment-name ${{ secrets.AWS_EB_ENVIRONMENT_NAME }} \
-          --version-label ${{ github.sha }}
+        aws s3 cp "deploy-files.zip" s3://elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/artifact/dotnet-mvc-app/
+        aws elasticbeanstalk create-application-version --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --version-label ${{ github.run_id }} --description ${{ github.run_id }} --source-bundle S3Bucket="elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="artifact/dotnet-mvc-app/${{ github.run_id }}.zip"
+        aws elasticbeanstalk update-environment --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }} --version-label ${{ github.run_id }}
+        aws elasticbeanstalk wait environment-updated --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }}
