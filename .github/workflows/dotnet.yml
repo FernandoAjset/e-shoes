@@ -74,11 +74,13 @@ jobs:
             }
           }' > ./publish/LCDE.runtimeconfig.json
         fi
+        mv ./publish/LCDE.runtimeconfig.json ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}.runtimeconfig.json
 
     - name: Move files to subdirectory with application name
       run: |
-        mkdir -p ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}
-        mv ./publish/* ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}/
+        mkdir ./publish/temp
+        mv ./publish/* ./publish/temp/
+        mv ./publish/temp ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}
 
     - name: List files in publish directory
       run: ls -la ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}
