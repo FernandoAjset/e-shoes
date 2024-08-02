@@ -58,7 +58,7 @@ jobs:
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4.3.3
-      with:
+      with: 
         name: deploy-files
         path: ${{github.run_id}}.zip
 
@@ -68,10 +68,6 @@ jobs:
 
     steps:
     - uses: actions/download-artifact@v4.1.7
-      with:
-        name: deploy-files
-        path: deploy-files.zip
-
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -81,7 +77,7 @@ jobs:
 
     - name: Deploy to Elastic Beanstalk
       run: |
-        aws s3 cp "deploy-files.zip" s3://elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/artifact/dotnet-mvc-app/
+        aws s3 cp "deploy-files/${{github.run_id}}.zip" s3://elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/artifact/dotnet-mvc-app/
         aws elasticbeanstalk create-application-version --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --version-label ${{ github.run_id }} --description ${{ github.run_id }} --source-bundle S3Bucket="elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="artifact/dotnet-mvc-app/${{ github.run_id }}.zip"
         aws elasticbeanstalk update-environment --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }} --version-label ${{ github.run_id }}
         aws elasticbeanstalk wait environment-updated --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }}
