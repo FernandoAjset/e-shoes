@@ -39,8 +39,9 @@ jobs:
 
     - name: Replace placeholders in appsettings.json
       run: |
-        cat appsettings.json | envsubst > appsettings.temp.json
-        mv appsettings.temp.json appsettings.json
+        cat LCDE/appsettings.json | envsubst > LCDE/appsettings.temp.json
+        mv LCDE/appsettings.temp.json LCDE/appsettings.json
+
       env:
         DB_SERVER: ${{ secrets.DB_SERVER }}
         DB_DATABASE: ${{ secrets.DB_DATABASE }}
