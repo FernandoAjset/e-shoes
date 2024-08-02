@@ -354,3 +354,6 @@ MigrationBackup/
 LCDE/.vs
 LCDE/LCDE/bin
 LCDE/LCDE/obj
+
+# Ignorar todos los archivos package-lock.json
+package-lock.json

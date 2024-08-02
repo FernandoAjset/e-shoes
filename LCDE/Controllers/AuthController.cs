@@ -48,7 +48,7 @@ namespace LCDE.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Nombre de usuario o password incorrecto.");
+                    ModelState.AddModelError(string.Empty, "Credenciales no validas");
                     return View(modelo);
                 }
             }
