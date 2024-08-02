@@ -43,8 +43,8 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             var usuario = await connection.QuerySingleOrDefaultAsync<Usuario>(
-                "EXEC SP_OBTENER_USUARIO @NombreUsuario,@Contrasennia,@Correo",
-                new { NombreUsuario = "", Contrasennia = "", Correo = emailNormalizado });
+                "EXEC SP_OBTENER_OBTENER_POR_CORREO @Correo",
+                new { Correo = emailNormalizado });
             return usuario;
         }
 
