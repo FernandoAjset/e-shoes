@@ -74,6 +74,7 @@ jobs:
             }
           }' > ./publish/LCDE.runtimeconfig.json
         fi
+        mv ./publish/LCDE.runtimeconfig.json ./publish/${{ secrets.AWS_EB_APPLICATION_NAME }}.runtimeconfig.json
 
     - name: List files in publish directory
       run: ls -la ./publish
