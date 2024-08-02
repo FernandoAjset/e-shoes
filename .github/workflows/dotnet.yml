@@ -49,7 +49,7 @@ jobs:
       run: dotnet test LCDE_no_report.sln --no-build --verbosity normal
 
     - name: Publish
-      run: dotnet publish -c Release -o ./publish
+      run: dotnet publish LCDE_no_report.sln -c Release -o ./publish
 
     - name: Compress deployment package
       run: zip -r deploy.zip ./publish
