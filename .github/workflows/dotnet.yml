@@ -30,6 +30,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.PROJECT_LOCATION }}
 
+    - name: Install envsubst
+      run: sudo apt-get update && sudo apt-get install -y gettext
+
     - name: Create environment file
       run: |
         echo "DB_SERVER=${{ secrets.DB_SERVER }}" >> .env
@@ -39,14 +42,12 @@ jobs:
 
     - name: Replace placeholders in appsettings.json
       run: |
+        export DB_SERVER=${{ secrets.DB_SERVER }}
+        export DB_DATABASE=${{ secrets.DB_DATABASE }}
+        export DB_USER=${{ secrets.DB_USER }}
+        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
         cat LCDE/appsettings.json | envsubst > LCDE/appsettings.temp.json
         mv LCDE/appsettings.temp.json LCDE/appsettings.json
-
-      env:
-        DB_SERVER: ${{ secrets.DB_SERVER }}
-        DB_DATABASE: ${{ secrets.DB_DATABASE }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     - name: Build
       run: dotnet build --no-restore ${{ env.PROJECT_LOCATION }}
