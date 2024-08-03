@@ -9,6 +9,7 @@ namespace LCDE.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [MaxLength(70, ErrorMessage = "El campo no puede exceder 70 caracteres")]
         [Display(Name = "Nombre de usuario")]
+        [ValidarLetras(ErrorMessage = "El campo solo puede contener letras de la A a la Z")]
         public string Nombre_usuario { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [EmailAddress(ErrorMessage = "El campo debe ser un correo electrónico válido")]
