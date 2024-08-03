@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@inject LCDE.Servicios.ISesionServicio sesionServicio
+<!DOCTYPE html>
 <html lang="es-gt">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>@ViewData["Title"] - LCDE</title>
+    <title>@ViewData["Title"] - E-SHOES</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <!-- Sweet Modal -->
@@ -42,7 +43,7 @@
                 <div class="sidebar-brand-icon">
                     <i class="fas fa-desktop"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">TIENDA LCDE</div>
+                <div class="sidebar-brand-text mx-3">E-SHOES</div>
             </a>
 
             <!-- Divider -->
@@ -56,7 +57,12 @@
                 </a>
                 <div id="collapseCatalogos" class="collapse" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a asp-action="Index" asp-controller="Usuarios" class="collapse-item">Usuarios</a>
+
+                        @if (sesionServicio.EsUsuarioAdmin())
+                        {
+                            <a asp-action="Index" asp-controller="Usuarios" class="collapse-item">Usuarios</a>
+                        }
+
                         <a asp-action="Index" asp-controller="Clientes" class="collapse-item">Clientes</a>
                         <a asp-action="Index" asp-controller="Proveedores" class="collapse-item">Proveedores</a>
                         <a asp-action="Index" asp-controller="Productos" class="collapse-item">Productos</a>

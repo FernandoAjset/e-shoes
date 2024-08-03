@@ -1,5 +1,6 @@
 using LCDE;
 using LCDE.Models;
+using LCDE.Models.Enums;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Identity;
 
@@ -22,15 +23,13 @@ builder.Services.AddTransient<RepositorioReportes, RepositorioReportes>();
 
 builder.Services.AddTransient<RepositorioPromociones, RepositorioPromociones>();
 
-
-
 builder.Services.AddTransient<SignInManager<Usuario>>();
-builder.Services.AddIdentityCore<Usuario>(opciones =>
+builder.Services.AddIdentityCore<Usuario>(options =>
 {
-    opciones.Password.RequireDigit = false;
-    opciones.Password.RequireLowercase = false;
-    opciones.Password.RequireUppercase = false;
-    opciones.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
 }).AddErrorDescriber<MensajesDeErrorIdentity>();
 
 builder.Services.AddAuthentication(options =>
@@ -38,11 +37,20 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
     options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
     options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
-}).AddCookie(IdentityConstants.ApplicationScheme, opciones =>
+}).AddCookie(IdentityConstants.ApplicationScheme, options =>
 {
-    opciones.LoginPath = "/Auth/login";
+    options.AccessDeniedPath = "/Auth/Unauthorized";
+    options.LoginPath = "/Auth/login";
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole(((int)Rol.Admin).ToString()));
+    options.AddPolicy("VendedorPolicy", policy => policy.RequireRole(((int)Rol.Vendedor).ToString()));
+    options.AddPolicy("ClientePolicy", policy => policy.RequireRole(((int)Rol.Cliente).ToString()));
+});
+
+builder.Services.AddTransient<ISesionServicio, SesionServicio>();
 
 var app = builder.Build();
 
@@ -50,7 +58,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

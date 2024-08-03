@@ -1,21 +1,28 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<Usuario> SignInManager
+@inject LCDE.Servicios.ISesionServicio SesionServicio
 
 <ul class="navbar-nav ml-auto">
 
     <div class="topbar-divider d-none d-sm-block"></div>
     @if (SignInManager.IsSignedIn(User))
     {
+        var rolNombre = SesionServicio.ObtenerNombreRolUsuario();
+
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">@User.Identity.Name @SignInManager.UserManager.GetUserId(User)</span>
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                    <strong> @User.Identity.Name</strong>
+                    <br />
+                    <span>Rol: @rolNombre</span>
+                </span>
                 <img class="img-profile rounded-circle"
-                 src="~/img/undraw_profile.svg">
+                     src="~/img/undraw_profile.svg">
             </a>
 
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-             aria-labelledby="userDropdown">
+                 aria-labelledby="userDropdown">
                 <form class="form-inline" asp-action="logout" asp-controller="usuarios">
                     <button type="submit" class="btn btn-link text-dark">
                         Salir
