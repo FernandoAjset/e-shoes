@@ -31,6 +31,10 @@
 			<Link>PDFs\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Content>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="appsettings.Development.json" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
@@ -42,6 +46,10 @@
 
 	<ItemGroup>
 		<Folder Include="PDFs\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="appsettings.Development.json" />
 	</ItemGroup>
 
 </Project>
