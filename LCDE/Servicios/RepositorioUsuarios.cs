@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LCDE.Models;
+using LCDE.Models.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 
@@ -82,7 +83,7 @@ namespace LCDE.Servicios
                 {
                     idusuario = usuario.Id,
                     nombre_usuario = usuario.Nombre_usuario,
-                    contrasennia = usuario.Contrasennia??"",
+                    contrasennia = usuario.Contrasennia ?? "",
                     correo = usuario.Correo,
                     Id_role = usuario.Id_Role
                 });
@@ -115,8 +116,9 @@ namespace LCDE.Servicios
         public async Task<IEnumerable<SelectListItem>> ObtenerRoles()
         {
             using var connection = new SqlConnection(connectionString);
-            IEnumerable<SelectListItem> user = await connection.QueryAsync<SelectListItem>(@"
-                        select Nombre AS Text, Id AS Value from rol 
+            IEnumerable<SelectListItem> user = await connection.QueryAsync<SelectListItem>(@$"
+                        select Nombre AS Text, Id AS Value from rol
+                        WHERE Id != {(int)Rol.Cliente}
                         ");
             return user.ToList();
         }

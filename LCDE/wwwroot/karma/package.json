@@ -1,0 +1,11 @@
+{
+  "name": "karma",
+  "version": "1.0.0",
+  "scripts": {
+    "build-css": "sass ./scss/main.scss ./css/main.css",
+    "watch-css": "sass --watch ./scss/main.scss:./css/main.css"
+  },
+  "devDependencies": {
+    "sass": "^1.32.0"
+  }
+}

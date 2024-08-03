@@ -355,5 +355,5 @@ LCDE/.vs
 LCDE/LCDE/bin
 LCDE/LCDE/obj
 
-LCDE/appsettings.json
-LCDE/appsettings.Development.json
+# Ignorar todos los archivos package-lock.json
+package-lock.json

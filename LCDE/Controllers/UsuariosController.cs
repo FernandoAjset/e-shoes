@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LCDE.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     public class UsuariosController : Controller
     {
         private readonly UserManager<Usuario> userManager;
         private readonly SignInManager<Usuario> signInManager;
-        private IRepositorioUsuarios repositorioUsuarios;
+        private readonly IRepositorioUsuarios repositorioUsuarios;
 
         public UsuariosController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios,
             SignInManager<Usuario> signInManager)
@@ -35,7 +36,6 @@ namespace LCDE.Controllers
             {
                 return RedirectToAction("Error", "Home");
             }
-
         }
 
         [HttpPost]
@@ -50,9 +50,7 @@ namespace LCDE.Controllers
                     return View(modelo);
                 }
 
-
                 var usuario = new Usuario() { Correo = modelo.Correo, Nombre_usuario = modelo.Nombre_usuario, Id_Role = modelo.Id_Role };
-
                 var resultado = await userManager.CreateAsync(usuario, password: modelo.Contrasennia);
 
                 if (resultado.Succeeded)
@@ -75,12 +73,9 @@ namespace LCDE.Controllers
             {
                 return RedirectToAction("Error", "Home");
             }
-
         }
 
-
-
-        [AllowAnonymous] //Se agrega para poder ingresar a esta acción sin estar registrado
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
@@ -95,8 +90,6 @@ namespace LCDE.Controllers
             }
         }
 
-
-        //Obtener todos los usuarios
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -111,7 +104,6 @@ namespace LCDE.Controllers
             }
         }
 
-        //Obtener Usuarios por ID
         [HttpGet]
         public async Task<IActionResult> Usuarios(int id)
         {
@@ -126,8 +118,6 @@ namespace LCDE.Controllers
             }
         }
 
-        //editar Uusario
-        //aqui deben de crear una vista para mostrar en el formulario la info del usuario pa editar chtm
         [HttpGet]
         public async Task<ActionResult> Editar(int Id)
         {
@@ -154,7 +144,6 @@ namespace LCDE.Controllers
             }
         }
 
-        // POST: ClientesController1/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Editar(UsuarioActualizarDTO usuario)
@@ -168,7 +157,7 @@ namespace LCDE.Controllers
                 }
 
                 var userExist = await repositorioUsuarios.BuscarUsuarioPorEmail(usuario.Correo);
-                if (userExist!=null && userExist.Id != usuario.Id)
+                if (userExist != null && userExist.Id != usuario.Id)
                 {
                     ModelState.AddModelError(string.Empty, "Correo ya existe.");
                     return View(usuario);
@@ -184,7 +173,6 @@ namespace LCDE.Controllers
                 usuarioExistente.Correo = usuario.Correo;
                 usuarioExistente.Id_Role = usuario.Id_Role;
 
-                // Actualizar propiedades de usuario
                 bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExistente);
                 if (codigoResult)
                 {
@@ -210,7 +198,6 @@ namespace LCDE.Controllers
             }
         }
 
-        //BORRAR USUARIO
         [HttpGet]
         public async Task<IActionResult> Borrar(int id)
         {
@@ -252,7 +239,6 @@ namespace LCDE.Controllers
             {
                 return RedirectToAction("Error", "Home");
             }
-
         }
 
         private async Task<IEnumerable<SelectListItem>> ObtenerRoles()
@@ -260,5 +246,4 @@ namespace LCDE.Controllers
             return await repositorioUsuarios.ObtenerRoles();
         }
     }
-
 }
