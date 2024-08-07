@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace LCDE.Controllers
@@ -13,14 +14,56 @@ namespace LCDE.Controllers
         private readonly UserManager<Usuario> userManager;
         private readonly SignInManager<Usuario> signInManager;
         private readonly IRepositorioUsuarios repositorioUsuarios;
-
-        public AuthController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios,
+        private readonly IRepositorioCliente repositorioCliente;
+        
+        public AuthController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios,IRepositorioCliente repositorioCliente,
             SignInManager<Usuario> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.repositorioUsuarios = repositorioUsuarios;
+            this.repositorioCliente = repositorioCliente;
         }
+
+        public async Task<IActionResult> Registro(CrearUusarioCliente modelo)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    modelo.informacionUsuario.Roles = await ObtenerRoles();
+                    return View(modelo);
+                }
+
+                var usuario = new Usuario() { Correo = modelo.informacionUsuario.Correo , Nombre_usuario = modelo.informacionUsuario.Nombre_usuario, Id_Role = modelo.informacionUsuario.Id_Role };
+                var resultadoUsuario = await userManager.CreateAsync(usuario, password: modelo.informacionUsuario.Contrasennia);
+
+                var cliente = new Cliente() { Correo = modelo.informacionCliente.Correo, Nombre = modelo.informacionCliente.Nombre, Direccion = modelo.informacionCliente.Direccion,
+                                              Telefono = modelo.informacionCliente.Telefono};
+                var resultadoCliente = await repositorioCliente.CrearCliente(cliente);
+
+                if (resultadoUsuario.Succeeded && resultadoCliente != 0) 
+                {
+                    return RedirectToAction("Index", "Usuarios");
+                }
+                else
+                {
+                    modelo.informacionUsuario.Roles = await ObtenerRoles();
+                    
+                    foreach (var error in resultadoUsuario.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    
+                    return View(modelo);
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
 
         [AllowAnonymous]
         [HttpGet]
@@ -77,6 +120,11 @@ namespace LCDE.Controllers
             {
                 return BadRequest(ex.ToString());
             }
+        }
+
+        private async Task<IEnumerable<SelectListItem>> ObtenerRoles()
+        {
+            return await repositorioUsuarios.ObtenerRoles();
         }
     }
 }

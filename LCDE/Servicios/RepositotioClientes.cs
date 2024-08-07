@@ -5,7 +5,16 @@ using System.Data;
 
 namespace LCDE.Servicios
 {
-    public class RepositotioClientes // clase
+    public interface IRepositorioCliente
+    {
+        Task<bool> BorrarCliente(int IdCliente);
+        Task<int> CrearCliente(Cliente cliente);
+        Task<bool> ModificarCliente(Cliente cliente);
+        Task<Cliente> ObtenerCliente(int IdCliente);
+        Task<Cliente> ObtenerClientePorNit(string NIT, int Id);
+        Task<IEnumerable<Cliente>> ObtenerTodosClientes();
+    }
+    public class RepositotioClientes: IRepositorioCliente// clase
     {
         private readonly string connectionString;
         public RepositotioClientes(IConfiguration configuration) //cosntructor que se llama igual que la clase
