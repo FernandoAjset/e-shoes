@@ -1,4 +1,5 @@
 ﻿using LCDE.Models;
+using LCDE.Models.Enums;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -15,8 +16,8 @@ namespace LCDE.Controllers
         private readonly SignInManager<Usuario> signInManager;
         private readonly IRepositorioUsuarios repositorioUsuarios;
         private readonly IRepositorioCliente repositorioCliente;
-        
-        public AuthController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios,IRepositorioCliente repositorioCliente,
+
+        public AuthController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios, IRepositorioCliente repositorioCliente,
             SignInManager<Usuario> signInManager)
         {
             this.userManager = userManager;
@@ -24,37 +25,42 @@ namespace LCDE.Controllers
             this.repositorioCliente = repositorioCliente;
         }
 
-        public async Task<IActionResult> Registro(CrearUusarioCliente modelo)
+        [HttpPost]
+        public async Task<IActionResult> Registro(CrearUsarioCliente modelo)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    modelo.informacionUsuario.Roles = await ObtenerRoles();
                     return View(modelo);
                 }
 
-                var usuario = new Usuario() { Correo = modelo.informacionUsuario.Correo , Nombre_usuario = modelo.informacionUsuario.Nombre_usuario, Id_Role = modelo.informacionUsuario.Id_Role };
+                var usuario = new Usuario()
+                {
+                    Correo = modelo.informacionUsuario.Correo,
+                    Nombre_usuario = modelo.informacionUsuario.Nombre_usuario,
+                    Id_Role = (int)Rol.Cliente
+                };
                 var resultadoUsuario = await userManager.CreateAsync(usuario, password: modelo.informacionUsuario.Contrasennia);
 
-                var cliente = new Cliente() { Correo = modelo.informacionCliente.Correo, Nombre = modelo.informacionCliente.Nombre, Direccion = modelo.informacionCliente.Direccion,
-                                              Telefono = modelo.informacionCliente.Telefono};
+                var cliente = new Cliente()
+                {
+                    Correo = modelo.informacionUsuario.Correo,
+                    Nombre = modelo.informacionCliente.Nombre,
+                    Direccion = modelo.informacionCliente.Direccion,
+                    Telefono = modelo.informacionCliente.Telefono
+                };
                 var resultadoCliente = await repositorioCliente.CrearCliente(cliente);
 
-                if (resultadoUsuario.Succeeded && resultadoCliente != 0) 
+                if (resultadoUsuario.Succeeded && resultadoCliente != 0)
                 {
-                    return RedirectToAction("Index", "Usuarios");
+                    return RedirectToAction("Login");
                 }
                 else
                 {
-                    modelo.informacionUsuario.Roles = await ObtenerRoles();
-                    
-                    foreach (var error in resultadoUsuario.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
 
-                    
+                    ModelState.AddModelError(string.Empty, "Ocurrió un error, intente más tarde.");
+
                     return View(modelo);
                 }
             }
@@ -64,6 +70,23 @@ namespace LCDE.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Registro()
+        {
+            try
+            {
+                var modelo = new CrearUsarioCliente()
+                {
+                    informacionUsuario = new RegistroUsuarioCliente(),
+                    informacionCliente = new CrearClienteDTo()
+                };
+                return View(modelo);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
 
         [AllowAnonymous]
         [HttpGet]
