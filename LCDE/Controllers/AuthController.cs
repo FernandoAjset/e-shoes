@@ -16,13 +16,18 @@ namespace LCDE.Controllers
         private readonly SignInManager<Usuario> signInManager;
         private readonly IRepositorioUsuarios repositorioUsuarios;
         private readonly IRepositorioCliente repositorioCliente;
+        private readonly IRepositorioToken repositorioToken;
+        private readonly IEmailService emailService;
 
         public AuthController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios, IRepositorioCliente repositorioCliente,
+            IRepositorioToken repositorioToken, IEmailService emailService,
             SignInManager<Usuario> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.repositorioCliente = repositorioCliente;
+            this.repositorioToken = repositorioToken;
+            this.emailService = emailService;
         }
 
         [HttpPost]
@@ -48,12 +53,28 @@ namespace LCDE.Controllers
                     Correo = modelo.informacionUsuario.Correo,
                     Nombre = modelo.informacionCliente.Nombre,
                     Direccion = modelo.informacionCliente.Direccion,
-                    Telefono = modelo.informacionCliente.Telefono
+                    Telefono = modelo.informacionCliente.Telefono,
+                    Id_usuario = usuario.Id
                 };
                 var resultadoCliente = await repositorioCliente.CrearCliente(cliente);
 
-                if (resultadoUsuario.Succeeded && resultadoCliente != 0)
+                var token = repositorioToken.CrearTokenRegistroUsuario(usuario);
+
+                try
                 {
+                    //Aqui debo de implementar la plantilla que no me ha hecho junior :,( ni la plantilla ni nada.
+                    //falta sustituir los valores de la plantilla 
+                    //generar Urla segun fernando que no sé pa que va a servir, pero gary debe componer el script xD
+                    await emailService.SendEmailAsync(usuario.Correo, "Confirmar registro", "La plantilla que falta señores, huevones xD");
+                }
+                catch (Exception ex)
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+                if (resultadoUsuario.Succeeded && resultadoCliente != 0)
+
+                {
+
                     return RedirectToAction("Login");
                 }
                 else

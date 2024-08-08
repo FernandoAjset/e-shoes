@@ -13,6 +13,7 @@ namespace LCDE.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [DataType(DataType.PhoneNumber)]
         public int Telefono { get; set; }
+        public string? Nit { get; set; }
         
     }
 
