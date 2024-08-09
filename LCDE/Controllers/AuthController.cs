@@ -19,8 +19,12 @@ namespace LCDE.Controllers
         private readonly IRepositorioToken repositorioToken;
         private readonly IEmailService emailService;
 
-        public AuthController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios, IRepositorioCliente repositorioCliente,
-            IRepositorioToken repositorioToken, IEmailService emailService,
+        public AuthController(
+            UserManager<Usuario> userManager,
+            IRepositorioUsuarios repositorioUsuarios,
+            IRepositorioCliente repositorioCliente,
+            IRepositorioToken repositorioToken,
+            IEmailService emailService,
             SignInManager<Usuario> signInManager)
         {
             this.userManager = userManager;
@@ -28,6 +32,57 @@ namespace LCDE.Controllers
             this.repositorioCliente = repositorioCliente;
             this.repositorioToken = repositorioToken;
             this.emailService = emailService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmarRegistro([FromQuery] string token)
+        {
+            try
+            {
+                var tokenbd = repositorioToken.ObtenerToken(token);
+                if (tokenbd == null)
+                {
+                    ViewData["Error"] = "Token no valido.";
+                    return View();
+                }
+                if (tokenbd.Activo == false)
+                {
+                    ViewData["Error"] = "Token no valido.";
+                    return View();
+                }
+                int resultadoFechas = DateTime.Compare(tokenbd.Fecha_Vencimiento, DateTime.Now);
+                if (resultadoFechas < 0)
+                {
+                    ViewData["Error"] = "Token no valido.";
+                    return View();
+                }
+                tokenbd.Activo = false;
+                if (!repositorioToken.ActualizarToken(tokenbd))
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+
+                var usuarioExistente = await userManager.FindByIdAsync(tokenbd.Id_Usuario.ToString());
+                if (usuarioExistente == null)
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+
+                usuarioExistente.Confirmado = true;
+                bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExistente);
+                if (codigoResult)
+                {
+                    return View();
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [HttpPost]

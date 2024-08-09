@@ -8,6 +8,7 @@ namespace LCDE.Servicios
 {
     public interface IRepositorioToken
     {
+        bool ActualizarToken(UsuarioToken token);
         string CrearTokenRegistroUsuario(Usuario usuario);
         UsuarioToken? ObtenerToken(string token);
     }
@@ -57,6 +58,32 @@ namespace LCDE.Servicios
             });
 
             return tokenbd;
+        }
+
+        public bool ActualizarToken(UsuarioToken token)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var filasAfectadas = connection.Execute(@"
+                EXEC Editar_Token_Usuario 
+                    @id,
+                    @tipo,
+                    @token,
+                    @id_usuario,
+                    @fecha_solicitud,
+                    @fecha_vencimiento,
+                    @activo",
+                new
+                {
+                    id = token.Id,
+                    tipo = token.Tipo,
+                    token = token.Token,
+                    id_usuario = token.Id_Usuario,
+                    fecha_solicitud = token.Fecha_Solicitud,
+                    fecha_vencimiento = token.Fecha_Vencimiento,
+                    activo = token.Activo,                    
+                });
+            return filasAfectadas > 0;
         }
     }
 }
