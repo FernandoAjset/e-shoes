@@ -224,7 +224,7 @@ namespace LCDE.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.ToString());
+                return RedirectToAction("Error", "Home");
             }
         }
 
