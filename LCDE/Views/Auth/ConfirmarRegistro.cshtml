@@ -34,6 +34,15 @@
                 </g>
               </svg>
                     </a>
+
+        @if(ViewData["Error"] != null){
+            <h1>CASO HAY ERROR, mostrar en rojo "SU CHINGADERA NO ES VALIDA"</h1>
+
+        }
+        else{
+            <h2>CASO NO HAY ERRROR, mostrar en verde "TRIUNFA EN LA VIDA"</h2>
+        }
+
                     <h4 class="my-3">Password reset successfully!</h4>
                 </div>
                 <div class="alert alert-success" role="alert"> An email has been sent to your email <strong>email@example.com</strong>. Please check your email to get reset link </div>

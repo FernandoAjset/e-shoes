@@ -51,7 +51,7 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             var tokenbd = connection.QueryFirstOrDefault<UsuarioToken>(@"
-                        EXEC Obtener_token_por_valor , @token
+                        EXEC Obtener_token_por_valor @token
                         ", new
             {
                 token = token,
