@@ -22,6 +22,8 @@ builder.Services.AddTransient<RepositorioRegistroCaja, RepositorioRegistroCaja>(
 builder.Services.AddTransient<RepositorioReportes, RepositorioReportes>();
 builder.Services.AddSingleton<IEncryptService, EncryptService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<IRepositorioToken, RepositorioToken>();
+
 builder.Services.AddTransient<RepositorioPromociones, RepositorioPromociones>();
 builder.Services.AddTransient<SignInManager<Usuario>>();
 builder.Services.AddIdentityCore<Usuario>(options =>
