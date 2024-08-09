@@ -12,6 +12,7 @@ namespace LCDE.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly IConfiguration configuration;
         private readonly UserManager<Usuario> userManager;
         private readonly SignInManager<Usuario> signInManager;
         private readonly IRepositorioUsuarios repositorioUsuarios;
@@ -20,6 +21,7 @@ namespace LCDE.Controllers
         private readonly IEmailService emailService;
 
         public AuthController(
+            IConfiguration configuration,
             UserManager<Usuario> userManager,
             IRepositorioUsuarios repositorioUsuarios,
             IRepositorioCliente repositorioCliente,
@@ -27,6 +29,7 @@ namespace LCDE.Controllers
             IEmailService emailService,
             SignInManager<Usuario> signInManager)
         {
+            this.configuration = configuration;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.repositorioCliente = repositorioCliente;
@@ -117,10 +120,14 @@ namespace LCDE.Controllers
 
                 try
                 {
-                    //Aqui debo de implementar la plantilla que no me ha hecho junior :,( ni la plantilla ni nada.
-                    //falta sustituir los valores de la plantilla 
-                    //generar Urla segun fernando que no sé pa que va a servir, pero gary debe componer el script xD
-                    await emailService.SendEmailAsync(usuario.Correo, "Confirmar registro", "La plantilla que falta señores, huevones xD");
+                    var getTemplate = LeerTemplateService.GetTemplateToStringByName($"confirmar-registro.html");
+
+                    var url = $"{configuration["AppUrl"]}/auth/ConfirmarRegistro?token={token}";
+                    var emailBody = getTemplate.Replace("{url}", url);
+                    emailBody = emailBody.Replace("{usuario}", usuario.Nombre_usuario);
+
+
+                    await emailService.SendEmailAsync(usuario.Correo, "Confirmar registro", emailBody);
                 }
                 catch (Exception ex)
                 {
