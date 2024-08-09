@@ -35,18 +35,22 @@
               </svg>
                     </a>
 
+                </div>
+
         @if(ViewData["Error"] != null){
-            <h1>CASO HAY ERROR, mostrar en rojo "SU CHINGADERA NO ES VALIDA"</h1>
+        
+                    <h1>Token NO valido</h1>
+                    <div class="alert alert-danger" role="danger"> Si el error persiste, comuniquese con el administrador de sistemas <strong>eshoes-support@clangpt.com</strong> </div>
+                    <a class="btn btn-lg btn-primary btn-block" asp-action="Login">Regresar a Login</a>
 
         }
         else{
-            <h2>CASO NO HAY ERRROR, mostrar en verde "TRIUNFA EN LA VIDA"</h2>
+
+                    <h4 class="my-3">Confirmacion de correo exitosa!</h4>
+                    <div class="alert alert-success" role="alert"> El registro se ah realizado de forma satisfatoria en e-shoes !! </div>
+                    <a class="btn btn-lg btn-primary btn-block" asp-action="Login">Regresar a Login</a>
         }
 
-                    <h4 class="my-3">Password reset successfully!</h4>
-                </div>
-                <div class="alert alert-success" role="alert"> An email has been sent to your email <strong>email@example.com</strong>. Please check your email to get reset link </div>
-                <a href="./index.html" class="btn btn-lg btn-primary btn-block">Back to home</a>
                 <p class="mt-5 mb-3 text-muted">© 2020</p>
             </form>
         </div>
