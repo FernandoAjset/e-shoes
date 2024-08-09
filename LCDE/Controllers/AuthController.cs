@@ -12,6 +12,7 @@ namespace LCDE.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly IConfiguration configuration;
         private readonly UserManager<Usuario> userManager;
         private readonly SignInManager<Usuario> signInManager;
         private readonly IRepositorioUsuarios repositorioUsuarios;
@@ -19,15 +20,72 @@ namespace LCDE.Controllers
         private readonly IRepositorioToken repositorioToken;
         private readonly IEmailService emailService;
 
-        public AuthController(UserManager<Usuario> userManager, IRepositorioUsuarios repositorioUsuarios, IRepositorioCliente repositorioCliente,
-            IRepositorioToken repositorioToken, IEmailService emailService,
+        public AuthController(
+            IConfiguration configuration,
+            UserManager<Usuario> userManager,
+            IRepositorioUsuarios repositorioUsuarios,
+            IRepositorioCliente repositorioCliente,
+            IRepositorioToken repositorioToken,
+            IEmailService emailService,
             SignInManager<Usuario> signInManager)
         {
+            this.configuration = configuration;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.repositorioCliente = repositorioCliente;
             this.repositorioToken = repositorioToken;
             this.emailService = emailService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmarRegistro([FromQuery] string token)
+        {
+            try
+            {
+                var tokenbd = repositorioToken.ObtenerToken(token);
+                if (tokenbd == null)
+                {
+                    ViewData["Error"] = "Token no valido.";
+                    return View();
+                }
+                if (tokenbd.Activo == false)
+                {
+                    ViewData["Error"] = "Token no valido.";
+                    return View();
+                }
+                int resultadoFechas = DateTime.Compare(tokenbd.Fecha_Vencimiento, DateTime.Now);
+                if (resultadoFechas < 0)
+                {
+                    ViewData["Error"] = "Token no valido.";
+                    return View();
+                }
+                tokenbd.Activo = false;
+                if (!repositorioToken.ActualizarToken(tokenbd))
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+
+                var usuarioExistente = await userManager.FindByIdAsync(tokenbd.Id_Usuario.ToString());
+                if (usuarioExistente == null)
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+
+                usuarioExistente.Confirmado = true;
+                bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExistente);
+                if (codigoResult)
+                {
+                    return View();
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [HttpPost]
@@ -62,10 +120,14 @@ namespace LCDE.Controllers
 
                 try
                 {
-                    //Aqui debo de implementar la plantilla que no me ha hecho junior :,( ni la plantilla ni nada.
-                    //falta sustituir los valores de la plantilla 
-                    //generar Urla segun fernando que no sé pa que va a servir, pero gary debe componer el script xD
-                    await emailService.SendEmailAsync(usuario.Correo, "Confirmar registro", "La plantilla que falta señores, huevones xD");
+                    var getTemplate = LeerTemplateService.GetTemplateToStringByName($"confirmar-registro.html");
+
+                    var url = $"{configuration["AppUrl"]}/auth/ConfirmarRegistro?token={token}";
+                    var emailBody = getTemplate.Replace("{url}", url);
+                    emailBody = emailBody.Replace("{usuario}", usuario.Nombre_usuario);
+
+
+                    await emailService.SendEmailAsync(usuario.Correo, "Confirmar registro", emailBody);
                 }
                 catch (Exception ex)
                 {

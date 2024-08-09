@@ -8,6 +8,6 @@
         public string Correo { get; set; }
         public int Id_Role { get; set; }
         public string Rol { get; set; }
-
+        public bool Confirmado { get; set; }
     }
 }

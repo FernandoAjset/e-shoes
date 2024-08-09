@@ -54,4 +54,10 @@
 	  <None Include="appsettings.Development.json" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="Data\confirmar-registro.html">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
