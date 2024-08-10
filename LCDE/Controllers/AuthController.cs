@@ -113,6 +113,7 @@ namespace LCDE.Controllers
                     Direccion = modelo.informacionCliente.Direccion,
                     Telefono = modelo.informacionCliente.Telefono,
                     Id_usuario = usuario.Id
+                    //Id_usuario = 0
                 };
                 var resultadoCliente = await repositorioCliente.CrearCliente(cliente);
 

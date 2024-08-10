@@ -98,40 +98,64 @@
                             </a>
                         </div>
                         <!-- /Logo -->
-                        <h4 class="mb-2">Adventure starts here 🚀</h4>
-                        <p class="mb-4">Make your app management easy and fun!</p>
+                        <h4 class="mb-2">Datos Registro del Cliente 🚀</h4>
 
                         <form asp-action="Registro"
                               id="formAuthentication" class="mb-3" method="POST">
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nombre completo</label>
+                                <input type="text" class="form-control" placeholder="Ingrese nombre completo" autofocus asp-for="informacionCliente.Nombre" />
+                                <span class="text-danger text-start" asp-validation-for="informacionCliente.Nombre"></span>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="username" class="form-label">Usuario</label>
-                                <input type="text"
-                                       asp-for="informacionUsuario.Nombre_usuario"
-                                       class="form-control"
-                                       placeholder="Enter your username"
-                                       autofocus />
-                                <span asp-validation-for="informacionUsuario.Nombre_usuario"
-                                      class="text-danger text-start"></span>
+                                <input type="text" class="form-control" placeholder="Ingrese su nickname" autofocus asp-for="informacionUsuario.Nombre_usuario" />
+                                <span class="text-danger text-start" asp-validation-for="informacionUsuario.Nombre_usuario"></span>
                             </div>
+
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email" />
+                                <label for="username" class="form-label">Direccion</label>
+                                <input type="text" class="form-control" placeholder="Ingrese su direccion" autofocus asp-for="informacionCliente.Direccion" />
+                                <span class="text-danger text-start" asp-validation-for="informacionCliente.Direccion"></span>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Telefono</label>
+                                <input type="text" class="form-control" placeholder="Ingrese numero telefonico" autofocus asp-for="informacionCliente.Telefono" />
+                                <span class="text-danger text-start" asp-validation-for="informacionCliente.Telefono"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">NIT</label>
+                                <input type="text" class="form-control" placeholder="Ingrese su NIT" autofocus asp-for="informacionCliente.Nit" />
+                                <span class="text-danger text-start" asp-validation-for="informacionCliente.Nit"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo</label>
+                                <input type="text" class="form-control"placeholder="Ingrese su Correo" asp-for="informacionUsuario.Correo" />
+                                <span class="text-danger text-start" asp-validation-for="informacionCliente.Nit"></span>
+                            </div>
+
                             <div class="mb-3 form-password-toggle">
-                                <label class="form-label" for="password">Password</label>
+                                <label class="form-label" for="password">Contraseña</label>
                                 <div class="input-group input-group-merge">
-                                    <input type="password"
-                                           id="password"
-                                           class="form-control"
-                                           name="password"
-                                           placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                                           aria-describedby="password" />
-                                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                    <input type="password" id="password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" asp-for="informacionUsuario.Contrasennia" />
+                                    <span class="text-danger text-start" asp-validation-for="informacionUsuario.Contrasennia"></span>
                                 </div>
                             </div>
 
+                            <div class="mb-3 form-password-toggle">
+                                <label class="form-label" for="confirm-password">Confirmar Contraseña</label>
+                                <div class="input-group input-group-merge">
+                                    <input type="password" id="confirm-password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="confirm-password"  />
+              
+                                </div>
+                            </div>
 
-                            <button class="btn btn-primary d-grid w-100" type="submit">Registrarse</button>
+                            <button type="submit" class="btn btn-primary d-grid w-100">Registrarse</button>
                         </form>
 
                         <p class="text-center">
@@ -164,3 +188,16 @@
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
+
+<script>
+    document.getElementById('confirm-password').addEventListener('input', function () {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+
+        if (password !== confirmPassword) {
+            this.setCustomValidity('Las contraseñas no coinciden.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>
