@@ -32,7 +32,8 @@ namespace LCDE.Servicios
             parameters.Add("@TelefonoCliente", cliente.Telefono);
             parameters.Add("@CorreoCliente", cliente.Correo);
             parameters.Add("@NIT", cliente.NIT);
-            parameters.Add("@IdCliente", 0);
+           parameters.Add("@IdCliente", 0);
+            parameters.Add("@id_usuario", cliente.Id_usuario);
             parameters.Add("@Operacion", "insert");
             cliente_id = await connection.QuerySingleAsync<int>("SP_CRUD_CLIENTES", parameters, commandType: CommandType.StoredProcedure);
             return cliente_id;
@@ -89,7 +90,7 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT,@IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
                         ", new
                 {
                     NombreCliente = cliente.Nombre,
