@@ -98,6 +98,13 @@ namespace LCDE.Controllers
                     return View(modelo);
                 }
 
+                var usuarioExistente = await userManager.FindByEmailAsync(modelo.informacionUsuario.Correo);
+                if (usuarioExistente != null)
+                {
+                    ModelState.AddModelError("ErrorValidacion", "El correo ya está en uso.");
+                    return View(modelo);
+                }
+
                 var usuario = new Usuario()
                 {
                     Correo = modelo.informacionUsuario.Correo,
@@ -125,7 +132,7 @@ namespace LCDE.Controllers
 
                     var url = $"{configuration["AppUrl"]}/auth/ConfirmarRegistro?token={token}";
                     var emailBody = getTemplate.Replace("{url}", url);
-                    emailBody = emailBody.Replace("{usuario}", usuario.Nombre_usuario);
+                    emailBody = emailBody.Replace("{usuario}", cliente.Nombre);
 
 
                     await emailService.SendEmailAsync(usuario.Correo, "Confirmar registro", emailBody);

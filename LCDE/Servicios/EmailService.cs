@@ -1,4 +1,6 @@
-﻿using SendGrid;
+﻿using RestSharp;
+using RestSharp.Authenticators;
+using SendGrid;
 using SendGrid.Helpers.Mail;
 
 namespace LCDE.Servicios
@@ -23,17 +25,25 @@ namespace LCDE.Servicios
                 var emailRemitente = configuration.GetValue<string>("SENDGRID_FROM");
                 var nombreRemitente = configuration.GetValue<string>("SENDGRID_NOMBRE");
 
-                var cliente = new SendGridClient(apiKey);
-                var from = new EmailAddress(emailRemitente, nombreRemitente);
-                var subjectMail = subject;
-                var to = new EmailAddress(email, email);
-                var contenidoHtml = message;
-                var singleEmail = MailHelper.CreateSingleEmail(from, to, subject,
-                                    "", contenidoHtml);
-                var respuesta = await cliente.SendEmailAsync(singleEmail);
+                var client = new RestClient(new RestClientOptions
+                {
+                    BaseUrl = new Uri("https://api.mailgun.net/v3"),
+                    Authenticator = new HttpBasicAuthenticator("api", apiKey)
+                });
+
+                var request = new RestRequest("sandbox64a0a36a7c454c5086d74f985001af3d.mailgun.org/messages", Method.Post);
+                request.AddParameter("domain", "fernandoajset.studio", ParameterType.UrlSegment);
+                request.AddParameter("from", emailRemitente);
+                request.AddParameter("to", email);
+                request.AddParameter("subject", subject);
+                request.AddParameter("text", message);
+
+                var response = await client.ExecuteAsync(request);
+                Console.WriteLine(response.Content);
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error al enviar el correo: {ex.Message}");
                 throw;
             }
         }

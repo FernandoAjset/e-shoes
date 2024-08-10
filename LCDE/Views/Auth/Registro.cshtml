@@ -99,6 +99,16 @@
                         </div>
                         <!-- /Logo -->
                         <h4 class="mb-2">Datos Registro del Cliente 🚀</h4>
+                        <!-- Mostrar mensajes de error -->
+                        @if (ViewData.ModelState.ContainsKey("ErrorValidacion"))
+                        {
+                            <div class="alert alert-danger">
+                                @foreach (var error in ViewData.ModelState["ErrorValidacion"].Errors)
+                                {
+                                    <p>@error.ErrorMessage</p>
+                                }
+                            </div>
+                        }
 
                         <form asp-action="Registro"
                               id="formAuthentication" class="mb-3" method="POST">
@@ -135,26 +145,15 @@
 
                             <div class="mb-3">
                                 <label for="email" class="form-label">Correo</label>
-                                <input type="text" class="form-control"placeholder="Ingrese su Correo" asp-for="informacionUsuario.Correo" />
+                                <input type="text" class="form-control" placeholder="Ingrese su Correo" asp-for="informacionUsuario.Correo" />
                                 <span class="text-danger text-start" asp-validation-for="informacionCliente.Nit"></span>
                             </div>
 
                             <div class="mb-3 form-password-toggle">
                                 <label class="form-label" for="password">Contraseña</label>
-                                <div class="input-group input-group-merge">
-                                    <input type="password" id="password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" asp-for="informacionUsuario.Contrasennia" />
-                                    <span class="text-danger text-start" asp-validation-for="informacionUsuario.Contrasennia"></span>
-                                </div>
+                                <input type="password" id="password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" asp-for="informacionUsuario.Contrasennia" />
+                                <span class="text-danger text-start" asp-validation-for="informacionUsuario.Contrasennia"></span>
                             </div>
-
-                            <div class="mb-3 form-password-toggle">
-                                <label class="form-label" for="confirm-password">Confirmar Contraseña</label>
-                                <div class="input-group input-group-merge">
-                                    <input type="password" id="confirm-password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="confirm-password"  />
-              
-                                </div>
-                            </div>
-
                             <button type="submit" class="btn btn-primary d-grid w-100">Registrarse</button>
                         </form>
 
