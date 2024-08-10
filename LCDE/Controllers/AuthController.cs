@@ -125,7 +125,6 @@ namespace LCDE.Controllers
                 var resultadoCliente = await repositorioCliente.CrearCliente(cliente);
 
                 var token = repositorioToken.CrearTokenRegistroUsuario(usuario);
-
                 try
                 {
                     var getTemplate = LeerTemplateService.GetTemplateToStringByName($"confirmar-registro.html");

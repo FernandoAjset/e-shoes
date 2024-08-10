@@ -1,7 +1,8 @@
-﻿using RestSharp;
-using RestSharp.Authenticators;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace LCDE.Servicios
 {
@@ -9,6 +10,7 @@ namespace LCDE.Servicios
     {
         Task SendEmailAsync(string email, string subject, string message);
     }
+
     public class EmailService : IEmailService
     {
         private readonly IConfiguration configuration;
@@ -17,33 +19,43 @@ namespace LCDE.Servicios
         {
             this.configuration = configuration;
         }
+
         public async Task SendEmailAsync(string email, string subject, string message)
         {
             try
             {
-                var apiKey = configuration.GetValue<string>("SENDGRID_API_KEY");
-                var emailRemitente = configuration.GetValue<string>("SENDGRID_FROM");
-                var nombreRemitente = configuration.GetValue<string>("SENDGRID_NOMBRE");
+                var newEmail = new MimeMessage();
+                newEmail.From.Add(MailboxAddress.Parse(configuration.GetSection("SMTP:USERNAME").Value));
+                newEmail.To.Add(MailboxAddress.Parse(email));
+                newEmail.Subject = subject;
 
-                var client = new RestClient(new RestClientOptions
+                // Crear el cuerpo del correo con formato HTML
+                newEmail.Body = new TextPart("html")
                 {
-                    BaseUrl = new Uri("https://api.mailgun.net/v3"),
-                    Authenticator = new HttpBasicAuthenticator("api", apiKey)
-                });
+                    Text = message
+                };
 
-                var request = new RestRequest("sandbox64a0a36a7c454c5086d74f985001af3d.mailgun.org/messages", Method.Post);
-                request.AddParameter("domain", "fernandoajset.studio", ParameterType.UrlSegment);
-                request.AddParameter("from", emailRemitente);
-                request.AddParameter("to", email);
-                request.AddParameter("subject", subject);
-                request.AddParameter("text", message);
+                using var smtp = new SmtpClient();
 
-                var response = await client.ExecuteAsync(request);
-                Console.WriteLine(response.Content);
+                // Ignorar la validación del certificado en entornos de desarrollo
+                smtp.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+
+                smtp.Connect(
+                    configuration.GetSection("SMTP:HOST").Value,
+                    Convert.ToInt32(configuration.GetSection("SMTP:PORT").Value),
+                    SecureSocketOptions.StartTls
+                );
+
+                smtp.Authenticate(
+                    configuration.GetSection("SMTP:USERNAME").Value,
+                    configuration.GetSection("SMTP:PASSWORD").Value
+                );
+
+                smtp.Send(newEmail);
+                smtp.Disconnect(true);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al enviar el correo: {ex.Message}");
                 throw;
             }
         }
