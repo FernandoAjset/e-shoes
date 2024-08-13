@@ -130,7 +130,9 @@ namespace LCDE.Controllers
                     var getTemplate = LeerTemplateService.GetTemplateToStringByName($"confirmar-registro.html");
 
                     var url = $"{configuration["AppUrl"]}/auth/ConfirmarRegistro?token={token}";
+
                     var emailBody = getTemplate.Replace("{url}", url);
+
                     emailBody = emailBody.Replace("{usuario}", cliente.Nombre);
 
 
