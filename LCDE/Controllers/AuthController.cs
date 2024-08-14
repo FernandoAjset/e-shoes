@@ -29,6 +29,7 @@ namespace LCDE.Controllers
             IEmailService emailService,
             SignInManager<Usuario> signInManager)
         {
+            this.repositorioUsuarios = repositorioUsuarios;
             this.configuration = configuration;
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -223,8 +224,11 @@ namespace LCDE.Controllers
                     // Crear un nuevo principal con los claims adicionales
                     await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, new ClaimsPrincipal(identity));
 
+                    if (usuario.Id_Role == (int)Rol.Cliente)
+                    {
+                        return RedirectToAction("Home", "Ecommerce");
+                    }
 
-                    //await signInManager.SignInAsync(usuario, modelo.Recuerdame);
                     return RedirectToAction("Index", "Ventas");
                 }
 
