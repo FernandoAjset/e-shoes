@@ -11,12 +11,17 @@ namespace LCDE.Controllers
     public class EcommerceController : Controller
     {
         private readonly IRepositorioCliente repositotioClientes;
+        private readonly ISesionServicio sesionServicio;
         private readonly IRepositorioUsuarios repositorioUsuarios;
         private readonly UserManager<Usuario> userManager;
-        public EcommerceController(UserManager<Usuario> userManager, IRepositorioCliente pepe, IRepositorioUsuarios repositorioUsuarios)
+        public EcommerceController(UserManager<Usuario> userManager,
+            IRepositorioCliente pepe,
+            ISesionServicio sesionServicio,
+            IRepositorioUsuarios repositorioUsuarios)
         {
 
             this.repositotioClientes = pepe;
+            this.sesionServicio = sesionServicio;
             this.repositorioUsuarios = repositorioUsuarios;
 
         }
@@ -28,13 +33,14 @@ namespace LCDE.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Editar(int idUsuario)
+        public async Task<IActionResult> ConfiguracionPerfil()
         {
             try
             {
+                var idUsuario = sesionServicio.ObtenerIdUsuarioSesion();
                 Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(idUsuario);
 
-                Cliente cliente = await repositotioClientes.ObtenerCliente(usuario.Id);
+                Cliente cliente = await repositotioClientes.ObtenerClientePorIdUsuario(usuario.Id);
 
                 ClienteDTO clienteDTO = new ClienteDTO();
                 if (usuario is null || cliente is null || cliente.Id == 0)

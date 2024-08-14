@@ -30,6 +30,16 @@ namespace LCDE.Servicios
             }
         }
 
+        public int ObtenerIdUsuarioSesion()
+        {
+            var userId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                throw new UnauthorizedAccessException("Sesión no valida.");
+            }
+            return int.Parse(userId.Value);
+        }
+
         public string ObtenerRolUsuario()
         {
             var rolEnum = ObtenerRolUsuarioEnumAsync().GetAwaiter().GetResult();
@@ -68,5 +78,6 @@ namespace LCDE.Servicios
         bool EsUsuarioVendedor();
         bool EsUsuarioCliente();
         string ObtenerNombreRolUsuario();
+        int ObtenerIdUsuarioSesion();
     }
 }
