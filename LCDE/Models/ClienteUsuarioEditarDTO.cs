@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LCDE.Models
 {
-    public class Cliente
+    public class ClienteUsuarioEditarDTO
     {
         public int Id { get; set; }
         public int Id_usuario { get; set; }
@@ -16,10 +16,12 @@ namespace LCDE.Models
         public string Nombre { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Direccion { get; set; }
+
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [DataType(DataType.PhoneNumber)]
         public int Telefono { get; set; }
-        [EmailAddress(ErrorMessage = "El campo debe ser un correo electrónico válido")]
-        public string? Correo { get; set; }
+
+        public UsuarioActualizarDTO UsuarioActualizar { get; set; }
+
     }
 }
