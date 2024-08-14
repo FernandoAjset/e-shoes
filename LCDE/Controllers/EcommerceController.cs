@@ -113,6 +113,9 @@ namespace LCDE.Controllers
                         {
                             var addPasswordResult = await userManager
                                 .AddPasswordAsync(usuarioExist, ClienteUsuario.Usuario.Contrasennia);
+
+                            // Mandar notificación por cambio de contraseña
+                            await repositorioUsuarios.NotificacionContrasenia(ClienteUsuario.Usuario.Correo);
                         }
                     }
                 }
