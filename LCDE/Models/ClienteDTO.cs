@@ -6,7 +6,6 @@ namespace LCDE.Models
     {
         public DatosCliente Cliente { get; set; }
         public DatosUsuario Usuario { get; set; }
-
     }
 
     public class DatosCliente
@@ -26,9 +25,11 @@ namespace LCDE.Models
     public class DatosUsuario
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Nombre_usuario { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [EmailAddress(ErrorMessage = "El campo debe ser un correo electrónico válido")]
         public string Correo { get; set; }
         public string? Contrasennia { get; set; }
     }
 }
-

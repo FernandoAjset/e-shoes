@@ -74,22 +74,21 @@ namespace LCDE.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Editar(ClienteUsuarioEditarDTO ClienteUsuario)
+        public async Task<IActionResult> ConfiguracionPerfil(ClienteDTO ClienteUsuario)
         {
-
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return RedirectToAction("Editar", "Ecommerce");
+                    return View(ClienteUsuario);
                 }
 
-                var ClientExist = await repositotioClientes.ObtenerCliente(ClienteUsuario.Id);
+                var ClientExist = await repositotioClientes.ObtenerCliente(ClienteUsuario.Usuario.Id);
 
                 if (ClientExist == null)
                 {
                     ModelState.AddModelError(string.Empty, "Cliente no existe.");
-                    return RedirectToAction("Editar", "Ecommerce");
+                    return RedirectToAction("NoEncontrado", "Home");
                 }
 
                 var usuarioExist = await userManager.FindByIdAsync(ClientExist.Id_usuario.ToString());
@@ -98,21 +97,22 @@ namespace LCDE.Controllers
                     return RedirectToAction("NoEncontrado", "Home");
                 }
 
-                usuarioExist.Nombre_usuario = ClienteUsuario.UsuarioActualizar.Nombre_usuario;
-                usuarioExist.Correo = ClienteUsuario.UsuarioActualizar.Correo;
-                usuarioExist.Id_Role = ClienteUsuario.UsuarioActualizar.Id_Role;
+                usuarioExist.Nombre_usuario = ClienteUsuario.Usuario.Nombre_usuario;
+                usuarioExist.Correo = ClienteUsuario.Usuario.Correo;
 
 
                 bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExist);
 
                 if (codigoResult)
                 {
-                    if (!string.IsNullOrEmpty(ClienteUsuario.UsuarioActualizar.Contrasennia))
+                    if (!string.IsNullOrEmpty(ClienteUsuario.Usuario.Contrasennia))
                     {
-                        var removePasswordResult = await userManager.RemovePasswordAsync(usuarioExist);
+                        var removePasswordResult = await userManager
+                                                        .RemovePasswordAsync(usuarioExist);
                         if (removePasswordResult.Succeeded)
                         {
-                            var addPasswordResult = await userManager.AddPasswordAsync(usuarioExist, ClienteUsuario.UsuarioActualizar.Contrasennia);
+                            var addPasswordResult = await userManager
+                                .AddPasswordAsync(usuarioExist, ClienteUsuario.Usuario.Contrasennia);
                         }
                     }
                 }
@@ -121,14 +121,20 @@ namespace LCDE.Controllers
                     return RedirectToAction("Error", "Home");
                 }
 
-                return RedirectToAction("Index");
+                // Actualizar cliente
+                ClientExist.NIT = ClienteUsuario.Cliente.NIT;
+                ClientExist.Nombre = ClienteUsuario.Cliente.Nombre;
+                ClientExist.Direccion = ClienteUsuario.Cliente.Direccion;
+                ClientExist.Telefono = ClienteUsuario.Cliente.Telefono ?? 0;
+                ClientExist.Correo = ClienteUsuario.Usuario.Correo;
+
+                return RedirectToAction("Home");
             }
             catch
             {
                 return RedirectToAction("Error", "Home");
             }
         }
-
 
         private async Task<IEnumerable<SelectListItem>> ObtenerRoles()
         {
