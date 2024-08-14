@@ -10,5 +10,10 @@ namespace LCDE.Controllers
         {
             return View();
         }
+
+        public IActionResult ConfiguracionPerfil()
+        {
+            return View();
+        }
     }
 }

@@ -1,9 +1,4 @@
-﻿using LCDE.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.ReportingServices.ReportProcessing.ReportObjectModel;
-using System.Security.Cryptography;
-
-namespace LCDE.Servicios
+﻿namespace LCDE.Servicios
 {
     public interface IEncryptService
     {
