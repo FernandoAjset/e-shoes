@@ -23,10 +23,12 @@ namespace LCDE.Servicios
     {
         private readonly string connectionString;
         private readonly IEmailService emailService;
-        public RepositorioUsuarios(IConfiguration configuration, IEmailService emailService)
+        private readonly IConfiguration configuration;
+        public RepositorioUsuarios(IConfiguration configuration, IEmailService emailService, IConfiguration configuration1)
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
             this.emailService = emailService;
+            this.configuration = configuration;
         }
 
         public async Task<int> CrearUsuario(Usuario usuario)///////////////////////////////////////
@@ -139,7 +141,11 @@ namespace LCDE.Servicios
 
                 var getTemplate = LeerTemplateService.GetTemplateToStringByName($"planitlla que deben realizar");
 
-                var emailBody = getTemplate.Replace("{usuario}", EmailUsuario.Nombre_usuario);
+                var url = $"{configuration["AppUrl"]}“/auth/login";
+
+                var emailBody = getTemplate.Replace("{url}", url);
+
+                emailBody = emailBody.Replace("{usuario}", EmailUsuario.Nombre_usuario);
 
                 await this.emailService.SendEmailAsync(email, "Cambio de contraseña", emailBody);
 
