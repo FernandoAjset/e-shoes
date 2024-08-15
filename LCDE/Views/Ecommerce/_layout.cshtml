@@ -60,52 +60,36 @@
     <div>
         <main role="main">
 
-            <!-- Start Top Nav -->
-            <nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-lg-block" id="templatemo_nav_top">
-                <div class="container text-light">
-                    <div class="w-100 d-flex justify-content-between">
-                        <div>
-                            <i class="fa fa-envelope mx-2"></i>
-                            <a class="navbar-sm-brand text-light text-decoration-none" href="mailto:info@company.com">info@company.com</a>
-                            <i class="fa fa-phone mx-2"></i>
-                            <a class="navbar-sm-brand text-light text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
-                        </div>
-                        <div>
-                            <a class="text-light" href="https://fb.com/templatemo" target="_blank" rel="sponsored"><i class="fab fa-facebook-f fa-sm fa-fw me-2"></i></a>
-                            <a class="text-light" href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram fa-sm fa-fw me-2"></i></a>
-                            <a class="text-light" href="https://twitter.com/" target="_blank"><i class="fab fa-twitter fa-sm fa-fw me-2"></i></a>
-                            <a class="text-light" href="https://www.linkedin.com/" target="_blank"><i class="fab fa-linkedin fa-sm fa-fw"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+
             <!-- Close Top Nav -->
             <!-- Header -->
+
             <nav class="navbar navbar-expand-lg navbar-light shadow">
                 <div class="container d-flex justify-content-between align-items-center">
 
                     <a class="navbar-brand text-success logo h1 align-self-center" href="index.html">
-                        Zay
+                        e-shoes
                     </a>
 
-                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="templatemo_main_nav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
-                    <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+                    <div class="align-self-center collapse navbar-collapse flex-fill d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
                         <div class="flex-fill">
+                            @* Títulos de la navbar *@
                             <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Home">Home</a>
+                                    <a class="nav-link" asp-action="Home">Inicio</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="about.html">About</a>
+                                    <a class="nav-link" href="about.html">Acerca de</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="shop.html">Shop</a>
+                                    <a class="nav-link" href="shop.html">Tienda</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="contact.html">Contact</a>
+                                    <a class="nav-link" href="contact.html">Contáctanos</a>
                                 </li>
                             </ul>
                         </div>
@@ -125,79 +109,86 @@
                                 <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
                                 <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
                             </a>
-                            <a class="nav-icon position-relative text-decoration-none" href="#">
+                            <ul class="navbar-nav ml-auto">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    var rolNombre = SesionServicio.ObtenerNombreRolUsuario();
 
-                                <ul class="navbar-nav ml-auto">
-
-                                    <div class="topbar-divider d-none d-sm-block"></div>
-                                    @if (SignInManager.IsSignedIn(User))
-                                    {
-                                        var rolNombre = SesionServicio.ObtenerNombreRolUsuario();
-
-                                        <li class="nav-item dropdown no-arrow">
-                                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                                    <strong> @User.Identity.Name</strong>
-                                                    <br />
-                                                    <span>Rol: @rolNombre</span>
-                                                </span>
-                                                <img class="img-profile rounded-circle"
-                                                     src="~/img/undraw_profile.svg">
-                                            </a>
-
-                                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                                 aria-labelledby="userDropdown">
-                                                <a class="dropdown-item" asp-action="ConfiguracionPerfil">
-                                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                                    Perfil
-                                                </a>
-                                                <form class="form-inline" asp-action="logout" asp-controller="usuarios">
-                                                    <button type="submit" class="btn btn-link text-dark">
-                                                        Salir
-                                                    </button>
-                                                </form>
+                                    <li class="nav-item dropdown no-arrow">
+                                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
+                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <div class="d-none d-lg-block text-gray-600 small text-center user-info">
+                                                <span><strong>@User.Identity.Name</strong></span>
+                                                <br />
+                                                <span>Rol: @rolNombre</span>
                                             </div>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li class="nav-item">
-                                            <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Registro">
-                                                Registro
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Login">
-                                                Login
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
+                                            <img class="img-profile rounded-circle ml-2" src="~/img/undraw_profile.svg" alt="User" style="width: 40px; height: 40px;">
+                                        </a>
 
-                            </a>
-
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                             aria-labelledby="userDropdown">
+                                            <a class="dropdown-item user-info" asp-action="ConfiguracionPerfil">
+                                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                                Perfil
+                                            </a>
+                                            <form class="form-inline" asp-action="logout" asp-controller="usuarios">
+                                                <button type="submit" class="btn btn-link text-dark user-info">
+                                                    Salir
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Registro">
+                                            Registro
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Login">
+                                            Login
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
                         </div>
                     </div>
-
                 </div>
             </nav>
+
+            <style>
+                .user-info {
+                    font-family: Arial, sans-serif;
+                    color: #343a40; /* Dark gray color */
+                    font-size: 0.9rem; /* Slightly smaller font size */
+                }
+            </style>
+
+
+
+
+
             <!-- Close Header -->
             <!-- Modal -->
             <div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="w-100 pt-1 mb-5 text-right">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Salir"></button>
                     </div>
                     <form action="" method="get" class="modal-content modal-body border-0 p-0">
                         <div class="input-group mb-2">
-                            <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Search ...">
+                            <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Buscar ...">
                             <button type="submit" class="input-group-text bg-success text-light">
                                 <i class="fa fa-fw fa-search text-white"></i>
                             </button>
                         </div>
                     </form>
                 </div>
+
+
+
             </div>
 
 
@@ -214,15 +205,15 @@
             <div class="row">
 
                 <div class="col-md-4 pt-5">
-                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">E-shoes</h2>
+                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">e-shoes</h2>
                     <ul class="list-unstyled text-light footer-link-list">
                         <li>
                             <i class="fas fa-map-marker-alt fa-fw"></i>
-                            123 Consectetur at ligula 10660
+                            Autopista Palín, Escuintla 05001
                         </li>
                         <li>
                             <i class="fa fa-phone fa-fw"></i>
-                            <a class="text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
+                            <a class="text-decoration-none" href="tel:">7884-1590</a>
                         </li>
                         <li>
                             <i class="fa fa-envelope fa-fw"></i>
@@ -232,26 +223,23 @@
                 </div>
 
                 <div class="col-md-4 pt-5">
-                    <h2 class="h2 text-light border-bottom pb-3 border-light">Products</h2>
+                    <h2 class="h2 text-light border-bottom pb-3 border-light">Productos</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li><a class="text-decoration-none" href="#">Luxury</a></li>
-                        <li><a class="text-decoration-none" href="#">Sport Wear</a></li>
-                        <li><a class="text-decoration-none" href="#">Men's Shoes</a></li>
-                        <li><a class="text-decoration-none" href="#">Women's Shoes</a></li>
-                        <li><a class="text-decoration-none" href="#">Popular Dress</a></li>
-                        <li><a class="text-decoration-none" href="#">Gym Accessories</a></li>
-                        <li><a class="text-decoration-none" href="#">Sport Shoes</a></li>
+                        <li><a class="text-decoration-none" href="#">Hombres</a></li>
+                        <li><a class="text-decoration-none" href="#">Mujeres</a></li>
+                        <li><a class="text-decoration-none" href="#">Niños</a></li>
+                        <li><a class="text-decoration-none" href="#">Accesorios</a></li>                        
                     </ul>
                 </div>
 
                 <div class="col-md-4 pt-5">
-                    <h2 class="h2 text-light border-bottom pb-3 border-light">Further Info</h2>
+                    <h2 class="h2 text-light border-bottom pb-3 border-light">Más información</h2>
                     <ul class="list-unstyled text-light footer-link-list">
-                        <li><a class="text-decoration-none" href="#">Home</a></li>
-                        <li><a class="text-decoration-none" href="#">About Us</a></li>
-                        <li><a class="text-decoration-none" href="#">Shop Locations</a></li>
-                        <li><a class="text-decoration-none" href="#">FAQs</a></li>
-                        <li><a class="text-decoration-none" href="#">Contact</a></li>
+                        <li><a class="text-decoration-none" href="#">Inicio</a></li>
+                        <li><a class="text-decoration-none" href="#">Sobre Nosotros</a></li>
+                        <li><a class="text-decoration-none" href="#">Ubicaciones</a></li>
+                        <li><a class="text-decoration-none" href="#">Preguntas Frecuentes</a></li>
+                        <li><a class="text-decoration-none" href="#">Contacto</a></li>
                     </ul>
                 </div>
 
@@ -280,7 +268,7 @@
                 <div class="col-auto">
                     <label class="sr-only" for="subscribeEmail">Email address</label>
                     <div class="input-group mb-2">
-                        <input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address">
+                        <input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Correo Electrónico">
                         <div class="input-group-text btn-success text-light">Subscribe</div>
                     </div>
                 </div>
@@ -292,8 +280,8 @@
                 <div class="row pt-2">
                     <div class="col-12">
                         <p class="text-left text-light">
-                            Copyright &copy; 2021 Company Name
-                            | Designed by <a rel="sponsored" href="https://templatemo.com" target="_blank">TemplateMo</a>
+                            Copyright &copy; Seminario 2024
+                            | Elaborado por <a rel="sponsored" href="https://templatemo.com" target="_blank">Grupo No. 1</a>
                         </p>
                     </div>
                 </div>
