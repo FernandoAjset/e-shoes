@@ -30,6 +30,8 @@ namespace LCDE.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [EmailAddress(ErrorMessage = "El campo debe ser un correo electrónico válido")]
         public string Correo { get; set; }
+        [MinLength(8, ErrorMessage = "El campo debe tener al menos 8 caracteres")]
+        [Display(Name = "Contraseña")]
         public string? Contrasennia { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace LCDE.Controllers
             this.repositotioClientes = pepe;
             this.sesionServicio = sesionServicio;
             this.repositorioUsuarios = repositorioUsuarios;
-
+            this.userManager = userManager;
         }
 
 
@@ -83,7 +83,7 @@ namespace LCDE.Controllers
                     return View(ClienteUsuario);
                 }
 
-                var ClientExist = await repositotioClientes.ObtenerCliente(ClienteUsuario.Usuario.Id);
+                var ClientExist = await repositotioClientes.ObtenerClientePorIdUsuario(ClienteUsuario.Usuario.Id);
 
                 if (ClientExist == null)
                 {
@@ -130,6 +130,7 @@ namespace LCDE.Controllers
                 ClientExist.Direccion = ClienteUsuario.Cliente.Direccion;
                 ClientExist.Telefono = ClienteUsuario.Cliente.Telefono ?? 0;
                 ClientExist.Correo = ClienteUsuario.Usuario.Correo;
+                await repositotioClientes.ModificarCliente(ClientExist);
 
                 return RedirectToAction("Home");
             }

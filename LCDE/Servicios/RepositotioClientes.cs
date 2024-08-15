@@ -118,7 +118,9 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, 
+                        @TelefonoCliente, @CorreoCliente, 
+                        @NIT, @IdCliente, @id_usuario, @Operacion
                         ", new
                 {
                     NombreCliente = cliente.Nombre,
@@ -127,6 +129,7 @@ namespace LCDE.Servicios
                     CorreoCliente = cliente.Correo,
                     NIT = cliente.NIT,
                     IdCliente = cliente.Id,
+                    id_usuario=cliente.Id_usuario,
                     Operacion = "update"
                 });
                 return true;
