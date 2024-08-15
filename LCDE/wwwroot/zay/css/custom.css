@@ -1,3 +1,31 @@
-/*
-Custom Css
-*/
+/* Establece las dimensiones y el estilo de las imágenes */
+.category-image {
+    width: 300px;
+    height: 300px; /* Alto fijo para asegurar que todas las imágenes sean del mismo tamaño */
+    object-fit: cover;
+    border-radius: 50%; /* Bordes redondeados */
+    border: 1px solid #ddd; /* Línea suave alrededor */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.col-md-4 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Responsive: En pantallas pequeñas, las imágenes se mostrarán una debajo de la otra */
+@media (max-width: 767px) {
+    .category-image {
+        width: 100%;
+        height: auto; /* Se ajusta el alto para mantener la proporción */
+        margin-bottom: 20px;
+    }
+}
+
+.logo-small {
+    width: 150px;
+    height: 150px;
+    max-width: 150px;
+    max-height: 150px;
+}
