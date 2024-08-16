@@ -139,7 +139,7 @@ namespace LCDE.Servicios
                 Usuario EmailUsuario = await BuscarUsuarioPorEmail(email);
                 if (EmailUsuario == null) return false;
 
-                var getTemplate = LeerTemplateService.GetTemplateToStringByName($"planitlla que deben realizar");
+                var getTemplate = LeerTemplateService.GetTemplateToStringByName($"notificacion_cambio_contraseña.html");
 
                 var url = $"{configuration["AppUrl"]}“/auth/login";
 
