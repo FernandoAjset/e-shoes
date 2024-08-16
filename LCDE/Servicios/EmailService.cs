@@ -1,4 +1,6 @@
-﻿using MailKit.Net.Smtp;
+﻿using LCDE.Models;
+using LCDE.Models.Enums;
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 
@@ -53,8 +55,19 @@ namespace LCDE.Servicios
                     configuration["SMTP:PASSWORD"].Replace('*', ' ') // Reemplazar asteriscos por espacios
                 );
 
-                await smtp.SendAsync(newEmail);
+                var result = await smtp.SendAsync(newEmail);
                 smtp.Disconnect(true);
+
+                LogEnum logLevel = LogEnum.INFO;
+                string logType = logLevel.GetDisplayName() ?? "None";
+                var logResult = new Log
+                {
+                    Type = logType,
+                    Message = $"Email sent to {email} with subject {subject}, Result: {result}",
+                    StackTrace = "",
+                    Date = DateTime.Now
+                };
+                logService.Log(logResult);
             }
             catch (Exception ex)
             {
@@ -67,7 +80,14 @@ namespace LCDE.Servicios
         {
             try
             {
-                logService.LogError(ex);
+                var logError = new Log
+                {
+                    Type = LogEnum.ERROR.GetDisplayName() ?? "None",
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace ?? "",
+                    Date = DateTime.Now
+                };
+                logService.Log(logError);
             }
             catch
             {
