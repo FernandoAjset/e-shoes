@@ -36,10 +36,11 @@ jobs:
 
     - name: Replace placeholders in appsettings.json
       run: |
-        export DB_SERVER=${{ secrets.HOST }}
-        export DB_SERVER=${{ secrets.PORT }}
-        export DB_SERVER=${{ secrets.USERNAME }}
-        export DB_SERVER=${{ secrets.PASSWORD }}
+        export AppUrl=${{ secrets.AppUrl }}
+        export HOST=${{ secrets.HOST }}
+        export PORT=${{ secrets.PORT }}
+        export USERNAME=${{ secrets.USERNAME }}
+        export PASSWORD=${{ secrets.PASSWORD }}
         export DB_SERVER=${{ secrets.DB_SERVER }}
         export DB_DATABASE=${{ secrets.DB_DATABASE }}
         export DB_USER=${{ secrets.DB_USER }}
