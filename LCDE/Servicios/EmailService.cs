@@ -24,7 +24,7 @@ namespace LCDE.Servicios
             try
             {
                 var newEmail = new MimeMessage();
-                newEmail.From.Add(MailboxAddress.Parse(configuration["SMTP:USERNAME"]));
+                newEmail.From.Add(MailboxAddress.Parse("eshoes-clangpt"));
                 newEmail.To.Add(MailboxAddress.Parse(email));
                 newEmail.Subject = subject;
 

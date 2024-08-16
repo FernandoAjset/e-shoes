@@ -5,18 +5,22 @@ namespace LCDE.Models
 {
     public class CrearClienteDTo
     {
-       
+
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Nombre { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Direccion { get; set; }
-        [DataType(DataType.PhoneNumber, ErrorMessage ="Télefono no valido")]
-        public int Telefono { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [DataType(DataType.PhoneNumber, ErrorMessage = "El formato del telefono no es válido")]
+        [MinLength(8, ErrorMessage = "El campo debe ser de 8 caracteres")]
+        [MaxLength(8, ErrorMessage = "El campo debe ser de 8 caracteres")]
+        public string? Telefono { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido, puede colocar CF")]
         public string? Nit { get; set; }
-        
+
     }
 
-    public class CrearUsarioCliente 
+    public class CrearUsarioCliente
     {
         public CrearClienteDTo informacionCliente { get; set; }
         public RegistroUsuarioCliente informacionUsuario { get; set; }

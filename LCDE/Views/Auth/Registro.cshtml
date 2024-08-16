@@ -133,7 +133,13 @@
 
                             <div class="mb-3">
                                 <label for="username" class="form-label">Telefono</label>
-                                <input type="text" class="form-control" placeholder="Ingrese numero telefonico" autofocus asp-for="informacionCliente.Telefono" />
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text">GT (+502)</span>
+                                    <input type="number"
+                                           class="form-control"
+                                           autofocus asp-for="informacionCliente.Telefono"
+                                           placeholder="Ingrese numero telefonico" />
+                                </div>
                                 <span class="text-danger text-start" asp-validation-for="informacionCliente.Telefono"></span>
                             </div>
 

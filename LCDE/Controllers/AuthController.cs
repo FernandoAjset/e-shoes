@@ -116,10 +116,11 @@ namespace LCDE.Controllers
 
                 var cliente = new Cliente()
                 {
+                    NIT = modelo.informacionCliente.Nit ?? "",
                     Correo = modelo.informacionUsuario.Correo,
                     Nombre = modelo.informacionCliente.Nombre,
                     Direccion = modelo.informacionCliente.Direccion,
-                    Telefono = modelo.informacionCliente.Telefono,
+                    Telefono = int.Parse(modelo.informacionCliente.Telefono ?? "0"),
                     Id_usuario = usuario.Id
                     //Id_usuario = 0
                 };

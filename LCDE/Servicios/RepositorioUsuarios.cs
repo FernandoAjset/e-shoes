@@ -161,7 +161,7 @@ namespace LCDE.Servicios
 
                 var getTemplate = LeerTemplateService.GetTemplateToStringByName($"notificacion_cambio_contraseña.html");
 
-                var url = $"{configuration["AppUrl"]}“/auth/login";
+                var url = $"{configuration["AppUrl"]}/auth/login";
 
                 var emailBody = getTemplate.Replace("{url}", url);
 

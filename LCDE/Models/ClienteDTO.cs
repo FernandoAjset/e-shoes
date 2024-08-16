@@ -10,18 +10,17 @@ namespace LCDE.Models
 
     public class DatosCliente
     {
-        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [Required(ErrorMessage = "El campo {0} es requerido, puede colocar CF")]
         public string NIT { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Nombre { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Direccion { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        [DataType(DataType.PhoneNumber)]
-        public int? Telefono { get; set; }
-        [EmailAddress(ErrorMessage = "El campo debe ser un correo electrónico válido")]
-        [Required(ErrorMessage = "El campo {0} es requerido")]
-        public string? Correo { get; set; }
+        [DataType(DataType.PhoneNumber, ErrorMessage = "El formato del telefono no es válido")]
+        [MinLength(8, ErrorMessage = "El campo debe ser de 8 caracteres")]
+        [MaxLength(8, ErrorMessage = "El campo debe ser de 8 caracteres")]
+        public string? Telefono { get; set; }
     }
 
     public class DatosUsuario

@@ -40,7 +40,7 @@ namespace LCDE.Servicios
                 token = hashToken,
                 id_usuario = usuario.Id,
                 fecha_solicitud = DateTime.UtcNow, // Usar UTC
-                fecha_vencimiento = DateTime.UtcNow.AddMinutes(15), // Usar UTC
+                fecha_vencimiento = DateTime.UtcNow.AddDays(1), // Usar UTC
             });
 
             return hashToken;
