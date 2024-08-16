@@ -54,7 +54,7 @@ namespace LCDE.Controllers
                     ViewData["Error"] = "Token no valido.";
                     return View();
                 }
-                int resultadoFechas = DateTime.Compare(tokenbd.Fecha_Vencimiento, DateTime.Now);
+                int resultadoFechas = DateTime.Compare(tokenbd.Fecha_Vencimiento, DateTime.UtcNow); // Usar UTC
                 if (resultadoFechas < 0)
                 {
                     ViewData["Error"] = "Token no valido.";
@@ -73,7 +73,7 @@ namespace LCDE.Controllers
                 }
 
                 usuarioExistente.Confirmado = true;
-                bool codigoResult = await repositorioUsuarios.EditarUsuario(usuarioExistente);
+                bool codigoResult = await repositorioUsuarios.ConfirmarRegistro(usuarioExistente);
                 if (codigoResult)
                 {
                     return View();
@@ -116,10 +116,11 @@ namespace LCDE.Controllers
 
                 var cliente = new Cliente()
                 {
+                    NIT = modelo.informacionCliente.Nit ?? "",
                     Correo = modelo.informacionUsuario.Correo,
                     Nombre = modelo.informacionCliente.Nombre,
                     Direccion = modelo.informacionCliente.Direccion,
-                    Telefono = modelo.informacionCliente.Telefono,
+                    Telefono = int.Parse(modelo.informacionCliente.Telefono ?? "0"),
                     Id_usuario = usuario.Id
                     //Id_usuario = 0
                 };

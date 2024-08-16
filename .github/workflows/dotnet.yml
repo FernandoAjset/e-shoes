@@ -1,0 +1,87 @@
+# This workflow will build and deploy a .NET project to AWS Elastic Beanstalk
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Deploy-Production
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  PROJECT_LOCATION: LCDE_no_report.sln
+  APPSETTINGS_PATH: LCDE/appsettings.json
+  ELASTIC_BEANSTALK_NAME: ${{ secrets.AWS_EB_APPLICATION_NAME }}
+  ELASTIC_BEANSTALK_ENV_NAME: ${{ secrets.AWS_EB_ENVIRONMENT_NAME }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_LOCATION }}
+
+    - name: Install envsubst
+      run: sudo apt-get update && sudo apt-get install -y gettext
+
+    - name: Replace placeholders in appsettings.json
+      run: |
+        export AppUrl=${{ secrets.AppUrl }}
+        export HOST=${{ secrets.HOST }}
+        export PORT=${{ secrets.PORT }}
+        export USERNAME=${{ secrets.USERNAME }}
+        export PASSWORD=$(echo "${{ secrets.PASSWORD }}" | sed 's/\*/ /g')
+        export DB_SERVER=${{ secrets.DB_SERVER }}
+        export DB_DATABASE=${{ secrets.DB_DATABASE }}
+        export DB_USER=${{ secrets.DB_USER }}
+        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        envsubst < ${{ env.APPSETTINGS_PATH }} > ${{ env.APPSETTINGS_PATH }}.temp
+        mv ${{ env.APPSETTINGS_PATH }}.temp ${{ env.APPSETTINGS_PATH }}
+
+    - name: Build
+      run: dotnet build ${{ env.PROJECT_LOCATION }} --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish ${{ env.PROJECT_LOCATION }} --configuration Release --output "${{ github.workspace }}/${{github.run_id}}"
+
+    - name: Pack
+      run: |
+        cd ${{github.run_id}}
+        zip -r ../${{github.run_id}}.zip .
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4.3.3
+      with: 
+        name: deploy-files
+        path: ${{github.run_id}}.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/download-artifact@v4.1.7
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Deploy to Elastic Beanstalk
+      run: |
+        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        aws s3 cp "deploy-files/${{github.run_id}}.zip" s3://elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}/artifact/dotnet-mvc-app/${{github.run_id}}-${TIMESTAMP}.zip
+        aws elasticbeanstalk create-application-version --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --version-label ${{ github.run_id }}-${TIMESTAMP} --description ${{ github.run_id }}-${TIMESTAMP} --source-bundle S3Bucket="elasticbeanstalk-${{ env.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}",S3Key="artifact/dotnet-mvc-app/${{ github.run_id }}-${TIMESTAMP}.zip"
+        aws elasticbeanstalk update-environment --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }} --version-label ${{ github.run_id }}-${TIMESTAMP}
+        aws elasticbeanstalk wait environment-updated --application-name ${{ env.ELASTIC_BEANSTALK_NAME }} --environment-name ${{ env.ELASTIC_BEANSTALK_ENV_NAME }}

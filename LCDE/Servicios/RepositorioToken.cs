@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using LCDE.Models;
 using Microsoft.Data.SqlClient;
-using Microsoft.ReportingServices.ReportProcessing.ReportObjectModel;
 using System.Security.Cryptography;
 
 namespace LCDE.Servicios
@@ -12,10 +11,10 @@ namespace LCDE.Servicios
         string CrearTokenRegistroUsuario(Usuario usuario);
         UsuarioToken? ObtenerToken(string token);
     }
+
     public class RepositorioToken : IRepositorioToken
     {
         private readonly IEncryptService encryptService;
-
         private readonly string connectionString;
 
         public RepositorioToken(IEncryptService encryptService, IConfiguration configuration)
@@ -23,6 +22,7 @@ namespace LCDE.Servicios
             this.encryptService = encryptService;
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
         }
+
         public string CrearTokenRegistroUsuario(Usuario usuario)
         {
             var randomNumber = new byte[256];
@@ -39,13 +39,12 @@ namespace LCDE.Servicios
                 tipo = "Confirmacion",
                 token = hashToken,
                 id_usuario = usuario.Id,
-                fecha_solicitud = DateTime.Now,
-                fecha_vencimiento = DateTime.Now.AddMinutes(15),
+                fecha_solicitud = DateTime.UtcNow, // Usar UTC
+                fecha_vencimiento = DateTime.UtcNow.AddDays(1), // Usar UTC
             });
 
             return hashToken;
         }
-
 
         public UsuarioToken? ObtenerToken(string token)
         {
@@ -81,7 +80,7 @@ namespace LCDE.Servicios
                     id_usuario = token.Id_Usuario,
                     fecha_solicitud = token.Fecha_Solicitud,
                     fecha_vencimiento = token.Fecha_Vencimiento,
-                    activo = token.Activo,                    
+                    activo = token.Activo,
                 });
             return filasAfectadas > 0;
         }

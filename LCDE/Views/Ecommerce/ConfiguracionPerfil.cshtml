@@ -27,8 +27,7 @@
                         <label for="Cliente.Nombre" class="form-label">Nombre</label>
                         <input class="form-control"
                                type="text"
-                               asp-for="Cliente.Nombre"
-                                />
+                               asp-for="Cliente.Nombre" />
                         <span class="text-danger text-start" asp-validation-for="Cliente.Nombre"></span>
                     </div>
                     <div class="mb-3 col-md-6">
@@ -37,33 +36,27 @@
                         <span class="text-danger text-start" asp-validation-for="Usuario.Correo"></span>
                     </div>
                     <div class="mb-3 col-md-6">
-                        <label for="Cliente.Correo" class="form-label">Correo1</label>
-                        <input class="form-control"
-                               type="text"
-                               asp-for="Cliente.Correo" />
-                        <span class="text-danger text-start" asp-validation-for="Cliente.Correo"></span>
-                    </div>
-                    <div class="mb-3 col-md-6">
-                        <label for="Usuario.Contrasennia" class="form-label">Contraseña</label>
-                        <input class="form-control"
-                               type="text"
-                               asp-for="Usuario.Contrasennia" />
-                        <span class="text-danger text-start" asp-validation-for="Usuario.Contrasennia"></span>
-                    </div>
-                    <div class="mb-3 col-md-6">
                         <label for="Cliente.Direccion" class="form-label">Direccion</label>
                         <input type="text"
                                class="form-control"
                                asp-for="Cliente.Direccion" />
-                            <span class="text-danger text-start" asp-validation-for="Cliente.Direccion"></span>
+                        <span class="text-danger text-start" asp-validation-for="Cliente.Direccion"></span>
                     </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="Usuario.Contrasennia" class="form-label">Contraseña</label>
+                        <input class="form-control"
+                               type="password"
+                               asp-for="Usuario.Contrasennia" />
+                        <span class="text-danger text-start" asp-validation-for="Usuario.Contrasennia"></span>
+                    </div>
+
                     <div>
                     </div>
                     <div class="mb-3 col-md-6">
                         <label class="form-label" for="Cliente.Telefono">Telefono</label>
                         <div class="input-group input-group-merge">
                             <span class="input-group-text">GT (+502)</span>
-                            <input type="text"
+                            <input type="number"
                                    class="form-control"
                                    asp-for="Cliente.Telefono" />
                         </div>

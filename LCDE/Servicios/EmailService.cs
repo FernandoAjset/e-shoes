@@ -1,8 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 
 namespace LCDE.Servicios
 {
@@ -14,6 +12,7 @@ namespace LCDE.Servicios
     public class EmailService : IEmailService
     {
         private readonly IConfiguration configuration;
+        private readonly string logFilePath = "emailservice.txt";
 
         public EmailService(IConfiguration configuration)
         {
@@ -25,7 +24,7 @@ namespace LCDE.Servicios
             try
             {
                 var newEmail = new MimeMessage();
-                newEmail.From.Add(MailboxAddress.Parse(configuration.GetSection("SMTP:USERNAME").Value));
+                newEmail.From.Add(MailboxAddress.Parse("eshoes-clangpt"));
                 newEmail.To.Add(MailboxAddress.Parse(email));
                 newEmail.Subject = subject;
 
@@ -41,20 +40,37 @@ namespace LCDE.Servicios
                 smtp.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
                 smtp.Connect(
-                    configuration.GetSection("SMTP:HOST").Value,
-                    Convert.ToInt32(configuration.GetSection("SMTP:PORT").Value),
+                    configuration["SMTP:HOST"],
+                    Convert.ToInt32(configuration["SMTP:PORT"]),
                     SecureSocketOptions.StartTls
                 );
 
                 smtp.Authenticate(
-                    configuration.GetSection("SMTP:USERNAME").Value,
-                    configuration.GetSection("SMTP:PASSWORD").Value
+                    configuration["SMTP:USERNAME"],
+                    configuration["SMTP:PASSWORD"].Replace('*', ' ') // Reemplazar asteriscos por espacios
                 );
 
-                smtp.Send(newEmail);
+                await smtp.SendAsync(newEmail);
                 smtp.Disconnect(true);
             }
             catch (Exception ex)
+            {
+                LogError(ex);
+                throw;
+            }
+        }
+
+        private void LogError(Exception ex)
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(logFilePath, true))
+                {
+                    writer.WriteLine($"[{DateTime.Now}] Error: {ex.Message}");
+                    writer.WriteLine($"[{DateTime.Now}] StackTrace: {ex.StackTrace}");
+                }
+            }
+            catch
             {
                 throw;
             }

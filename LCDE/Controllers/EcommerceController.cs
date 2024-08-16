@@ -54,8 +54,7 @@ namespace LCDE.Controllers
                     NIT = cliente.NIT,
                     Nombre = cliente.Nombre,
                     Direccion = cliente.Direccion,
-                    Telefono = cliente.Telefono,
-                    Correo = cliente.Correo,
+                    Telefono = cliente.Telefono.ToString(),
                 };
 
                 clienteDTO.Usuario = new DatosUsuario()
@@ -128,7 +127,7 @@ namespace LCDE.Controllers
                 ClientExist.NIT = ClienteUsuario.Cliente.NIT;
                 ClientExist.Nombre = ClienteUsuario.Cliente.Nombre;
                 ClientExist.Direccion = ClienteUsuario.Cliente.Direccion;
-                ClientExist.Telefono = ClienteUsuario.Cliente.Telefono ?? 0;
+                ClientExist.Telefono = int.Parse(ClienteUsuario.Cliente.Telefono ?? "0");
                 ClientExist.Correo = ClienteUsuario.Usuario.Correo;
                 await repositotioClientes.ModificarCliente(ClientExist);
 

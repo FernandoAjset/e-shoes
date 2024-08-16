@@ -17,6 +17,7 @@ namespace LCDE.Servicios
         Task<bool> BorrarUsuario(int id);
         Task<IEnumerable<SelectListItem>> ObtenerRoles();
         Task<bool> NotificacionContrasenia(string email);
+        Task<bool> ConfirmarRegistro(Usuario usuario);
     }
 
     public class RepositorioUsuarios : IRepositorioUsuarios
@@ -101,6 +102,25 @@ namespace LCDE.Servicios
             }
         }
 
+        public async Task<bool> ConfirmarRegistro(Usuario usuario)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);//Yaaaaaaaaa
+                await connection.ExecuteAsync(@"
+                       EXEC SP_CONFIRMAR_REGISTRO_USUARIO @Id_Usuario
+                        ", new
+                {
+                    Id_Usuario = usuario.Id
+                });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         //sp para eliminar USUARIO
         //Borrar usuarios, asi como ella te borro de su corazón chtmouser!
         public async Task<bool> BorrarUsuario(int IdUser)
@@ -141,7 +161,7 @@ namespace LCDE.Servicios
 
                 var getTemplate = LeerTemplateService.GetTemplateToStringByName($"notificacion_cambio_contraseña.html");
 
-                var url = $"{configuration["AppUrl"]}“/auth/login";
+                var url = $"{configuration["AppUrl"]}/auth/login";
 
                 var emailBody = getTemplate.Replace("{url}", url);
 
