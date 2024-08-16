@@ -23,7 +23,7 @@ builder.Services.AddTransient<RepositorioReportes, RepositorioReportes>();
 builder.Services.AddSingleton<IEncryptService, EncryptService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<IRepositorioToken, RepositorioToken>();
-builder.Services.AddSingleton<ILogService, LogService>();
+builder.Services.AddTransient<ILogService, LogService>();
 
 builder.Services.AddTransient<RepositorioPromociones, RepositorioPromociones>();
 builder.Services.AddTransient<SignInManager<Usuario>>();

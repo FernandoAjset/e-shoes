@@ -25,10 +25,10 @@ namespace LCDE.Servicios
         private readonly string connectionString;
         private readonly IEmailService emailService;
         private readonly IConfiguration configuration;
-        private readonly LogService logService;
+        private readonly ILogService logService;
 
         public RepositorioUsuarios(IConfiguration configuration,
-            LogService logService,
+            ILogService logService,
             IEmailService emailService, IConfiguration configuration1)
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
