@@ -75,6 +75,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Usar el middleware personalizado
+app.UseMiddleware<RoleBasedRedirectionMiddleware>();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Ventas}/{action=Index}/{id?}");
