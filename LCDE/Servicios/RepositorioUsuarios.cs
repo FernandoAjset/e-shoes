@@ -3,6 +3,7 @@ using LCDE.Models;
 using LCDE.Models.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
+using Newtonsoft.Json.Linq;
 
 namespace LCDE.Servicios
 {
@@ -15,14 +16,19 @@ namespace LCDE.Servicios
         Task<bool> EditarUsuario(Usuario usuario);
         Task<bool> BorrarUsuario(int id);
         Task<IEnumerable<SelectListItem>> ObtenerRoles();
+        Task<bool> NotificacionContrasenia(string email);
     }
 
     public class RepositorioUsuarios : IRepositorioUsuarios
     {
         private readonly string connectionString;
-        public RepositorioUsuarios(IConfiguration configuration)
+        private readonly IEmailService emailService;
+        private readonly IConfiguration configuration;
+        public RepositorioUsuarios(IConfiguration configuration, IEmailService emailService, IConfiguration configuration1)
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
+            this.emailService = emailService;
+            this.configuration = configuration;
         }
 
         public async Task<int> CrearUsuario(Usuario usuario)///////////////////////////////////////
@@ -122,5 +128,34 @@ namespace LCDE.Servicios
                         ");
             return user.ToList();
         }
+
+        /// AQUI ESTÁ LA FUNCIOON
+        public async Task<bool> NotificacionContrasenia(string email)
+        {
+            try
+            {
+                if (email == null) return false;
+
+                Usuario EmailUsuario = await BuscarUsuarioPorEmail(email);
+                if (EmailUsuario == null) return false;
+
+                var getTemplate = LeerTemplateService.GetTemplateToStringByName($"notificacion_cambio_contraseña.html");
+
+                var url = $"{configuration["AppUrl"]}“/auth/login";
+
+                var emailBody = getTemplate.Replace("{url}", url);
+
+                emailBody = emailBody.Replace("{usuario}", EmailUsuario.Nombre_usuario);
+
+                await this.emailService.SendEmailAsync(email, "Cambio de contraseña", emailBody);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
     }
 }

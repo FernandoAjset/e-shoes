@@ -10,7 +10,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IRepositorioUsuarios, RepositorioUsuarios>();
 builder.Services.AddTransient<IUserStore<Usuario>, UsuarioStore>();
-builder.Services.AddTransient<RepositotioClientes, RepositotioClientes>();
+builder.Services.AddTransient<IRepositorioCliente, RepositotioClientes>();
 builder.Services.AddTransient<RepositorioProveedores, RepositorioProveedores>();
 builder.Services.AddTransient<RepositorioProductos, RepositorioProductos>();
 builder.Services.AddTransient<RepositorioCategorias, RepositorioCategorias>();
@@ -20,9 +20,11 @@ builder.Services.AddTransient<ReportesServicio, ReportesServicio>();
 builder.Services.AddTransient<RepositorioDevoluciones, RepositorioDevoluciones>();
 builder.Services.AddTransient<RepositorioRegistroCaja, RepositorioRegistroCaja>();
 builder.Services.AddTransient<RepositorioReportes, RepositorioReportes>();
+builder.Services.AddSingleton<IEncryptService, EncryptService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<IRepositorioToken, RepositorioToken>();
 
 builder.Services.AddTransient<RepositorioPromociones, RepositorioPromociones>();
-
 builder.Services.AddTransient<SignInManager<Usuario>>();
 builder.Services.AddIdentityCore<Usuario>(options =>
 {

@@ -5,7 +5,17 @@ using System.Data;
 
 namespace LCDE.Servicios
 {
-    public class RepositotioClientes // clase
+    public interface IRepositorioCliente
+    {
+        Task<bool> BorrarCliente(int IdCliente);
+        Task<int> CrearCliente(Cliente cliente);
+        Task<bool> ModificarCliente(Cliente cliente);
+        Task<Cliente> ObtenerCliente(int IdCliente);
+        Task<Cliente> ObtenerClientePorIdUsuario(int IdUsuario);
+        Task<Cliente> ObtenerClientePorNit(string NIT, int Id);
+        Task<IEnumerable<Cliente>> ObtenerTodosClientes();
+    }
+    public class RepositotioClientes : IRepositorioCliente// clase
     {
         private readonly string connectionString;
         public RepositotioClientes(IConfiguration configuration) //cosntructor que se llama igual que la clase
@@ -24,25 +34,53 @@ namespace LCDE.Servicios
             parameters.Add("@CorreoCliente", cliente.Correo);
             parameters.Add("@NIT", cliente.NIT);
             parameters.Add("@IdCliente", 0);
+            parameters.Add("@id_usuario", cliente.Id_usuario);
             parameters.Add("@Operacion", "insert");
             cliente_id = await connection.QuerySingleAsync<int>("SP_CRUD_CLIENTES", parameters, commandType: CommandType.StoredProcedure);
             return cliente_id;
         }
 
-
-        public async Task<Cliente> ObtenerCliente(int IdCliente)
+        public async Task<Cliente> ObtenerClientePorIdUsuario(int IdUsuario)
         {
             using var connection = new SqlConnection(connectionString);
-            Cliente cliente = await connection.QuerySingleAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT,@IdCliente, @Operacion
+            Cliente cliente = await connection.QuerySingleOrDefaultAsync<Cliente>(@"
+                        EXEC SP_CRUD_CLIENTES 
+                        @NombreCliente, 
+                        @DireccionCliente, @TelefonoCliente, 
+                        @CorreoCliente, @NIT,
+                        @IdCliente, @id_usuario,@Operacion
                         ", new
             {
                 NombreCliente = "",
                 DireccionCliente = "",
-                TelefonoCliente = "",
+                TelefonoCliente = 0,
+                CorreoCliente = "",
+                NIT = "",
+                IdCliente = 0,
+                id_usuario = IdUsuario,
+                Operacion = "selectPorUsuarioId"
+            });
+            return cliente;
+        }
+
+        public async Task<Cliente> ObtenerCliente(int IdCliente)
+        {
+            using var connection = new SqlConnection(connectionString);
+            Cliente cliente = await connection.QuerySingleOrDefaultAsync<Cliente>(@"
+                        EXEC SP_CRUD_CLIENTES 
+                        @NombreCliente, 
+                        @DireccionCliente, @TelefonoCliente, 
+                        @CorreoCliente, @NIT,
+                        @IdCliente, @id_usuario,@Operacion
+                        ", new
+            {
+                NombreCliente = "",
+                DireccionCliente = "",
+                TelefonoCliente = 0,
                 CorreoCliente = "",
                 NIT = "",
                 IdCliente = IdCliente,
+                id_usuario = 0,
                 Operacion = "select"
             });
             return cliente;
@@ -80,7 +118,9 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT,@IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, 
+                        @TelefonoCliente, @CorreoCliente, 
+                        @NIT, @IdCliente, @id_usuario, @Operacion
                         ", new
                 {
                     NombreCliente = cliente.Nombre,
@@ -89,6 +129,7 @@ namespace LCDE.Servicios
                     CorreoCliente = cliente.Correo,
                     NIT = cliente.NIT,
                     IdCliente = cliente.Id,
+                    id_usuario=cliente.Id_usuario,
                     Operacion = "update"
                 });
                 return true;
@@ -120,7 +161,7 @@ namespace LCDE.Servicios
             }
             catch (Exception ex)
             {
-                return false;   
+                return false;
             }
         }
 

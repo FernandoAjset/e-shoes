@@ -9,13 +9,13 @@ namespace LCDE.Controllers
     /// </summary>
     public class ClientesController : Controller
     {
-        private readonly RepositotioClientes repositotioClientes;
+        private readonly IRepositorioCliente repositotioClientes;
 
         /// <summary>
         /// Constructor de clase.
         /// </summary>
         /// <param name="repositotioClientes">Inyección del servicio de repositorio de clientes, que realiza el acceso a la base de datos.</param>
-        public ClientesController(RepositotioClientes repositotioClientes)
+        public ClientesController(IRepositorioCliente repositotioClientes)
         {
             this.repositotioClientes = repositotioClientes;
         }

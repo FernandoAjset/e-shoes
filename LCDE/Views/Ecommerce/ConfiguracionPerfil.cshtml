@@ -1,0 +1,84 @@
+﻿@model LCDE.Models.ClienteDTO
+
+<div class="px-5 my-5">
+    <div class="card mb-4">
+        <h5 class="card-header">Profile Details</h5>
+        <!-- Account -->
+        <div class="card-body">
+            <form asp-action="ConfiguracionPerfil" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="Usuario.Id" class="form-control"  hidden  />
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="Cliente.NIT">NIT</label>
+                        <div class="input-group input-group-merge">
+                            <input type="text"
+                                   class="form-control"
+                                   asp-for="Cliente.NIT" />
+                        </div>
+                        <span class="text-danger text-start" asp-validation-for="Cliente.NIT"></span>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="Usuario.Nombre_usuario" class="form-label">Nombre de Usuario</label>
+                        <input class="form-control" type="text" asp-for="Usuario.Nombre_usuario" />
+                        <span class="text-danger text-start" asp-validation-for="Usuario.Nombre_usuario"></span>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="Cliente.Nombre" class="form-label">Nombre</label>
+                        <input class="form-control"
+                               type="text"
+                               asp-for="Cliente.Nombre"
+                                />
+                        <span class="text-danger text-start" asp-validation-for="Cliente.Nombre"></span>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="Usuario.Correo" class="form-label">Correo</label>
+                        <input class="form-control" type="text" asp-for="Usuario.Correo" />
+                        <span class="text-danger text-start" asp-validation-for="Usuario.Correo"></span>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="Cliente.Correo" class="form-label">Correo1</label>
+                        <input class="form-control"
+                               type="text"
+                               asp-for="Cliente.Correo" />
+                        <span class="text-danger text-start" asp-validation-for="Cliente.Correo"></span>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="Usuario.Contrasennia" class="form-label">Contraseña</label>
+                        <input class="form-control"
+                               type="text"
+                               asp-for="Usuario.Contrasennia" />
+                        <span class="text-danger text-start" asp-validation-for="Usuario.Contrasennia"></span>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label for="Cliente.Direccion" class="form-label">Direccion</label>
+                        <input type="text"
+                               class="form-control"
+                               asp-for="Cliente.Direccion" />
+                            <span class="text-danger text-start" asp-validation-for="Cliente.Direccion"></span>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label" for="Cliente.Telefono">Telefono</label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text">GT (+502)</span>
+                            <input type="text"
+                                   class="form-control"
+                                   asp-for="Cliente.Telefono" />
+                        </div>
+                        <span class="text-danger text-start" asp-validation-for="Cliente.Telefono"></span>
+                    </div>
+
+
+
+                </div>
+                <div class="mt-2">
+                    <button type="submit" value="submit" class="btn btn-primary me-2">Save changes</button>
+                    <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+        <!-- /Account -->
+    </div>
+</div>

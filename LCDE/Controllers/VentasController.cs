@@ -1,7 +1,6 @@
 ﻿using LCDE.Models;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -20,7 +19,7 @@ namespace LCDE.Controllers
         private readonly RepositorioCategorias repositorioCategorias;
         private readonly RepositorioProveedores repositorioProveedores;
         private readonly RepositorioTipoPago repositorioTipoPago;
-        private readonly RepositotioClientes repositotioClientes;
+        private readonly IRepositorioCliente repositotioClientes;
         private readonly RepositorioVentas repositorioVentas;
         private readonly ReportesServicio reportesServicio;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -34,7 +33,7 @@ namespace LCDE.Controllers
             RepositorioCategorias repositorioCategorias,
             RepositorioProveedores repositorioProveedores,
             RepositorioTipoPago repositorioTipoPago,
-            RepositotioClientes repositotioClientes,
+            IRepositorioCliente repositotioClientes,
             RepositorioVentas repositorioVentas,
             ReportesServicio reportesServicio,
             IHttpContextAccessor httpContextAccessor

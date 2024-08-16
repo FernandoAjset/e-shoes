@@ -6,6 +6,8 @@ namespace LCDE.Models
     public class Cliente
     {
         public int Id { get; set; }
+        public int Id_usuario { get; set; }
+
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Remote(action: "ClienteExiste", controller: "Clientes",
             AdditionalFields = nameof(Id))]
