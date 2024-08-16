@@ -1,0 +1,4 @@
+[15/08/2024 22:44:55] Error: Input string was not in a correct format.
+[15/08/2024 22:44:55] StackTrace:    at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type)
+   at System.Convert.ToInt32(String value)
+   at LCDE.Servicios.EmailService.SendEmailAsync(String email, String subject, String message) in C:\Users\ferna\source\repos\UMG\Seminario\LCDE\Servicios\EmailService.cs:line 42

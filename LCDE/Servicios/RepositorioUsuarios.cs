@@ -17,6 +17,7 @@ namespace LCDE.Servicios
         Task<bool> BorrarUsuario(int id);
         Task<IEnumerable<SelectListItem>> ObtenerRoles();
         Task<bool> NotificacionContrasenia(string email);
+        Task<bool> ConfirmarRegistro(Usuario usuario);
     }
 
     public class RepositorioUsuarios : IRepositorioUsuarios
@@ -92,6 +93,25 @@ namespace LCDE.Servicios
                     contrasennia = usuario.Contrasennia ?? "",
                     correo = usuario.Correo,
                     Id_role = usuario.Id_Role
+                });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> ConfirmarRegistro(Usuario usuario)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);//Yaaaaaaaaa
+                await connection.ExecuteAsync(@"
+                       EXEC SP_CONFIRMAR_REGISTRO_USUARIO @Id_Usuario
+                        ", new
+                {
+                    Id_Usuario = usuario.Id
                 });
                 return true;
             }
