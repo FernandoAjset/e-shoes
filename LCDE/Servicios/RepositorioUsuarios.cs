@@ -3,7 +3,6 @@ using LCDE.Models;
 using LCDE.Models.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
-using Newtonsoft.Json.Linq;
 
 namespace LCDE.Servicios
 {
@@ -24,15 +23,19 @@ namespace LCDE.Servicios
     {
         private readonly string connectionString;
         private readonly IEmailService emailService;
+        private readonly ILeerTemplateService leerTemplateService;
         private readonly IConfiguration configuration;
         private readonly ILogService logService;
 
-        public RepositorioUsuarios(IConfiguration configuration,
+        public RepositorioUsuarios(
+            ILeerTemplateService leerTemplateService,
+            IConfiguration configuration,
             ILogService logService,
             IEmailService emailService, IConfiguration configuration1)
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
             this.emailService = emailService;
+            this.leerTemplateService = leerTemplateService;
             this.configuration = configuration;
             this.logService = logService;
         }
@@ -164,7 +167,7 @@ namespace LCDE.Servicios
                 Usuario EmailUsuario = await BuscarUsuarioPorEmail(email);
                 if (EmailUsuario == null) return false;
 
-                var getTemplate = LeerTemplateService.GetTemplateToStringByName($"notificacion_cambio_contraseña.html");
+                var getTemplate = leerTemplateService.GetTemplateToStringByName($"notificacion_cambio_contraseña.html");
 
                 var url = $"{configuration["AppUrl"]}/auth/login";
 

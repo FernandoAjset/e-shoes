@@ -55,6 +55,9 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddTransient<ISesionServicio, SesionServicio>();
 
+// Registrar LeerTemplateService
+builder.Services.AddTransient<ILeerTemplateService, LeerTemplateService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
