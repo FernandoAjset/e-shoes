@@ -11,11 +11,14 @@ namespace LCDE.Servicios
 
     public class EmailService : IEmailService
     {
+        private readonly ILogService logService;
         private readonly IConfiguration configuration;
-        private readonly string logFilePath = "emailservice.txt";
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(
+            ILogService logService,
+            IConfiguration configuration)
         {
+            this.logService = logService;
             this.configuration = configuration;
         }
 
@@ -64,11 +67,7 @@ namespace LCDE.Servicios
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter(logFilePath, true))
-                {
-                    writer.WriteLine($"[{DateTime.Now}] Error: {ex.Message}");
-                    writer.WriteLine($"[{DateTime.Now}] StackTrace: {ex.StackTrace}");
-                }
+                logService.LogError(ex);
             }
             catch
             {
