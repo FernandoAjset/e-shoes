@@ -16,9 +16,11 @@ namespace LCDE.Models
         public string Nombre { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Direccion { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
         [DataType(DataType.PhoneNumber)]
         public int? Telefono { get; set; }
         [EmailAddress(ErrorMessage = "El campo debe ser un correo electrónico válido")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
         public string? Correo { get; set; }
     }
 
