@@ -1,11 +1,12 @@
 ﻿using LCDE.Models;
 using LCDE.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Globalization;
 
 namespace LCDE.Controllers
 {
+    [Authorize(Policy = "AdminOrVendedorPolicy")]
     public class DevolucionesController : Controller
     {
 

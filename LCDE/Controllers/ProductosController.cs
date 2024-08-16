@@ -1,15 +1,16 @@
 ﻿using LCDE.Models;
 using LCDE.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
-using System.Reflection;
 
 namespace LCDE.Controllers
 {
     /// <summary>
     /// Controlador con acciones relacionadas a la entidad de Cliente.
     /// </summary>
+    [Authorize(Policy = "AdminPolicy")]
     public class ProductosController : Controller
     {
         private readonly RepositorioProductos repositorioProductos;

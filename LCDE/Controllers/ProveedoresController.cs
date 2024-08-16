@@ -1,5 +1,6 @@
 ﻿using LCDE.Models;
 using LCDE.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LCDE.Controllers
@@ -7,6 +8,7 @@ namespace LCDE.Controllers
     /// <summary>
     /// Controlador con acciones relacionadas a la entidad de Cliente.
     /// </summary>
+    [Authorize(Policy = "AdminOrVendedorPolicy")]
     public class ProveedoresController : Controller
     {
         private readonly RepositorioProveedores repositorioProveedores;
