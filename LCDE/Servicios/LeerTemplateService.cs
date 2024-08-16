@@ -1,71 +1,42 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
-
-namespace LCDE.Servicios
+﻿namespace LCDE.Servicios
 {
-    public static class LeerTemplateService
-
+    public class LeerTemplateService : ILeerTemplateService
     {
-
-        private static string basePath = Assembly
-                                            .GetExecutingAssembly()
-                                            .Location
-                                            .Replace("LCDE.dll",
-                                                        string.Empty);
-
-        // Allows setting the base path for tests
-
-        public static void SetBasePath(string path)
-
+        private readonly IWebHostEnvironment _env;
+        private string basePath = "";
+        public LeerTemplateService(IWebHostEnvironment env)
         {
-
-            basePath = path;
-
+            _env = env;
         }
 
-        public static string GetTemplateToStringByName(string name)
-
+        public string GetTemplateToStringByName(string name)
         {
-
             if (string.IsNullOrWhiteSpace(name))
-
             {
-
                 throw new ArgumentException("Template name cannot be null, empty, or whitespace.", nameof(name));
-
             }
 
             try
-
             {
-
-                string templatePath = $"{basePath}Data\\{name}";
+                basePath = Path.Combine(_env.ContentRootPath, "Data");
+                string templatePath = Path.Combine(basePath, name);
 
                 using StreamReader reader = new(templatePath);
-
                 return reader.ReadToEnd();
-
             }
-
-            catch (FileNotFoundException)
-
+            catch (FileNotFoundException ex)
             {
-
-                throw new Exception("No se pudo obtener el archivo del correo.");
-
+                throw new Exception($"No se pudo obtener el archivo del correo. Path = {basePath}. Error = {ex.StackTrace}");
             }
-
             catch (Exception ex)
-
             {
-
-                throw new Exception("Ocurrió un error al obtener el archivo.");
-
+                throw new Exception("Ocurrió un error al obtener el archivo.", ex);
             }
-
         }
-
     }
 
+    public interface ILeerTemplateService
+    {
+        string GetTemplateToStringByName(string name);
+    }
 }

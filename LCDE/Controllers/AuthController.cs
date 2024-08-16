@@ -13,6 +13,7 @@ namespace LCDE.Controllers
     public class AuthController : Controller
     {
         private readonly IConfiguration configuration;
+        private readonly ILeerTemplateService leerTemplateService;
         private readonly UserManager<Usuario> userManager;
         private readonly SignInManager<Usuario> signInManager;
         private readonly IRepositorioUsuarios repositorioUsuarios;
@@ -22,6 +23,7 @@ namespace LCDE.Controllers
 
         public AuthController(
             IConfiguration configuration,
+            ILeerTemplateService leerTemplateService,
             UserManager<Usuario> userManager,
             IRepositorioUsuarios repositorioUsuarios,
             IRepositorioCliente repositorioCliente,
@@ -31,6 +33,7 @@ namespace LCDE.Controllers
         {
             this.repositorioUsuarios = repositorioUsuarios;
             this.configuration = configuration;
+            this.leerTemplateService = leerTemplateService;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.repositorioCliente = repositorioCliente;
@@ -129,7 +132,7 @@ namespace LCDE.Controllers
                 var token = repositorioToken.CrearTokenRegistroUsuario(usuario);
                 try
                 {
-                    var getTemplate = LeerTemplateService.GetTemplateToStringByName($"confirmar-registro.html");
+                    var getTemplate = leerTemplateService.GetTemplateToStringByName($"confirmar-registro.html");
 
                     var url = $"{configuration["AppUrl"]}/auth/ConfirmarRegistro?token={token}";
 
