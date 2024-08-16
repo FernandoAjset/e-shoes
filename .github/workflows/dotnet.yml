@@ -34,17 +34,13 @@ jobs:
     - name: Install envsubst
       run: sudo apt-get update && sudo apt-get install -y gettext
 
-    - name: Replace asterisks with spaces in PASSWORD
-      run: |
-        export PASSWORD=${{ secrets.PASSWORD }}
-        export PASSWORD=$(echo $PASSWORD | sed 's/\*/ /g')
-
     - name: Replace placeholders in appsettings.json
       run: |
         export AppUrl=${{ secrets.AppUrl }}
         export HOST=${{ secrets.HOST }}
         export PORT=${{ secrets.PORT }}
         export USERNAME=${{ secrets.USERNAME }}
+        export PASSWORD=$(echo "${{ secrets.PASSWORD }}" | sed 's/\*/ /g')
         export DB_SERVER=${{ secrets.DB_SERVER }}
         export DB_DATABASE=${{ secrets.DB_DATABASE }}
         export DB_USER=${{ secrets.DB_USER }}
