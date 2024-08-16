@@ -1,10 +1,12 @@
 ﻿using LCDE.Models;
 using LCDE.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LCDE.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     public class CajaController : Controller
     {
         private readonly SignInManager<Usuario> signInManager;

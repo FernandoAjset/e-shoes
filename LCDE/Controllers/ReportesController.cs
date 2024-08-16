@@ -1,11 +1,11 @@
-﻿using LCDE.Models;
-using LCDE.Servicios;
-using Microsoft.AspNetCore.Identity;
+﻿using LCDE.Servicios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LCDE.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     public class ReportesController : Controller
     {
         private readonly RepositorioReportes repositorioReportes;

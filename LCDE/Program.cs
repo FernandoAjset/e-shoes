@@ -48,9 +48,22 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole(((int)Rol.Admin).ToString()));
-    options.AddPolicy("VendedorPolicy", policy => policy.RequireRole(((int)Rol.Vendedor).ToString()));
-    options.AddPolicy("ClientePolicy", policy => policy.RequireRole(((int)Rol.Cliente).ToString()));
+    options.AddPolicy("AdminPolicy", policy =>
+    policy.RequireAssertion(context =>
+    context.User.IsInRole(((int)Rol.Admin).ToString())));
+
+    options.AddPolicy("ClientePolicy", policy =>
+    policy.RequireAssertion(context =>
+    context.User.IsInRole(((int)Rol.Cliente).ToString())));
+
+    options.AddPolicy("VendedorPolicy", policy =>
+    policy.RequireAssertion(context =>
+    context.User.IsInRole(((int)Rol.Vendedor).ToString())));
+
+    options.AddPolicy("AdminOrVendedorPolicy", policy =>
+        policy.RequireAssertion(context =>
+            context.User.IsInRole(((int)Rol.Admin).ToString()) ||
+            context.User.IsInRole(((int)Rol.Vendedor).ToString())));
 });
 
 builder.Services.AddTransient<ISesionServicio, SesionServicio>();
@@ -75,8 +88,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Usar el middleware personalizado
+app.UseMiddleware<RoleBasedRedirectionMiddleware>();
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Ventas}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
