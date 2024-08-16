@@ -25,11 +25,16 @@ namespace LCDE.Servicios
         private readonly string connectionString;
         private readonly IEmailService emailService;
         private readonly IConfiguration configuration;
-        public RepositorioUsuarios(IConfiguration configuration, IEmailService emailService, IConfiguration configuration1)
+        private readonly LogService logService;
+
+        public RepositorioUsuarios(IConfiguration configuration,
+            LogService logService,
+            IEmailService emailService, IConfiguration configuration1)
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
             this.emailService = emailService;
             this.configuration = configuration;
+            this.logService = logService;
         }
 
         public async Task<int> CrearUsuario(Usuario usuario)///////////////////////////////////////
@@ -173,7 +178,15 @@ namespace LCDE.Servicios
             }
             catch (Exception ex)
             {
-                return false;
+                var logError = new Log
+                {
+                    Type = LogEnum.ERROR.GetDisplayName() ?? "None",
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace ?? "",
+                    Date = DateTime.Now,
+                };
+                logService.Log(logError);
+                throw;
             }
         }
 
