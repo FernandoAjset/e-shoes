@@ -6,7 +6,7 @@ namespace LCDE.Models
     public class CrearClienteDTo
     {
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Solo se permiten letras.")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten letras.")]
         public string Nombre { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -20,7 +20,7 @@ namespace LCDE.Models
         public string? Telefono { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido, puede colocar CF")]
-        [RegularExpression(@"^(?!0+$)[a-zA-Z0-9-]+$", ErrorMessage = "El campo solo puede contener letras, números y guiones, y no puede ser solo ceros")]
+        [RegularExpression(@"^(?![-]+$)(?!0+$)[a-zA-Z0-9-]+$", ErrorMessage = "El campo solo puede contener letras, números y guiones")]
         public string? Nit { get; set; }
     }
 
@@ -35,9 +35,7 @@ namespace LCDE.Models
         public int? Id { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        [MaxLength(70, ErrorMessage = "El campo no puede exceder 70 caracteres")]
-        [Display(Name = "Nombre de usuario")]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Solo se permiten letras.")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Solo se permiten letras, sin espacios.")]
         public string Nombre_usuario { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
