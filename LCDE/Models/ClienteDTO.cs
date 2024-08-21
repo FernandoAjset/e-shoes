@@ -6,6 +6,9 @@ namespace LCDE.Models
     {
         public DatosCliente Cliente { get; set; }
         public DatosUsuario Usuario { get; set; }
+
+        //public ProductoFiltroDTO filtros
+        //public List<ProductoListarDTO> productos
     }
 
     public class DatosCliente
