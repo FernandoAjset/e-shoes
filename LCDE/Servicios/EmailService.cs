@@ -46,7 +46,7 @@ namespace LCDE.Servicios
 
                 smtp.Connect(
                     configuration["SMTP:HOST"],
-                    Convert.ToInt32(configuration["SMTP:PORT"]),
+                    configuration.GetSection("SMTP").GetValue<int>("PORT"),
                     SecureSocketOptions.StartTls
                 );
 
