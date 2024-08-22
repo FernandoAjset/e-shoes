@@ -192,7 +192,7 @@ namespace LCDE.Servicios
             try
             {
                 using var connection = new SqlConnection(connectionString);
-                ProductoListarDTO producto = await connection.QuerySingleAsync<ProductoListarDTO>(@"
+                ProductoListarDTO producto = await connection.QueryFirstOrDefaultAsync<ProductoListarDTO>(@"
              EXEC sp_ObtenerDetalleProducto 
               @IdProducto
                      ", new
