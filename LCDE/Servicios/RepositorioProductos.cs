@@ -4,11 +4,6 @@ using Microsoft.Data.SqlClient;
 
 namespace LCDE.Servicios
 {
-    public interface IrepositorioProducto
-    {
-        Task<ProductoListarDTO> ObtenerDetalleProducto(int idProducto);
-
-    }
     public class RepositorioProductos
     {
         private readonly string connectionString;
@@ -175,28 +170,6 @@ namespace LCDE.Servicios
             {
                 return null;
             }
-        }
-
-        public async Task<ProductoListarDTO> ObtenerDetalleProducto(int idProducto)
-        {
-            try
-            {
-                using var connection = new SqlConnection(connectionString);
-                ProductoListarDTO producto = await connection.QuerySingleAsync<ProductoListarDTO>(@"
-                EXEC SP_CRUD_PRODUCTOS 
-                 @IdProducto
-                        ", new
-                {
-                    IdProducto = idProducto,
-
-                });
-                return producto;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-                
         }
     }
 }
