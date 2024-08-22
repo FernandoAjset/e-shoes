@@ -7,7 +7,7 @@ namespace LCDE.Servicios
     public class RepositorioProductos
     {
         private readonly string connectionString;
-        public RepositorioProductos(IConfiguration configuration)
+        public RepositorioProductos(IConfiguration configuration)//chingadamadre otro sin interfaz
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
 
@@ -165,6 +165,43 @@ namespace LCDE.Servicios
                     Operacion = "selectPorNombre"
                 });
                 return producto;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<decimal> PrecioMaximo()
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                decimal precio = await connection.QueryFirstOrDefaultAsync<decimal>(@"
+                EXEC sp_ObtenerPrecioMaximo");
+                return precio;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<List<ProductoListarDTO>> ObtenerProductoFiltrado(ProductoFiltroDTO productoFiltrar)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                List<ProductoListarDTO> ListaFiltrada = (await connection.QueryAsync<ProductoListarDTO>(@"
+                EXEC sp_FiltrarProductos @categoriaId, @nombreProducto, @precioMin, @precioMax
+                ", new
+                {
+                    categoriaId = productoFiltrar.CategoriaId,
+                    nombreProducto = productoFiltrar.NombreProducto,
+                    precioMin = productoFiltrar.PrecioMin,
+                    precioMax = productoFiltrar.PrecioMax,
+                })).ToList();
+                return ListaFiltrada;
             }
             catch (Exception ex)
             {

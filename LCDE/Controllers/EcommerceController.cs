@@ -14,8 +14,9 @@ namespace LCDE.Controllers
         private readonly ISesionServicio sesionServicio;
         private readonly IRepositorioUsuarios repositorioUsuarios;
         private readonly UserManager<Usuario> userManager;
+        
         public EcommerceController(UserManager<Usuario> userManager,
-            IRepositorioCliente pepe,
+            IRepositorioCliente pepe, //quien chingados le pone pepe a una interfaz no mameen xD
             ISesionServicio sesionServicio,
             IRepositorioUsuarios repositorioUsuarios)
         {
@@ -153,6 +154,8 @@ namespace LCDE.Controllers
         {
             return await repositorioUsuarios.ObtenerRoles();
         }
+
+       
 
     }
 }
