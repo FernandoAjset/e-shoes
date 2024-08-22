@@ -19,6 +19,24 @@ namespace LCDE.Controllers
             this.repositorioProductos = repositorioProductos;
             this.repositorioCategorias = repositorioCategorias;
         }
+        public async Task<IActionResult> DetalleProducto(int productoId)
+        {
+            try
+            {
+                ProductoListarDTO producto = await repositorioProductos.ObtenerDetalleProducto(productoId);
+
+                if (producto == null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+                return View(producto);
+
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> ValidarExistenciaSuficiente(int id, int cantidadIngresada)

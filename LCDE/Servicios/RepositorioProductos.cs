@@ -187,6 +187,28 @@ namespace LCDE.Servicios
             }
         }
 
+        public async Task<ProductoListarDTO> ObtenerDetalleProducto(int idProducto)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                ProductoListarDTO producto = await connection.QuerySingleAsync<ProductoListarDTO>(@"
+             EXEC sp_ObtenerDetalleProducto 
+              @IdProducto
+                     ", new
+                {
+                    IdProducto = idProducto,
+
+                });
+                return producto;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
+
         public async Task<List<ProductoListarDTO>> ObtenerProductoFiltrado(ProductoFiltroDTO productoFiltrar)
         {
             try
