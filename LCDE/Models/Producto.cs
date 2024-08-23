@@ -6,11 +6,16 @@ namespace LCDE.Models
     public class Producto
     {
         public int Id { get; set; }
+        public string? Image_url { get; set; }
+
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        public string Nombre { get; set; }
+
+
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Nombre producto")]
         [Remote(action: "ProductoExiste", controller: "Productos",
             AdditionalFields = nameof(Id))]
-
         public string Detalle { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Existencia inicial")]
