@@ -7,7 +7,7 @@ namespace LCDE.Servicios
     public class RepositorioProductos
     {
         private readonly string connectionString;
-        public RepositorioProductos(IConfiguration configuration)
+        public RepositorioProductos(IConfiguration configuration)//chingadamadre otro sin interfaz
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
 
@@ -165,6 +165,65 @@ namespace LCDE.Servicios
                     Operacion = "selectPorNombre"
                 });
                 return producto;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<decimal> PrecioMaximo()
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                var precio = await connection.QueryFirstOrDefaultAsync<dynamic>(@"
+                EXEC sp_ObtenerPrecioMaximo");
+                return precio!=null ? precio.precio_unidad:0;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<ProductoListarDTO> ObtenerDetalleProducto(int idProducto)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                ProductoListarDTO producto = await connection.QueryFirstOrDefaultAsync<ProductoListarDTO>(@"
+             EXEC sp_ObtenerDetalleProducto 
+              @IdProducto
+                     ", new
+                {
+                    IdProducto = idProducto,
+
+                });
+                return producto;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
+
+        public async Task<List<ProductoListarDTO>> ObtenerProductoFiltrado(ProductoFiltroDTO productoFiltrar)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                List<ProductoListarDTO> ListaFiltrada = (await connection.QueryAsync<ProductoListarDTO>(@"
+                EXEC sp_FiltrarProductos @categoriaId, @nombreProducto, @precioMin, @precioMax
+                ", new
+                {
+                    categoriaId = productoFiltrar.CategoriaId,
+                    nombreProducto = productoFiltrar.NombreProducto,
+                    precioMin = productoFiltrar.PrecioMin,
+                    precioMax = productoFiltrar.PrecioMax,
+                })).ToList();
+                return ListaFiltrada;
             }
             catch (Exception ex)
             {

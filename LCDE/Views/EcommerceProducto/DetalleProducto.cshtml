@@ -1,0 +1,81 @@
+﻿@model ProductoListarDTO
+@{
+    Layout = "~/Views/Shared/_layoutEcommerce.cshtml";
+}
+<link rel="stylesheet" href="~/css/detprod.css">
+
+<!--================Single Product Area =================-->
+<div class="container">
+    <div class="row s_product_inner">
+        <div class="col-lg-6">
+            <div class="s_Product_carousel">
+                <div class="single-prd-item my-4">
+                    <img class="img-fluid" src="@Model.Image_url" width="500px"> <!--Falta la ruta de la imagen-->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 offset-lg-1">
+            <div class="s_product_text">
+                <h3>@Model.Nombre </h3>
+                <h6>@Model.Detalle</h6>
+                <h2>@Model.PrecioUnidad</h2>
+                <ul class="list">
+                    <li><a class="active" href="#"><strong><span>Categoria</span> : </strong>@Model.NombreCategoria</a></li>
+                    <li><a class="active" href="#"><strong><span>Disponibilidad</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp : </strong>@Model.Existencia</a></li>
+                </ul>
+                <p>
+                    <!--Falta la descripcion del producto-->
+                </p>
+                <div class="product_count">
+                    <label for="qty"><b>Cantidad:</b></label>
+                    <input type="number" name="qty" id="sst" min="1" max="@Model.Existencia" title="Quantity:" class="input-text qty">
+
+
+                </div>
+                <div class="card_area d-flex align-items-center">
+                    <button class="primary-btn" onclick="addToCart(@Model.Id, document.getElementById('sst').value)">Agregar al Carrito</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================End Single Product Area =================-->
+
+<script>
+    function addToCart(productId, quantity) {
+        // Convertir la cantidad a un número para evitar concatenaciones
+        quantity = parseInt(quantity, 10);
+
+        // Verificar si la conversión fue exitosa y la cantidad es válida
+        if (isNaN(quantity) || quantity <= 0) {
+            alert("Por favor, ingrese una cantidad válida.");
+            return;
+        }
+
+        // Obtener el carrito actual del local storage o inicializar uno vacío si no existe
+        let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+
+        // Verificar si el producto ya está en el carrito
+        let productIndex = cart.findIndex(item => item.id === productId);
+
+        if (productIndex !== -1) {
+            // Si el producto ya está en el carrito, asegurar que la cantidad existente es numérica
+            let existingQuantity = parseInt(cart[productIndex].quantity, 10);
+            if (isNaN(existingQuantity)) {
+                existingQuantity = 0; // Valor por defecto si la cantidad no es un número válido
+            }
+
+            // Actualizar la cantidad sumando correctamente
+            cart[productIndex].quantity = existingQuantity + quantity;
+        } else {
+            // Si el producto no está en el carrito, agregarlo con la cantidad correcta
+            cart.push({ id: productId, quantity: quantity });
+        }
+
+        // Guardar el carrito actualizado en el local storage
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+
+        // Confirmar que el producto se ha agregado
+        alert("Producto agregado al carrito");
+    }
+</script>

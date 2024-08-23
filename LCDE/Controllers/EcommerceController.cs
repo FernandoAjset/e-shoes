@@ -13,23 +13,30 @@ namespace LCDE.Controllers
         private readonly IRepositorioCliente repositotioClientes;
         private readonly ISesionServicio sesionServicio;
         private readonly IRepositorioUsuarios repositorioUsuarios;
+        private readonly RepositorioCategorias repositorioCategorias;
         private readonly UserManager<Usuario> userManager;
+
         public EcommerceController(UserManager<Usuario> userManager,
-            IRepositorioCliente pepe,
+            IRepositorioCliente pepe, //quien chingados le pone pepe a una interfaz no mameen xD
             ISesionServicio sesionServicio,
-            IRepositorioUsuarios repositorioUsuarios)
+            IRepositorioUsuarios repositorioUsuarios,
+            RepositorioCategorias repositorioCategorias
+            )
         {
 
             this.repositotioClientes = pepe;
             this.sesionServicio = sesionServicio;
             this.repositorioUsuarios = repositorioUsuarios;
+            this.repositorioCategorias = repositorioCategorias;
             this.userManager = userManager;
         }
 
 
-        public IActionResult Home()
+        public async Task<IActionResult> Home()
         {
-            return View();
+            var model = new EcommerceHomeViewModel();
+            model.Categorias = await repositorioCategorias.ObtenerTodosCategorias();
+            return View(model);
         }
 
         [HttpGet]
@@ -153,6 +160,8 @@ namespace LCDE.Controllers
         {
             return await repositorioUsuarios.ObtenerRoles();
         }
+
+
 
     }
 }

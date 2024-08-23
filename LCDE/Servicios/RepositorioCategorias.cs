@@ -49,10 +49,10 @@ namespace LCDE.Servicios
             ", new
             {
                 IdCategoria = categoria.Id,
-                Nombre =categoria.Nombre,
+                Nombre = categoria.Nombre,
                 Operacion = "update"
             });
-            return categoria_id>0;
+            return categoria_id > 0;
         }
 
         public async Task<bool> BorrarCategoria(int IdCategoria)
@@ -83,5 +83,6 @@ namespace LCDE.Servicios
             });
             return categoria;
         }
+
     }
 }
