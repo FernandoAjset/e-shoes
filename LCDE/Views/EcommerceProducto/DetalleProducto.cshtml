@@ -1,10 +1,7 @@
 ﻿@model ProductoListarDTO
 
 
-
-<link rel="stylesheet" href="css/main.css">
-
-
+<link rel="stylesheet" href="~/css/detprod.css">
 
 <!--================Single Product Area =================-->
 <div class="product_image_area">
@@ -19,25 +16,23 @@
 			</div>
 			<div class="col-lg-5 offset-lg-1">
 				<div class="s_product_text">
-					<h3>@Model.Detalle </h3>
+					<h3 >@Model.Detalle </h3>
 					<h2>@Model.PrecioUnidad</h2>
 					<ul class="list">
-						<li><a class="active" href="#"><span>Categoria</span> : @Model.NombreCategoria</a></li>
-						<li><a href="#"><span>Disponibilidad</span> : @Model.Existencia</a></li>
+						<li><a class="active" href="#"><strong><span>Categoria</span> : </strong>@Model.NombreCategoria</a></li>
+						<li><a class="active" href="#"><strong><span>Disponibilidad</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp : </strong>@Model.Existencia</a></li>
 					</ul>
 					<p>
 						<!--Falta la descripcion del producto-->
 					</p>
 					<div class="product_count">
-						<label for="qty">Cantidad:</label>
+						<label for="qty"><b>Cantidad:</b></label>
 						<input type="number" name="qty" id="sst" min="1" max="@Model.Existencia" title="Quantity:" class="input-text qty">
 						
 				
 					</div>
 					<div class="card_area d-flex align-items-center">
 						<button class="primary-btn" onclick="addToCart(@Model.Id, document.getElementById('sst').value)">Agregar al Carrito</button>
-						<a class="icon_btn" href="#"><i class="lnr lnr lnr-diamond"></i></a>
-						<a class="icon_btn" href="#"><i class="lnr lnr lnr-heart"></i></a>
 					</div>
 				</div>
 			</div>
