@@ -177,9 +177,9 @@ namespace LCDE.Servicios
             try
             {
                 using var connection = new SqlConnection(connectionString);
-                decimal precio = await connection.QueryFirstOrDefaultAsync<decimal>(@"
+                var precio = await connection.QueryFirstOrDefaultAsync<dynamic>(@"
                 EXEC sp_ObtenerPrecioMaximo");
-                return precio;
+                return precio!=null ? precio.precio_unidad:0;
             }
             catch (Exception ex)
             {

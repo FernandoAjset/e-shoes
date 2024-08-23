@@ -1,0 +1,83 @@
+﻿@model LCDE.Models.ProductoFiltroDTO
+@{
+    Layout = "~/Views/Shared/_layoutEcommerce.cshtml";
+}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-xl-3 col-lg-4 col-md-5">
+            <div class="sidebar-categories">
+                <div class="head-primary">Categorias</div>
+                <ul class="main-categories">
+                    @foreach (var item in Model.Categorias)
+                    {
+                        <li class="main-nav-list">
+                            <a asp-action="BuscarPorCategorias" asp-route-CategoriaId="@item.Id">
+                                <span class="lnr lnr-arrow-right"></span>
+                                @item.Nombre
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="col-xl-9 col-lg-8 col-md-7">
+            <!-- Start Best Seller -->
+            <section class="lattest-product-area pb-40 category-list">
+                <div class="row">
+                    @foreach (var item in Model.productosListarDTO)
+                    {
+                        <!-- single product -->
+                        <div class="col-lg-4 col-md-6">
+                            <div class="single-product">
+                                <img class="img-fluid" src="@item.Image_url" alt="">
+                                <div class="product-details">
+                                    <h6>
+                                        @item.Nombre
+                                    </h6>
+                                    <div class="price">
+                                        <h6>Q.@item.PrecioUnidad</h6>
+                                    </div>
+                                    <div class="prd-bottom">
+
+                                        <a href="" class="social-info">
+                                            <span class="ti-bag"></span>
+                                            <p class="hover-text">Agregar</p>
+                                        </a>
+                                        <a asp-action="DetalleProducto" asp-route-productoId="@item.Id"
+                                           class="social-info">
+                                            <span class="lnr lnr-move"></span>
+                                            <p class="hover-text">Ver</p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Inicializar el slider de jQuery UI
+            $("#price-range").slider({
+                range: true,
+                min: 0, // Valor mínimo del rango
+                max: 1000, // Valor máximo del rango
+                values: [100, 500], // Valores iniciales del slider
+                slide: function (event, ui) {
+                    // Actualizar los valores mostrados al mover el slider
+                    $("#lower-value").text(ui.values[0]);
+                    $("#upper-value").text(ui.values[1]);
+                }
+            });
+
+            // Establecer los valores iniciales en los elementos correspondientes
+            $("#lower-value").text($("#price-range").slider("values", 0));
+            $("#upper-value").text($("#price-range").slider("values", 1));
+        });
+    </script>
+}

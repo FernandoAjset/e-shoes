@@ -21,25 +21,7 @@ namespace LCDE.Controllers
         {
             try
             {
-                //ProductoListarDTO producto = await repositorioProductos.ObtenerDetalleProducto(productoId);
-                var producto = new ProductoListarDTO()
-                {
-                    Id = 1,
-                    Nombre = "Producto 1",
-                    Detalle = "Detalles extensos del producto.",
-                    Image_url = "https://resourcesdev.blob.core.windows.net/resources-web/proyectos/banner_img_01.jpg",
-                    Existencia = 10,
-                    Id_Categoria = 1,
-                    Id_Proveedor = 1,
-                    IdPrecio = 1,
-                    IdPromocion = 1,
-                    NombreCategoria = "Categoria 1",
-                    NombreProveedor = "Proveedor 1",
-                    PrecioUnidad = 100,
-                    Promocion = "Promocion 1",
-                    Descuento = 10
-                };
-
+                ProductoListarDTO producto = await repositorioProductos.ObtenerDetalleProducto(productoId);
                 if (producto == null)
                 {
                     return RedirectToAction("NoEncontrado", "Home");
