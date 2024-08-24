@@ -138,9 +138,43 @@
                     type: "POST",
                     url: "@Url.Action("BuscarPorCategorias", "EcommerceProducto")",
                     data: filtro,
+
+
                     success: function (response) {
-                        $("#product-list").html($(response).find("#product-list").html());
+                        // Limpiar la lista de productos actual
+                        $("#product-list .row").empty();
+
+                        // Agregar los productos nuevos
+                        response.forEach(function (producto) {
+                            var detalleUrl = '@Url.Action("DetalleProducto", "EcommerceProducto", new { productoId = "__ID__" })';
+                            detalleUrl = detalleUrl.replace("__ID__", producto.id);
+
+                            var productHtml = `
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-product">
+                                    <img class="img-fluid" src="${producto.image_url}" alt="">
+                                    <div class="product-details">
+                                        <h6>${producto.nombre}</h6>
+                                        <div class="price">
+                                            <h6>Q.${producto.precioUnidad}</h6>
+                                        </div>
+                                        <div class="prd-bottom">
+                                            <a href="#" class="social-info">
+                                                <span class="ti-bag"></span>
+                                                <p class="hover-text">Agregar</p>
+                                            </a>
+                                            <a href="${detalleUrl}" class="social-info">
+                                                <span class="lnr lnr-move"></span>
+                                                <p class="hover-text">Ver</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                            $("#product-list .row").append(productHtml);
+                        });
                     },
+
                     error: function () {
                         alert("Hubo un error al filtrar los productos.");
                     }
