@@ -4,3 +4,41 @@
     padding: 10px;
     margin-bottom: 10px;
 }
+
+.price-range-area {
+    margin: 20px 0;
+}
+
+#price-range {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.value-wrapper {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+    .value-wrapper .price,
+    .value-wrapper .to {
+        margin: 0 10px;
+    }
+
+.price-range-area .ui-slider {
+    background: #ddd;
+    border-radius: 10px;
+    height: 8px;
+}
+
+.price-range-area .ui-slider-handle {
+    background: #007bff;
+    border-radius: 50%;
+    border: none;
+    height: 20px;
+    width: 20px;
+}
+
+.price-range-area .ui-slider-range {
+    background: #007bff;
+}

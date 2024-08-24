@@ -69,13 +69,11 @@ namespace LCDE.Controllers
             try
             {
                 List<ProductoListarDTO> productos = await repositorioProductos.ObtenerProductoFiltrado(productoFiltrar);
-                productoFiltrar.productosListarDTO = productos;
-
-                return StatusCode(200, productoFiltrar);
+                return Json(productos);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home");
+                return StatusCode(500, new { message = "Hubo un error al filtrar los productos." });
             }
         }
     }
