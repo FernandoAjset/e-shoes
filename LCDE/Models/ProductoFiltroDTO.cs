@@ -13,6 +13,5 @@
         public List<Categoria>? Categorias { get; set; }
         public List<ProductoListarDTO>? productosListarDTO { get; set; }
 
-        // otra propiedad de tipo lista productos, puede ser lista vacia no nula, de tipo ProductoListarDTO
     }
 }
