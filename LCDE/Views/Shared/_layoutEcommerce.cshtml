@@ -86,12 +86,12 @@
                                     <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
                                         @foreach (var categoria in categorias)
                                         {
-                                            <li>
-                                                <a class="dropdown-item"
-                                                   asp-action="BuscarPorCategorias"
-                                                   asp-controller="EcommerceProducto"
-                                                   asp-route-categoriaId="@categoria.Id">@categoria.Nombre</a>
-                                            </li>
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                               asp-action="BuscarPorCategorias"
+                                                                               asp-controller="EcommerceProducto"
+                                                                               asp-route-categoriaId="@categoria.Id">@categoria.Nombre</a>
+                                                                        </li>
                                         }
                                     </ul>
                                 </li>
@@ -117,50 +117,50 @@
                             </a>
                             <a class="nav-icon position-relative text-decoration-none" href="#">
                                 <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                                <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
+                                <span id="cart-count" class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">0</span>
                             </a>
                             <ul class="navbar-nav ml-auto">
                                 @if (SignInManager.IsSignedIn(User))
                                 {
                                     var rolNombre = SesionServicio.ObtenerNombreRolUsuario();
 
-                                    <li class="nav-item dropdown no-arrow">
-                                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
-                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <div class="d-none d-lg-block text-gray-600 small text-center user-info">
-                                                <span><strong>@User.Identity.Name</strong></span>
-                                                <br />
-                                                <span>Rol: @rolNombre</span>
-                                            </div>
-                                            <img class="img-profile rounded-circle ml-2" src="~/img/undraw_profile.svg" alt="User" style="width: 40px; height: 40px;">
-                                        </a>
+                                                                <li class="nav-item dropdown no-arrow">
+                                                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
+                                                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <div class="d-none d-lg-block text-gray-600 small text-center user-info">
+                                                                            <span><strong>@User.Identity.Name</strong></span>
+                                                                            <br />
+                                                                            <span>Rol: @rolNombre</span>
+                                                                        </div>
+                                                                        <img class="img-profile rounded-circle ml-2" src="~/img/undraw_profile.svg" alt="User" style="width: 40px; height: 40px;">
+                                                                    </a>
 
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                             aria-labelledby="userDropdown">
-                                            <a class="dropdown-item user-info" asp-action="ConfiguracionPerfil">
-                                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                                Perfil
-                                            </a>
-                                            <form class="form-inline" asp-action="logout" asp-controller="usuarios">
-                                                <button type="submit" class="btn btn-link text-dark user-info">
-                                                    Salir
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </li>
+                                                                    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                                                         aria-labelledby="userDropdown">
+                                                                        <a class="dropdown-item user-info" asp-action="ConfiguracionPerfil">
+                                                                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                                                            Perfil
+                                                                        </a>
+                                                                        <form class="form-inline" asp-action="logout" asp-controller="usuarios">
+                                                                            <button type="submit" class="btn btn-link text-dark user-info">
+                                                                                Salir
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
+                                                                </li>
                                 }
                                 else
                                 {
-                                    <li class="nav-item">
-                                        <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Registro">
-                                            Registro
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Login">
-                                            Login
-                                        </a>
-                                    </li>
+                                                                <li class="nav-item">
+                                                                    <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Registro">
+                                                                        Registro
+                                                                    </a>
+                                                                </li>
+                                                                <li class="nav-item">
+                                                                    <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Login">
+                                                                        Login
+                                                                    </a>
+                                                                </li>
                                 }
                             </ul>
                         </div>
@@ -202,8 +202,31 @@
             </div>
 
 
-            @RenderBody()
 
+            <!-- Toast Container -->
+            <div aria-live="polite" aria-atomic="true" class="position-relative">
+                <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3">
+                    <!-- Toast de éxito -->
+                    <div id="success-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body" id="success-toast-body">
+                                <!-- Mensaje de éxito -->
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <!-- Toast de error -->
+                    <div id="error-toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body" id="error-toast-body">
+                                <!-- Mensaje de error -->
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @RenderBody()
         </main>
     </div>
 
@@ -325,6 +348,23 @@
     <script src="~/sneat/js/main.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+<script>
+    // Función para actualizar el contador del carrito
+    function updateCartCount() {
+        let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+        let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cart-count').textContent = totalItems;
+    }
 
+    // Escuchar cambios en el localStorage
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'shoppingCart') {
+            updateCartCount();
+        }
+    });
+
+    // Actualizar el contador al cargar la página
+    document.addEventListener('DOMContentLoaded', updateCartCount);
+</script>
 </body>
 </html>
