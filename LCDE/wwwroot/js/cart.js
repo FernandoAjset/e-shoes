@@ -16,22 +16,43 @@
     }
 }
 
-function addToCart(productId, quantity) {
+function showToast(type, message, duration = 1500) {
+    let toastElement, toastBodyElement;
+
+    if (type === 'success') {
+        toastElement = document.getElementById('success-toast');
+        toastBodyElement = document.getElementById('success-toast-body');
+    } else if (type === 'error') {
+        toastElement = document.getElementById('error-toast');
+        toastBodyElement = document.getElementById('error-toast-body');
+    }
+
+    if (toastElement && toastBodyElement) {
+        toastBodyElement.textContent = message;
+        let toast = new bootstrap.Toast(toastElement, { delay: duration });
+        toast.show();
+    }
+}
+
+function addToCart(productId, quantity, maxQuantity) {
     quantity = parseInt(quantity, 10);
+    productId = productId.toString(); // Convertir el ID a cadena
 
     if (isNaN(quantity) || quantity <= 0) {
-        showToast('error', 'Por favor, ingrese una cantidad válida.');
+        showToast('error', 'Cantidad no válida.');
         return;
     }
 
     let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-    let productIndex = cart.findIndex(item => item.id === productId);
+    let productIndex = cart.findIndex(item => item.id.toString() === productId); // Convertir el ID del carrito a cadena
+    let existingQuantity = productIndex !== -1 ? parseInt(cart[productIndex].quantity, 10) : 0;
+
+    if (quantity + existingQuantity > maxQuantity) {
+        showToast('error', `Ya tienes ${existingQuantity} en el carrito. La existencia total del producto es ${maxQuantity}.`);
+        return;
+    }
 
     if (productIndex !== -1) {
-        let existingQuantity = parseInt(cart[productIndex].quantity, 10);
-        if (isNaN(existingQuantity)) {
-            existingQuantity = 0;
-        }
         cart[productIndex].quantity = existingQuantity + quantity;
     } else {
         cart.push({ id: productId, quantity: quantity });

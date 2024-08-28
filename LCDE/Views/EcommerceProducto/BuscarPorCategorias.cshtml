@@ -129,16 +129,25 @@
         }
 
         function confirmAddToCart() {
-            var productId = $('#modalProductId').val();
+            var productId = $('#modalProductId').val().toString(); // Convertir el ID a cadena
             var quantity = parseInt($('#modalQuantity').val(), 10);
             var maxQuantity = parseInt($('#modalMaxQuantity').val(), 10);
 
-            if (isNaN(quantity) || quantity <= 0 || quantity > maxQuantity) {
-                showToast('error', 'Por favor, ingrese una cantidad válida.');
+            if (isNaN(quantity) || quantity <= 0) {
+                showToast('error', 'Cantidad no válida.');
                 return;
             }
 
-            addToCart(productId, quantity);
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            let productIndex = cart.findIndex(item => item.id.toString() === productId); // Convertir el ID del carrito a cadena
+            let existingQuantity = productIndex !== -1 ? parseInt(cart[productIndex].quantity, 10) : 0;
+
+            if (quantity + existingQuantity > maxQuantity) {
+                showToast('error', `Ya tienes ${existingQuantity} en el carrito. La existencia total del producto es ${maxQuantity}.`);
+                return;
+            }
+
+            addToCart(productId, quantity, maxQuantity);
             $('#addToCartModal').modal('hide');
         }
     </script>
