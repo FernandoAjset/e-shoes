@@ -66,7 +66,7 @@
                                         <h6>Q.@item.PrecioUnidad</h6>
                                     </div>
                                     <div class="prd-bottom">
-                                        <a href="" class="social-info">
+                                        <a href="#" class="social-info" onclick="openAddToCartModal(@item.Id, @item.Existencia)">
                                             <span class="ti-bag"></span>
                                             <p class="hover-text">Agregar</p>
                                         </a>
@@ -86,105 +86,51 @@
     </div>
 </div>
 
+<!-- Modal para ingresar la cantidad -->
+<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addToCartModalLabel">Agregar al Carrito</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="modalQuantity"><b>Cantidad:</b></label>
+                <input type="number" id="modalQuantity" class="form-control" min="1" />
+                <input type="hidden" id="modalProductId" />
+                <input type="hidden" id="modalMaxQuantity" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmAddToCart()">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <script src="~/js/cart.js"></script>
     <script>
-        $(document).ready(function () {
-            // Inicializar el slider de jQuery UI
-            $("#price-range").slider({
-                range: true,
-                min: 0,
-                max: 1000,
-                values: [100, 500],
-                slide: function (event, ui) {
-                    $("#lower-value").text(ui.values[0]);
-                    $("#upper-value").text(ui.values[1]);
-                },
-                change: function (event, ui) {
-                    actualizarProductos();
-                }
-            });
+        function openAddToCartModal(productId, maxQuantity) {
+            $('#modalProductId').val(productId);
+            $('#modalMaxQuantity').val(maxQuantity);
+            $('#modalQuantity').attr('max', maxQuantity);
+            $('#modalQuantity').val(1);
+            $('#addToCartModal').modal('show');
+        }
 
-            // Valores iniciales del slider
-            $("#lower-value").text($("#price-range").slider("values", 0));
-            $("#upper-value").text($("#price-range").slider("values", 1));
+        function confirmAddToCart() {
+            var productId = $('#modalProductId').val();
+            var quantity = $('#modalQuantity').val();
+            var maxQuantity = $('#modalMaxQuantity').val();
 
-            // Manejo de clic en la categoría
-            $(".category-link").click(function (e) {
-                e.preventDefault();
-                var categoriaId = $(this).data("category-id");
-                $("#CategoriaId").val(categoriaId);
-                actualizarProductos();
-            });
-
-            // Manejo de la barra de búsqueda con retraso de 500 ms
-            let timeout = null;
-            $("#NombreProducto").on('keyup', function () {
-                clearTimeout(timeout);
-                timeout = setTimeout(function () {
-                    actualizarProductos();
-                }, 500);
-            });
-
-            // Función para actualizar productos
-            function actualizarProductos() {
-                var filtro = {
-                    CategoriaId: $("#CategoriaId").val(),
-                    NombreProducto: $("#NombreProducto").val(),
-                    PrecioMin: $("#price-range").slider("values", 0),
-                    PrecioMax: $("#price-range").slider("values", 1)
-                };
-
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("BuscarPorCategorias", "EcommerceProducto")",
-                    data: filtro,
-
-
-                    success: function (response) {
-                        // Limpiar la lista de productos actual
-                        $("#product-list .row").empty();
-
-                        // Agregar los productos nuevos
-                        response.forEach(function (producto) {
-                            var detalleUrl = '@Url.Action("DetalleProducto", "EcommerceProducto", new { productoId = "__ID__" })';
-                            detalleUrl = detalleUrl.replace("__ID__", producto.id);
-
-                            var productHtml = `
-                            <div class="col-lg-4 col-md-6">
-                                <div class="single-product">
-                                    <img class="img-fluid" src="${producto.image_url}" alt="">
-                                    <div class="product-details">
-                                        <h6>${producto.nombre}</h6>
-                                        <div class="price">
-                                            <h6>Q.${producto.precioUnidad}</h6>
-                                        </div>
-                                        <div class="prd-bottom">
-                                            <a href="#" class="social-info">
-                                                <span class="ti-bag"></span>
-                                                <p class="hover-text">Agregar</p>
-                                            </a>
-                                            <a href="${detalleUrl}" class="social-info">
-                                                <span class="lnr lnr-move"></span>
-                                                <p class="hover-text">Ver</p>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`;
-                            $("#product-list .row").append(productHtml);
-                        });
-                    },
-
-                    error: function () {
-                        alert("Hubo un error al filtrar los productos.");
-                    }
-                });
+            if (quantity <= 0 || quantity > maxQuantity) {
+                showToast('error', 'Por favor, ingrese una cantidad válida.');
+                return;
             }
-        });
-    </script>
 
-    <!-- Campos ocultos para los filtros -->
-    <input type="hidden" id="CategoriaId" name="CategoriaId" value="@Model.CategoriaId" />
-    <input type="hidden" id="PrecioMin" name="PrecioMin" value="@Model.PrecioMin" />
-    <input type="hidden" id="PrecioMax" name="PrecioMax" value="@Model.PrecioMax" />
+            addToCart(productId, quantity);
+            $('#addToCartModal').modal('hide');
+        }
+    </script>
 }
