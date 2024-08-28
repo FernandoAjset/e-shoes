@@ -11,14 +11,17 @@
             <div class="sidebar-categories">
                 <div class="head-primary">Categorías</div>
                 <ul class="main-categories">
-                    @foreach (var item in Model.Categorias)
+                    @if (Model.Categorias != null)
                     {
-                        <li class="main-nav-list">
-                            <a href="#" class="category-link" data-category-id="@item.Id">
-                                <span class="lnr lnr-arrow-right"></span>
-                                @item.Nombre
-                            </a>
-                        </li>
+                        @foreach (var item in Model.Categorias)
+                        {
+                            <li class="main-nav-list">
+                                <a href="#" class="category-link" data-category-id="@item.Id">
+                                    <span class="lnr lnr-arrow-right"></span>
+                                    @item.Nombre
+                                </a>
+                            </li>
+                        }
                     }
                 </ul>
             </div>
@@ -54,31 +57,37 @@
             <!-- Lista de Productos -->
             <section id="product-list" class="lattest-product-area pb-40 category-list">
                 <div class="row">
-                    @foreach (var item in Model.productosListarDTO)
+                    @if (Model.productosListarDTO != null)
                     {
-                        <!-- Producto Individual -->
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-product">
-                                <img class="img-fluid" src="@item.Image_url" alt="">
-                                <div class="product-details">
-                                    <h6>@item.Nombre</h6>
-                                    <div class="price">
-                                        <h6>Q.@item.PrecioUnidad</h6>
-                                    </div>
-                                    <div class="prd-bottom">
-                                        <a href="#" class="social-info" onclick="openAddToCartModal(@item.Id, @item.Existencia)">
-                                            <span class="ti-bag"></span>
-                                            <p class="hover-text">Agregar</p>
-                                        </a>
-                                        <a asp-action="DetalleProducto" asp-route-productoId="@item.Id"
-                                           class="social-info">
-                                            <span class="lnr lnr-move"></span>
-                                            <p class="hover-text">Ver</p>
-                                        </a>
+                        @foreach (var item in Model.productosListarDTO)
+                        {
+                            <!-- Producto Individual -->
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-product">
+                                    <img class="img-fluid" src="@item.Image_url" alt="">
+                                    <div class="product-details">
+                                        <h6>@item.Nombre</h6>
+                                        <div class="price">
+                                            <h6>Q.@item.PrecioUnidad</h6>
+                                        </div>
+                                        <div class="stock">
+                                            <p>Existencia: @item.Existencia</p>
+                                        </div>
+                                        <div class="prd-bottom">
+                                            <a href="#" class="social-info" onclick="openAddToCartModal(@item.Id, @item.Existencia)">
+                                                <span class="ti-bag"></span>
+                                                <p class="hover-text">Agregar</p>
+                                            </a>
+                                            <a asp-action="DetalleProducto" asp-route-productoId="@item.Id"
+                                               class="social-info">
+                                                <span class="lnr lnr-move"></span>
+                                                <p class="hover-text">Ver</p>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     }
                 </div>
             </section>
@@ -121,10 +130,10 @@
 
         function confirmAddToCart() {
             var productId = $('#modalProductId').val();
-            var quantity = $('#modalQuantity').val();
-            var maxQuantity = $('#modalMaxQuantity').val();
+            var quantity = parseInt($('#modalQuantity').val(), 10);
+            var maxQuantity = parseInt($('#modalMaxQuantity').val(), 10);
 
-            if (quantity <= 0 || quantity > maxQuantity) {
+            if (isNaN(quantity) || quantity <= 0 || quantity > maxQuantity) {
                 showToast('error', 'Por favor, ingrese una cantidad válida.');
                 return;
             }
