@@ -83,12 +83,12 @@
                                     <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
                                         @foreach (var categoria in categorias)
                                         {
-                                                                        <li>
-                                                                            <a class="dropdown-item"
-                                                                               asp-action="BuscarPorCategorias"
-                                                                               asp-controller="EcommerceProducto"
-                                                                               asp-route-categoriaId="@categoria.Id">@categoria.Nombre</a>
-                                                                        </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-action="BuscarPorCategorias"
+                                                   asp-controller="EcommerceProducto"
+                                                   asp-route-categoriaId="@categoria.Id">@categoria.Nombre</a>
+                                            </li>
                                         }
                                     </ul>
                                 </li>
@@ -112,7 +112,9 @@
                             <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
                                 <i class="fa fa-fw fa-search text-dark mr-2"></i>
                             </a>
-                            <a class="nav-icon position-relative text-decoration-none" href="#">
+                            <a class="nav-icon position-relative text-decoration-none"
+                               asp-action="ResumenCarrito"
+                               asp-controller="Ecommerce">
                                 <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
                                 <span id="cart-count" class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">0</span>
                             </a>
@@ -121,43 +123,43 @@
                                 {
                                     var rolNombre = SesionServicio.ObtenerNombreRolUsuario();
 
-                                                                <li class="nav-item dropdown no-arrow">
-                                                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
-                                                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        <div class="d-none d-lg-block text-gray-600 small text-center user-info">
-                                                                            <span><strong>@User.Identity.Name</strong></span>
-                                                                            <br />
-                                                                            <span>Rol: @rolNombre</span>
-                                                                        </div>
-                                                                        <img class="img-profile rounded-circle ml-2" src="~/img/undraw_profile.svg" alt="User" style="width: 40px; height: 40px;">
-                                                                    </a>
+                                    <li class="nav-item dropdown no-arrow">
+                                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
+                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <div class="d-none d-lg-block text-gray-600 small text-center user-info">
+                                                <span><strong>@User.Identity.Name</strong></span>
+                                                <br />
+                                                <span>Rol: @rolNombre</span>
+                                            </div>
+                                            <img class="img-profile rounded-circle ml-2" src="~/img/undraw_profile.svg" alt="User" style="width: 40px; height: 40px;">
+                                        </a>
 
-                                                                    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                                                         aria-labelledby="userDropdown">
-                                                                        <a class="dropdown-item user-info" asp-action="ConfiguracionPerfil">
-                                                                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                                                            Perfil
-                                                                        </a>
-                                                                        <form class="form-inline" asp-action="logout" asp-controller="usuarios">
-                                                                            <button type="submit" class="btn btn-link text-dark user-info">
-                                                                                Salir
-                                                                            </button>
-                                                                        </form>
-                                                                    </div>
-                                                                </li>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                             aria-labelledby="userDropdown">
+                                            <a class="dropdown-item user-info" asp-action="ConfiguracionPerfil">
+                                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                                Perfil
+                                            </a>
+                                            <form class="form-inline" asp-action="logout" asp-controller="usuarios">
+                                                <button type="submit" class="btn btn-link text-dark user-info">
+                                                    Salir
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
                                 }
                                 else
                                 {
-                                                                <li class="nav-item">
-                                                                    <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Registro">
-                                                                        Registro
-                                                                    </a>
-                                                                </li>
-                                                                <li class="nav-item">
-                                                                    <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Login">
-                                                                        Login
-                                                                    </a>
-                                                                </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Registro">
+                                            Registro
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link dark-text" asp-controller="usuarios" asp-action="Login">
+                                            Login
+                                        </a>
+                                    </li>
                                 }
                             </ul>
                         </div>
@@ -342,23 +344,24 @@
     <script src="~/sneat/js/main.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/cart.js"></script>
     <script>
-    // Función para actualizar el contador del carrito
-    function updateCartCount() {
-        let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-        let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        document.getElementById('cart-count').textContent = totalItems;
-    }
-
-    // Escuchar cambios en el localStorage
-    window.addEventListener('storage', function(event) {
-        if (event.key === 'shoppingCart') {
-            updateCartCount();
+        // Función para actualizar el contador del carrito
+        function updateCartCount() {
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = totalItems;
         }
-    });
 
-    // Actualizar el contador al cargar la página
-    document.addEventListener('DOMContentLoaded', updateCartCount);
-</script>
+        // Escuchar cambios en el localStorage
+        window.addEventListener('storage', function (event) {
+            if (event.key === 'shoppingCart') {
+                updateCartCount();
+            }
+        });
+
+        // Actualizar el contador al cargar la página
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+    </script>
 </body>
 </html>

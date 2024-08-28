@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace LCDE.Controllers
 {
@@ -14,13 +15,15 @@ namespace LCDE.Controllers
         private readonly ISesionServicio sesionServicio;
         private readonly IRepositorioUsuarios repositorioUsuarios;
         private readonly RepositorioCategorias repositorioCategorias;
+        private readonly RepositorioProductos repositorioProductos;
         private readonly UserManager<Usuario> userManager;
 
         public EcommerceController(UserManager<Usuario> userManager,
             IRepositorioCliente pepe, //quien chingados le pone pepe a una interfaz no mameen xD
             ISesionServicio sesionServicio,
             IRepositorioUsuarios repositorioUsuarios,
-            RepositorioCategorias repositorioCategorias
+            RepositorioCategorias repositorioCategorias,
+            RepositorioProductos repositorioProductos
             )
         {
 
@@ -28,9 +31,41 @@ namespace LCDE.Controllers
             this.sesionServicio = sesionServicio;
             this.repositorioUsuarios = repositorioUsuarios;
             this.repositorioCategorias = repositorioCategorias;
+            this.repositorioProductos = repositorioProductos;
             this.userManager = userManager;
         }
 
+        [HttpGet]
+        public IActionResult ResumenCarrito()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResumenCarrito([FromBody] List<CarritoItemDTO> carrito)
+        {
+            if (carrito == null || !carrito.Any())
+            {
+                return PartialView("_ResumenCarritoPartial", new List<CarritoItemDTO>());
+            }
+
+            // Obtener los IDs de los productos en el carrito
+            var idsProductos = carrito.Select(c => c.IdProducto).ToList();
+
+            // Obtener los detalles de los productos desde el repositorio
+            var productos = await repositorioProductos.ObtenerDetallesProductos(idsProductos);
+
+            // Combinar la información del carrito con los detalles de los productos
+            var carritoDetalles = carrito.Join(productos, c => c.IdProducto, p => p.Id, (c, p) => new CarritoItemDTO
+            {
+                IdProducto = c.IdProducto,
+                NombreProducto = p.Nombre,
+                Cantidad = c.Cantidad,
+                PrecioUnidad = p.PrecioUnidad
+            }).ToList();
+
+            return PartialView("_ResumenCarritoPartial", carritoDetalles);
+        }
 
         public async Task<IActionResult> Home()
         {

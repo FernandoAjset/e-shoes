@@ -33,6 +33,19 @@ namespace LCDE.Servicios
             });
             return producto_id;
         }
+
+        public async Task<IEnumerable<ProductoListarDTO>> ObtenerDetallesProductos(IEnumerable<int> idsProductos)
+        {
+            using var connection = new SqlConnection(connectionString);
+            var productos = await connection.QueryAsync<ProductoListarDTO>(@"
+                                EXEC sp_ObtenerDetallesProductos @IdsProductos
+                            ", new
+            {
+                IdsProductos = string.Join(",", idsProductos)
+            });
+            return productos;
+        }
+
         public async Task<ProductoCreacionDTO> ObtenerProducto(int IdProducto)
         {
             try
@@ -179,7 +192,7 @@ namespace LCDE.Servicios
                 using var connection = new SqlConnection(connectionString);
                 var precio = await connection.QueryFirstOrDefaultAsync<dynamic>(@"
                 EXEC sp_ObtenerPrecioMaximo");
-                return precio!=null ? precio.precio_unidad:0;
+                return precio != null ? precio.precio_unidad : 0;
             }
             catch (Exception ex)
             {

@@ -69,3 +69,22 @@ function addToCart(productId, quantity, maxQuantity) {
     // Actualizar el contador del carrito
     updateCartCount();
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname === '/Ecommerce/ResumenCarrito') {
+        let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+        fetch('/Ecommerce/ResumenCarrito', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify(cart)
+        })
+            .then(response => response.text())
+            .then(html => {
+                document.querySelector('.cart_area').innerHTML = html;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+});

@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "~/Views/Shared/_layoutEcommerce.cshtml";
+}
+
+<section class="cart_area">
+    <div class="container">
+        <div class="cart_inner">
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <!-- El contenido se actualizará dinámicamente -->
+            </div>
+        </div>
+    </div>
+</section>
