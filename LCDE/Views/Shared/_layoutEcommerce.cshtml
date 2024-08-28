@@ -342,7 +342,7 @@
     <script src="~/sneat/js/main.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
-<script>
+    <script>
     // Función para actualizar el contador del carrito
     function updateCartCount() {
         let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
