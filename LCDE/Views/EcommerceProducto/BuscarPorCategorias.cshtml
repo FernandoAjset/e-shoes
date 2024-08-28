@@ -1,17 +1,20 @@
 ﻿@model LCDE.Models.ProductoFiltroDTO
+
 @{
     Layout = "~/Views/Shared/_layoutEcommerce.cshtml";
 }
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-xl-3 col-lg-4 col-md-5">
+            <!-- Categorías -->
             <div class="sidebar-categories">
-                <div class="head-primary">Categorias</div>
+                <div class="head-primary">Categorías</div>
                 <ul class="main-categories">
                     @foreach (var item in Model.Categorias)
                     {
                         <li class="main-nav-list">
-                            <a asp-action="BuscarPorCategorias" asp-route-CategoriaId="@item.Id">
+                            <a href="#" class="category-link" data-category-id="@item.Id">
                                 <span class="lnr lnr-arrow-right"></span>
                                 @item.Nombre
                             </a>
@@ -19,26 +22,50 @@
                     }
                 </ul>
             </div>
+
+            <!-- Rango de Precio -->
+            <div class="sidebar-filter mt-50">
+                <div class="top-filter-head">Filtros</div>
+                <div class="common-filter">
+                    <div class="head">Rango de precio</div>
+                    <div class="price-range-area">
+                        <div id="price-range"></div>
+                        <div class="value-wrapper d-flex">
+                            <div class="price">Precio:</div>
+                            <span>Q</span>
+                            <div id="lower-value"></div>
+                            <div class="to">a</div>
+                            <span>Q</span>
+                            <div id="upper-value"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="col-xl-9 col-lg-8 col-md-7">
-            <!-- Start Best Seller -->
-            <section class="lattest-product-area pb-40 category-list">
+            <!-- Barra de Búsqueda -->
+            <div class="mb-4">
+                <div class="input-group">
+                    <input type="text" id="NombreProducto" name="NombreProducto" class="form-control" placeholder="Buscar producto..." />
+                </div>
+            </div>
+
+            <!-- Lista de Productos -->
+            <section id="product-list" class="lattest-product-area pb-40 category-list">
                 <div class="row">
                     @foreach (var item in Model.productosListarDTO)
                     {
-                        <!-- single product -->
+                        <!-- Producto Individual -->
                         <div class="col-lg-4 col-md-6">
                             <div class="single-product">
                                 <img class="img-fluid" src="@item.Image_url" alt="">
                                 <div class="product-details">
-                                    <h6>
-                                        @item.Nombre
-                                    </h6>
+                                    <h6>@item.Nombre</h6>
                                     <div class="price">
                                         <h6>Q.@item.PrecioUnidad</h6>
                                     </div>
                                     <div class="prd-bottom">
-
                                         <a href="" class="social-info">
                                             <span class="ti-bag"></span>
                                             <p class="hover-text">Agregar</p>
@@ -65,19 +92,99 @@
             // Inicializar el slider de jQuery UI
             $("#price-range").slider({
                 range: true,
-                min: 0, // Valor mínimo del rango
-                max: 1000, // Valor máximo del rango
-                values: [100, 500], // Valores iniciales del slider
+                min: 0,
+                max: 1000,
+                values: [100, 500],
                 slide: function (event, ui) {
-                    // Actualizar los valores mostrados al mover el slider
                     $("#lower-value").text(ui.values[0]);
                     $("#upper-value").text(ui.values[1]);
+                },
+                change: function (event, ui) {
+                    actualizarProductos();
                 }
             });
 
-            // Establecer los valores iniciales en los elementos correspondientes
+            // Valores iniciales del slider
             $("#lower-value").text($("#price-range").slider("values", 0));
             $("#upper-value").text($("#price-range").slider("values", 1));
+
+            // Manejo de clic en la categoría
+            $(".category-link").click(function (e) {
+                e.preventDefault();
+                var categoriaId = $(this).data("category-id");
+                $("#CategoriaId").val(categoriaId);
+                actualizarProductos();
+            });
+
+            // Manejo de la barra de búsqueda con retraso de 500 ms
+            let timeout = null;
+            $("#NombreProducto").on('keyup', function () {
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    actualizarProductos();
+                }, 500);
+            });
+
+            // Función para actualizar productos
+            function actualizarProductos() {
+                var filtro = {
+                    CategoriaId: $("#CategoriaId").val(),
+                    NombreProducto: $("#NombreProducto").val(),
+                    PrecioMin: $("#price-range").slider("values", 0),
+                    PrecioMax: $("#price-range").slider("values", 1)
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("BuscarPorCategorias", "EcommerceProducto")",
+                    data: filtro,
+
+
+                    success: function (response) {
+                        // Limpiar la lista de productos actual
+                        $("#product-list .row").empty();
+
+                        // Agregar los productos nuevos
+                        response.forEach(function (producto) {
+                            var detalleUrl = '@Url.Action("DetalleProducto", "EcommerceProducto", new { productoId = "__ID__" })';
+                            detalleUrl = detalleUrl.replace("__ID__", producto.id);
+
+                            var productHtml = `
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-product">
+                                    <img class="img-fluid" src="${producto.image_url}" alt="">
+                                    <div class="product-details">
+                                        <h6>${producto.nombre}</h6>
+                                        <div class="price">
+                                            <h6>Q.${producto.precioUnidad}</h6>
+                                        </div>
+                                        <div class="prd-bottom">
+                                            <a href="#" class="social-info">
+                                                <span class="ti-bag"></span>
+                                                <p class="hover-text">Agregar</p>
+                                            </a>
+                                            <a href="${detalleUrl}" class="social-info">
+                                                <span class="lnr lnr-move"></span>
+                                                <p class="hover-text">Ver</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                            $("#product-list .row").append(productHtml);
+                        });
+                    },
+
+                    error: function () {
+                        alert("Hubo un error al filtrar los productos.");
+                    }
+                });
+            }
         });
     </script>
+
+    <!-- Campos ocultos para los filtros -->
+    <input type="hidden" id="CategoriaId" name="CategoriaId" value="@Model.CategoriaId" />
+    <input type="hidden" id="PrecioMin" name="PrecioMin" value="@Model.PrecioMin" />
+    <input type="hidden" id="PrecioMax" name="PrecioMax" value="@Model.PrecioMax" />
 }
