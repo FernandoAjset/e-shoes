@@ -16,24 +16,6 @@
     }
 }
 
-function showToast(type, message, duration = 1500) {
-    let toastElement, toastBodyElement;
-
-    if (type === 'success') {
-        toastElement = document.getElementById('success-toast');
-        toastBodyElement = document.getElementById('success-toast-body');
-    } else if (type === 'error') {
-        toastElement = document.getElementById('error-toast');
-        toastBodyElement = document.getElementById('error-toast-body');
-    }
-
-    if (toastElement && toastBodyElement) {
-        toastBodyElement.textContent = message;
-        let toast = new bootstrap.Toast(toastElement, { delay: duration });
-        toast.show();
-    }
-}
-
 function addToCart(productId, quantity, maxQuantity, precioUnidad) {
     quantity = parseInt(quantity, 10);
     productId = productId.toString(); // Convertir el ID a cadena
@@ -70,66 +52,6 @@ function addToCart(productId, quantity, maxQuantity, precioUnidad) {
     // Actualizar el contador del carrito
     updateCartCount();
 }
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname === '/Ecommerce/ResumenCarrito') {
-        let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-        fetch('/Ecommerce/ResumenCarrito', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: JSON.stringify(cart)
-        })
-            .then(response => response.text())
-            .then(html => {
-                document.querySelector('.cart_area').innerHTML = html;
-            })
-            .catch(error => console.error('Error:', error));
-    }
-});
-
-function loadCartView() {
-    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-    fetch('/Ecommerce/ResumenCarrito', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-        },
-        body: JSON.stringify(cart)
-    })
-        .then(response => response.text())
-        .then(html => {
-            document.querySelector('.cart_area').innerHTML = html;
-            attachEventListeners();
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname === '/Ecommerce/ResumenCarrito') {
-        loadCartView();
-    }
-});
-
-function removeFromCart(productId) {
-    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-    cart = cart.filter(item => item.idProducto.toString() !== productId.toString());
-    localStorage.setItem('shoppingCart', JSON.stringify(cart));
-
-    // Disparar evento de almacenamiento local
-    window.dispatchEvent(new Event('storage'));
-
-    // Mostrar el toast de éxito
-    showToast('success', 'Producto eliminado del carrito.');
-
-    // Actualizar el contador del carrito
-    updateCartCount();
-
-    // Recargar la vista del carrito
-    loadCartView();
-}
 
 function updateCartItem(productId, quantity, maxQuantity) {
     quantity = parseInt(quantity, 10);
@@ -148,18 +70,63 @@ function updateCartItem(productId, quantity, maxQuantity) {
 
         if (quantity > maxQuantity) {
             showToast('error', `La cantidad no puede superar la existencia total del producto (${maxQuantity}).`);
+            // Restaurar la cantidad anterior
             document.querySelector(`input[data-product-id="${productId}"]`).value = previousQuantity;
             return;
-        } else {
-            cart[productIndex].cantidad = quantity;
-            localStorage.setItem('shoppingCart', JSON.stringify(cart));
-            // Disparar evento de almacenamiento local
-            window.dispatchEvent(new Event('storage'));
         }
+
+        cart[productIndex].cantidad = quantity;
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+
+        // Disparar evento de almacenamiento local
+        window.dispatchEvent(new Event('storage'));
+
         // Mostrar el toast de éxito
         showToast('success', 'Cantidad actualizada.');
+
+        // Recargar la vista del carrito
+        loadCartView();
     }
 }
+
+function removeFromCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    cart = cart.filter(item => item.idProducto.toString() !== productId.toString());
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+
+    // Disparar evento de almacenamiento local
+    window.dispatchEvent(new Event('storage'));
+
+    // Mostrar el toast de éxito
+    showToast('success', 'Producto eliminado del carrito.');
+
+    // Recargar la vista del carrito
+    loadCartView();
+}
+
+function loadCartView() {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    fetch('/Ecommerce/ResumenCarrito', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        },
+        body: JSON.stringify(cart)
+    })
+        .then(response => response.text())
+        .then(html => {
+            document.querySelector('.cart_area').innerHTML = html;
+            attachEventListeners(); // Adjuntar eventos después de cargar la vista
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname === '/Ecommerce/ResumenCarrito') {
+        loadCartView();
+    }
+});
 
 function attachEventListeners() {
     document.querySelectorAll('.remove-item').forEach(button => {
