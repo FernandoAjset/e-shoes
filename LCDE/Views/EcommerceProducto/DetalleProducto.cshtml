@@ -30,7 +30,7 @@
                     <input type="number" name="qty" id="sst" min="1" max="@Model.Existencia" title="Quantity:" class="input-text qty">
                 </div>
                 <div class="card_area d-flex align-items-center">
-                    <button class="primary-btn" onclick="addToCart(@Model.Id, document.getElementById('sst').value, @Model.Existencia)">Agregar al Carrito</button>
+                    <button class="primary-btn" onclick="addToCart(@Model.Id, document.getElementById('sst').value, @Model.Existencia, @Model.PrecioUnidad)">Agregar al Carrito</button>
                 </div>
             </div>
         </div>

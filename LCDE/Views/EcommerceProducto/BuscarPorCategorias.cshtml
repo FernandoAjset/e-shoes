@@ -74,7 +74,10 @@
                                             <p>Existencia: @item.Existencia</p>
                                         </div>
                                         <div class="prd-bottom">
-                                            <a href="#" class="social-info" onclick="openAddToCartModal(@item.Id, @item.Existencia)">
+                                            <a href="#" class="social-info"
+                                               onclick="openAddToCartModal(@item.Id, 
+                                            @item.Existencia , 
+                                            @item.PrecioUnidad)">
                                                 <span class="ti-bag"></span>
                                                 <p class="hover-text">Agregar</p>
                                             </a>
@@ -108,6 +111,7 @@
                 <input type="number" id="modalQuantity" class="form-control" min="1" />
                 <input type="hidden" id="modalProductId" />
                 <input type="hidden" id="modalMaxQuantity" />
+                <input type="hidden" id="modalPrecioUnidad" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -119,8 +123,9 @@
 
 @section Scripts {
     <script>
-        function openAddToCartModal(productId, maxQuantity) {
+        function openAddToCartModal(productId, maxQuantity, precioUnidad) {
             $('#modalProductId').val(productId);
+            $('#modalPrecioUnidad').val(precioUnidad);
             $('#modalMaxQuantity').val(maxQuantity);
             $('#modalQuantity').attr('max', maxQuantity);
             $('#modalQuantity').val(1);
@@ -131,6 +136,7 @@
             var productId = $('#modalProductId').val().toString(); // Convertir el ID a cadena
             var quantity = parseInt($('#modalQuantity').val(), 10);
             var maxQuantity = parseInt($('#modalMaxQuantity').val(), 10);
+            var precioUnidad = parseFloat($('#modalPrecioUnidad').val());
 
             if (isNaN(quantity) || quantity <= 0) {
                 showToast('error', 'Cantidad no válida.');
@@ -146,7 +152,7 @@
                 return;
             }
 
-            addToCart(productId, quantity, maxQuantity);
+            addToCart(productId, quantity, maxQuantity, precioUnidad);
             $('#addToCartModal').modal('hide');
         }
     </script>
