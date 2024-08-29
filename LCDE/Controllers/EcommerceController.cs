@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 
 namespace LCDE.Controllers
 {
@@ -56,10 +55,10 @@ namespace LCDE.Controllers
             var productos = await repositorioProductos.ObtenerDetallesProductos(idsProductos);
 
             // Combinar la información del carrito con los detalles de los productos
-            var carritoDetalles = carrito.Join(productos, c => c.IdProducto, p => p.Id, (c, p) => new CarritoItemDTO
+            var carritoDetalles = carrito.Join(productos, c => c.IdProducto, p => p.IdProducto, (c, p) => new CarritoItemDTO
             {
                 IdProducto = c.IdProducto,
-                NombreProducto = p.Nombre,
+                NombreProducto = p.NombreProducto,
                 Cantidad = c.Cantidad,
                 PrecioUnidad = p.PrecioUnidad
             }).ToList();

@@ -44,8 +44,8 @@ function addToCart(productId, quantity, maxQuantity) {
     }
 
     let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-    let productIndex = cart.findIndex(item => item.id.toString() === productId); // Convertir el ID del carrito a cadena
-    let existingQuantity = productIndex !== -1 ? parseInt(cart[productIndex].quantity, 10) : 0;
+    let productIndex = cart.findIndex(item => item.idProducto.toString() === productId); // Convertir el ID del carrito a cadena
+    let existingQuantity = productIndex !== -1 ? parseInt(cart[productIndex].cantidad, 10) : 0;
 
     if (quantity + existingQuantity > maxQuantity) {
         showToast('error', `Ya tienes ${existingQuantity} en el carrito. La existencia total del producto es ${maxQuantity}.`);
@@ -53,9 +53,10 @@ function addToCart(productId, quantity, maxQuantity) {
     }
 
     if (productIndex !== -1) {
-        cart[productIndex].quantity = existingQuantity + quantity;
+        cart[productIndex].cantidad = existingQuantity + quantity;
     } else {
-        cart.push({ id: productId, quantity: quantity });
+        // Aquí se crea el objeto con las propiedades en minúscula
+        cart.push({ idProducto: productId, cantidad: quantity, nombreProducto: '', precioUnidad: 0 });
     }
 
     localStorage.setItem('shoppingCart', JSON.stringify(cart));
@@ -69,7 +70,6 @@ function addToCart(productId, quantity, maxQuantity) {
     // Actualizar el contador del carrito
     updateCartCount();
 }
-
 document.addEventListener('DOMContentLoaded', function () {
     if (window.location.pathname === '/Ecommerce/ResumenCarrito') {
         let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];

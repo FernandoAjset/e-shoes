@@ -349,7 +349,7 @@
         // Función para actualizar el contador del carrito
         function updateCartCount() {
             let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-            let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            let totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
             document.getElementById('cart-count').textContent = totalItems;
         }
 

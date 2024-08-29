@@ -34,11 +34,11 @@ namespace LCDE.Servicios
             return producto_id;
         }
 
-        public async Task<IEnumerable<ProductoListarDTO>> ObtenerDetallesProductos(IEnumerable<int> idsProductos)
+        public async Task<IEnumerable<CarritoItemDTO>> ObtenerDetallesProductos(IEnumerable<int> idsProductos)
         {
             using var connection = new SqlConnection(connectionString);
-            var productos = await connection.QueryAsync<ProductoListarDTO>(@"
-                                EXEC sp_ObtenerDetallesProductos @IdsProductos
+            var productos = await connection.QueryAsync<CarritoItemDTO>(@"
+                                EXEC sp_ObtenerListadoDetallesProductos @IdsProductos
                             ", new
             {
                 IdsProductos = string.Join(",", idsProductos)

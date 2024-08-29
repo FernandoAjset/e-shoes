@@ -138,7 +138,7 @@
             }
 
             let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-            let productIndex = cart.findIndex(item => item.id.toString() === productId); // Convertir el ID del carrito a cadena
+            let productIndex = cart.findIndex(item => item.idProducto.toString() === productId); // Convertir el ID del carrito a cadena
             let existingQuantity = productIndex !== -1 ? parseInt(cart[productIndex].quantity, 10) : 0;
 
             if (quantity + existingQuantity > maxQuantity) {
