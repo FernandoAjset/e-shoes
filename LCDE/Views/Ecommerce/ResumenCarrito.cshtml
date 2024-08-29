@@ -7,7 +7,20 @@
         <div class="cart_inner">
             @Html.AntiForgeryToken()
             <div class="table-responsive">
-                <!-- El contenido se actualizará dinámicamente -->
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items">
+                        <!-- El contenido se actualizará dinámicamente -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

@@ -8,5 +8,6 @@
         public int Cantidad { get; set; }
         public double PrecioUnidad { get; set; }
         public double Total => Cantidad * PrecioUnidad;
+        public int Existencia { get; set; }
     }
 }

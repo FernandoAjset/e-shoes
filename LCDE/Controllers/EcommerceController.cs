@@ -61,7 +61,8 @@ namespace LCDE.Controllers
                 IdProducto = c.IdProducto,
                 NombreProducto = p.NombreProducto,
                 Cantidad = c.Cantidad,
-                PrecioUnidad = p.PrecioUnidad
+                PrecioUnidad = p.PrecioUnidad,
+                Existencia = p.Existencia
             }).ToList();
 
             return PartialView("_ResumenCarritoPartial", carritoDetalles);

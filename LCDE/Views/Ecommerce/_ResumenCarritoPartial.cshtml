@@ -9,6 +9,7 @@
                         <th scope="col">Precio</th>
                         <th scope="col">Cantidad</th>
                         <th scope="col">Total</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -18,7 +19,7 @@
                             <td>
                                 <div class="media">
                                     <div class="d-flex">
-                                        <img src="@item.ImageUrl" alt="product-img" style="width: 100px; height: 100px;">
+                                        <img src="@item.ImageUrl" alt="product-img" style="width: 50px; height: 50px;">
                                     </div>
                                     <div class="media-body">
                                         <p>@item.NombreProducto</p>
@@ -32,19 +33,16 @@
                             </td>
                             <td>
                                 <div class="product_count">
-                                    <input type="text" name="qty" id="sst" maxlength="12" value="@item.Cantidad" title="Cantidad:" class="input-text qty">
-                                    <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button">
-                                        <i class="lnr lnr-chevron-up"></i>
-                                    </button>
-                                    <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button">
-                                        <i class="lnr lnr-chevron-down"></i>
-                                    </button>
+                                    <input type="number" name="qty" class="update-quantity" data-product-id="@item.IdProducto" data-max-quantity="@item.Existencia" min="1" max="@item.Existencia" value="@item.Cantidad" title="Cantidad:" class="input-text qty">
                                 </div>
                             </td>
                             <td>
                                 <h5>
                                     @("Q" + (item.Cantidad * item.PrecioUnidad).ToString("N2"))
                                 </h5>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger remove-item" data-product-id="@item.IdProducto">Eliminar</button>
                             </td>
                         </tr>
                     }
@@ -57,6 +55,7 @@
                         <td>
                             <h5>@("Q" + Model.Sum(item => item.Cantidad * item.PrecioUnidad).ToString("N2"))</h5>
                         </td>
+                        <td></td>
                     </tr>
                     <tr class="out_button_area">
                         <div class="checkout_btn_inner d-flex align-items-center">

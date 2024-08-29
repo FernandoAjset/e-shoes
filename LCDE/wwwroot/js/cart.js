@@ -88,3 +88,64 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error:', error));
     }
 });
+
+function removeFromCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    cart = cart.filter(item => item.idProducto.toString() !== productId.toString());
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+
+    // Disparar evento de almacenamiento local
+    window.dispatchEvent(new Event('storage'));
+
+    // Mostrar el toast de éxito
+    showToast('success', 'Producto eliminado del carrito.');
+
+    // Actualizar el contador del carrito
+    updateCartCount();
+}
+
+function updateCartItem(productId, quantity, maxQuantity) {
+    quantity = parseInt(quantity, 10);
+    productId = productId.toString(); // Convertir el ID a cadena
+
+    if (isNaN(quantity) || quantity <= 0) {
+        showToast('error', 'Cantidad no válida.');
+        return;
+    }
+
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    let productIndex = cart.findIndex(item => item.idProducto.toString() === productId); // Convertir el ID del carrito a cadena
+
+    if (productIndex !== -1) {
+        if (quantity > maxQuantity) {
+            showToast('error', `La cantidad no puede superar la existencia total del producto (${maxQuantity}).`);
+            return;
+        }
+        cart[productIndex].cantidad = quantity;
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+
+        // Disparar evento de almacenamiento local
+        window.dispatchEvent(new Event('storage'));
+
+        // Mostrar el toast de éxito
+        showToast('success', 'Cantidad actualizada.');
+    }
+}
+
+function attachEventListeners() {
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function () {
+            let productId = this.dataset.productId;
+            removeFromCart(productId);
+        });
+    });
+
+    document.querySelectorAll('.update-quantity').forEach(input => {
+        input.addEventListener('change', function () {
+            let productId = this.dataset.productId;
+            let quantity = this.value;
+            let maxQuantity = this.dataset.maxQuantity;
+            updateCartItem(productId, quantity, maxQuantity);
+        });
+    });
+}
