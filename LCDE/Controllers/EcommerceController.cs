@@ -57,6 +57,7 @@ namespace LCDE.Controllers
             // Combinar la información del carrito con los detalles de los productos
             var carritoDetalles = carrito.Join(productos, c => c.IdProducto, p => p.IdProducto, (c, p) => new CarritoItemDTO
             {
+                ImageUrl = p.ImageUrl,
                 IdProducto = c.IdProducto,
                 NombreProducto = p.NombreProducto,
                 Cantidad = c.Cantidad,

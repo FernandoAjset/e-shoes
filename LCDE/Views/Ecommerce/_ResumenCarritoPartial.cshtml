@@ -1,74 +1,72 @@
 ﻿@model List<CarritoItemDTO>
-<section class="cart_area">
-    <div class="container">
-        <div class="cart_inner">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+<div class="container">
+    <div class="cart_inner">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
                         <tr>
-                            <th scope="col">Producto</th>
-                            <th scope="col">Precio</th>
-                            <th scope="col">Cantidad</th>
-                            <th scope="col">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="media">
-                                        <div class="d-flex">
-                                            <img src="img/cart.jpg" alt="">
-                                        </div>
-                                        <div class="media-body">
-                                            <p>@item.NombreProducto</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <h5>
-                                        @("Q" + item.PrecioUnidad.ToString("N2"))
-                                    </h5>
-                                </td>
-                                <td>
-                                    <div class="product_count">
-                                        <input type="text" name="qty" id="sst" maxlength="12" value="@item.Cantidad" title="Cantidad:" class="input-text qty">
-                                        <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button">
-                                            <i class="lnr lnr-chevron-up"></i>
-                                        </button>
-                                        <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button">
-                                            <i class="lnr lnr-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <h5>
-                                        @("Q" + (item.Cantidad * item.PrecioUnidad).ToString("N2"))
-                                    </h5>
-                                </td>
-                            </tr>
-                        }
-                        <tr>
-                            <td></td>
-                            <td></td>
                             <td>
-                                <h5>Subtotal</h5>
+                                <div class="media">
+                                    <div class="d-flex">
+                                        <img src="@item.ImageUrl" alt="product-img" style="width: 100px; height: 100px;">
+                                    </div>
+                                    <div class="media-body">
+                                        <p>@item.NombreProducto</p>
+                                    </div>
+                                </div>
                             </td>
                             <td>
-                                <h5>@("Q" + Model.Sum(item => item.Cantidad * item.PrecioUnidad).ToString("N2"))</h5>
+                                <h5>
+                                    @("Q" + item.PrecioUnidad.ToString("N2"))
+                                </h5>
+                            </td>
+                            <td>
+                                <div class="product_count">
+                                    <input type="text" name="qty" id="sst" maxlength="12" value="@item.Cantidad" title="Cantidad:" class="input-text qty">
+                                    <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;" class="increase items-count" type="button">
+                                        <i class="lnr lnr-chevron-up"></i>
+                                    </button>
+                                    <button onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;" class="reduced items-count" type="button">
+                                        <i class="lnr lnr-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <h5>
+                                    @("Q" + (item.Cantidad * item.PrecioUnidad).ToString("N2"))
+                                </h5>
                             </td>
                         </tr>
-                        <tr class="out_button_area">
-                            <div class="checkout_btn_inner d-flex align-items-center">
-                                <a class="gray_btn" href="/">Continuar comprando</a>
-                                <a class="primary-btn" href="#">Proceder al pago</a>
-                            </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <h5>Subtotal</h5>
+                        </td>
+                        <td>
+                            <h5>@("Q" + Model.Sum(item => item.Cantidad * item.PrecioUnidad).ToString("N2"))</h5>
+                        </td>
+                    </tr>
+                    <tr class="out_button_area">
+                        <div class="checkout_btn_inner d-flex align-items-center">
+                            <a class="gray_btn" href="/">Continuar comprando</a>
+                            <a class="primary-btn" href="#">Proceder al pago</a>
+                        </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-</section>
+</div>
