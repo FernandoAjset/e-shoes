@@ -86,6 +86,9 @@ function updateCartItem(productId, quantity, maxQuantity) {
 
         // Recargar la vista del carrito
         loadCartView();
+
+        // Actualizar el contador del carrito
+        updateCartCount();
     }
 }
 
@@ -102,6 +105,9 @@ function removeFromCart(productId) {
 
     // Recargar la vista del carrito
     loadCartView();
+
+    // Actualizar el contador del carrito
+    updateCartCount();
 }
 
 function loadCartView() {
@@ -145,3 +151,20 @@ function attachEventListeners() {
         });
     });
 }
+
+// Función para actualizar el contador del carrito
+function updateCartCount() {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    let totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+    document.getElementById('cart-count').textContent = totalItems;
+}
+
+// Escuchar cambios en el localStorage
+window.addEventListener('storage', function (event) {
+    if (event.key === 'shoppingCart') {
+        updateCartCount();
+    }
+});
+
+// Actualizar el contador al cargar la página
+document.addEventListener('DOMContentLoaded', updateCartCount);
