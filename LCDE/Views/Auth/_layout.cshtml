@@ -51,5 +51,10 @@
     <script src="~/karma/js/gmaps.min.js"></script>
     <script src="~/karma/js/main.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            localStorage.removeItem('shoppingCart');
+        });
+    </script>
 </body>
 </html>
