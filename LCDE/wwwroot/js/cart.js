@@ -110,8 +110,21 @@ function removeFromCart(productId) {
     updateCartCount();
 }
 
+function createCarritoItemDTO(item) {
+    return {
+        idProducto: item.idProducto || 0,
+        imageUrl: item.imageUrl || '',
+        nombreProducto: item.nombreProducto || '',
+        cantidad: item.cantidad || 0,
+        precioUnidad: item.precioUnidad || 0.0,
+        existencia: item.existencia || 0
+    };
+}
+
 function loadCartView() {
     let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    cart = cart.map(createCarritoItemDTO); // Crear objetos CarritoItemDTO con valores por defecto
+    console.log(cart); // Verificar los datos del carrito
     fetch('/Ecommerce/ResumenCarrito', {
         method: 'POST',
         headers: {

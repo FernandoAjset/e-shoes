@@ -75,9 +75,7 @@
                                         </div>
                                         <div class="prd-bottom">
                                             <a href="#" class="social-info"
-                                               onclick="openAddToCartModal(@item.Id, 
-                                            @item.Existencia , 
-                                            @item.PrecioUnidad)">
+                                               onclick="openAddToCartModal(@item.Id, @item.Existencia, @item.PrecioUnidad)">
                                                 <span class="ti-bag"></span>
                                                 <p class="hover-text">Agregar</p>
                                             </a>
@@ -185,27 +183,28 @@
                             detalleUrl = detalleUrl.replace("__ID__", producto.id);
 
                             var productHtml = `
-                                    <div class="col-lg-4 col-md-6">
-                                        <div class="single-product">
-                                            <img class="img-fluid" src="${producto.image_url}" alt="">
-                                            <div class="product-details">
-                                                <h6>${producto.nombre}</h6>
-                                                <div class="price">
-                                                    <h6>Q.${producto.precioUnidad}</h6>
-                                                </div>
-                                                <div class="prd-bottom">
-                                                    <a href="#" class="social-info">
-                                                        <span class="ti-bag"></span>
-                                                        <p class="hover-text">Agregar</p>
-                                                    </a>
-                                                    <a href="${detalleUrl}" class="social-info">
-                                                        <span class="lnr lnr-move"></span>
-                                                        <p class="hover-text">Ver</p>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>`;
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="single-product">
+                                                        <img class="img-fluid" src="${producto.image_url}" alt="">
+                                                        <div class="product-details">
+                                                            <h6>${producto.nombre}</h6>
+                                                            <div class="price">
+                                                                <h6>Q.${producto.precioUnidad}</h6>
+                                                            </div>
+                                                            <div class="prd-bottom">
+                                                                <a href="#" class="social-info"
+                                                                   onclick="openAddToCartModal(${producto.id}, ${producto.existencia}, ${producto.precioUnidad})">
+                                                                    <span class="ti-bag"></span>
+                                                                    <p class="hover-text">Agregar</p>
+                                                                </a>
+                                                                <a href="${detalleUrl}" class="social-info">
+                                                                    <span class="lnr lnr-move"></span>
+                                                                    <p class="hover-text">Ver</p>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
                             $("#product-list .row").append(productHtml);
                         });
                     },
