@@ -24,11 +24,11 @@
                         <thead>
                             <tr class="encabezado-tabla">
                                 <th scope="col">Nombre</th>
+                                <th scope="col">Descripcion</th>
                                 <th scope="col">Existencia</th>
                                 <th scope="col">Categoria</th>
                                 <th scope="col">Proveedor</th>
                                 <th scope="col">Precio Unidad</th>
-                                <th scope="col">Promoción</th>
                                 <th scope="col">Acciones</th>
                             </tr>
                         </thead>
@@ -36,6 +36,9 @@
                             @foreach (var producto in Model)
                             {
                                 <tr>
+                                    <td>
+                                        @producto.Nombre
+                                    </td>
                                     <td>
                                         @producto.Detalle
                                     </td>
@@ -51,9 +54,7 @@
                                     <td>
                                         Q. @producto.PrecioUnidad
                                     </td>
-                                    <td>
-                                        @producto.Promocion
-                                    </td>
+
                                     <td>
                                         <a class="btn btn-primary" asp-action="Editar" asp-route-id="@producto.Id">
                                             <i class="bi bi-pencil-fill" style="font-size:1rem; color: white; margin-right:10px"></i>

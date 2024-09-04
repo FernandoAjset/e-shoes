@@ -36,6 +36,7 @@
 	  <Content Remove="appsettings.Development.json" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.21.2" />
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="MailKit" Version="4.7.1.1" />

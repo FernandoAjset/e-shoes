@@ -6,14 +6,18 @@ namespace LCDE.Models
     public class Producto
     {
         public int Id { get; set; }
+
+        [Display(Name = "Imagen del producto")]
+        [Url(ErrorMessage = "Debe ser una URL válida.")]
         public string? Image_url { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
+        [Display(Name = "Nombre producto")]
         public string Nombre { get; set; }
 
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        [Display(Name = "Nombre producto")]
+        [Display(Name = "Descripcion del Producto")]
         [Remote(action: "ProductoExiste", controller: "Productos",
             AdditionalFields = nameof(Id))]
         public string Detalle { get; set; }

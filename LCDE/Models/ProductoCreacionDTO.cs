@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using LCDE.Validaciones;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace LCDE.Models
@@ -12,6 +13,11 @@ namespace LCDE.Models
         public string PrecioUnidadString { get; set; }
 
         public decimal PrecioUnidad { get; set; }
+
+        [Display(Name = "Seleccionar Imagen")]
+        [DataType(DataType.Upload)]
+        [TipoArchivoValidacion(grupoTipoArchivo: GrupoTipoArchivo.Imagen)]
+        public IFormFile? Imagen { get; set; }
 
         public IEnumerable<SelectListItem>? Categorias { get; set; }
         public IEnumerable<SelectListItem>? Proveedores { get; set; }
