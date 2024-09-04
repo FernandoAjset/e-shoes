@@ -45,6 +45,7 @@ jobs:
         export DB_DATABASE=${{ secrets.DB_DATABASE }}
         export DB_USER=${{ secrets.DB_USER }}
         export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        export AZUREPASSWORD=${{ secrets.AZUREPASSWORD }}
         envsubst < ${{ env.APPSETTINGS_PATH }} > ${{ env.APPSETTINGS_PATH }}.temp
         mv ${{ env.APPSETTINGS_PATH }}.temp ${{ env.APPSETTINGS_PATH }}
 
