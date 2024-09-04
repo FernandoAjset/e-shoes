@@ -11,14 +11,17 @@
             <div class="sidebar-categories">
                 <div class="head-primary">Categorías</div>
                 <ul class="main-categories">
-                    @foreach (var item in Model.Categorias)
+                    @if (Model.Categorias != null)
                     {
-                        <li class="main-nav-list">
-                            <a href="#" class="category-link" data-category-id="@item.Id">
-                                <span class="lnr lnr-arrow-right"></span>
-                                @item.Nombre
-                            </a>
-                        </li>
+                        @foreach (var item in Model.Categorias)
+                        {
+                            <li class="main-nav-list">
+                                <a asp-action="BuscarPorCategorias" asp-route-CategoriaId="@item.Id">
+                                    <span class="lnr lnr-arrow-right"></span>
+                                    @item.Nombre
+                                </a>
+                            </li>
+                        }
                     }
                 </ul>
             </div>
@@ -54,34 +57,64 @@
             <!-- Lista de Productos -->
             <section id="product-list" class="lattest-product-area pb-40 category-list">
                 <div class="row">
-                    @foreach (var item in Model.productosListarDTO)
+                    @if (Model.productosListarDTO != null)
                     {
-                        <!-- Producto Individual -->
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-product">
-                                <img class="img-fluid" src="@item.Image_url" alt="">
-                                <div class="product-details">
-                                    <h6>@item.Nombre</h6>
-                                    <div class="price">
-                                        <h6>Q.@item.PrecioUnidad</h6>
-                                    </div>
-                                    <div class="prd-bottom">
-                                        <a href="" class="social-info">
-                                            <span class="ti-bag"></span>
-                                            <p class="hover-text">Agregar</p>
-                                        </a>
-                                        <a asp-action="DetalleProducto" asp-route-productoId="@item.Id"
-                                           class="social-info">
-                                            <span class="lnr lnr-move"></span>
-                                            <p class="hover-text">Ver</p>
-                                        </a>
+                        @foreach (var item in Model.productosListarDTO)
+                        {
+                            <!-- Producto Individual -->
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-product">
+                                    <img class="img-fluid" src="@item.Image_url" alt="">
+                                    <div class="product-details">
+                                        <h6>@item.Nombre</h6>
+                                        <div class="price">
+                                            <h6>Q.@item.PrecioUnidad</h6>
+                                        </div>
+                                        <div class="stock">
+                                            <p>Existencia: @item.Existencia</p>
+                                        </div>
+                                        <div class="prd-bottom">
+                                            <a href="#" class="social-info"
+                                               onclick="openAddToCartModal(@item.Id, @item.Existencia, @item.PrecioUnidad)">
+                                                <span class="ti-bag"></span>
+                                                <p class="hover-text">Agregar</p>
+                                            </a>
+                                            <a asp-action="DetalleProducto" asp-route-productoId="@item.Id"
+                                               class="social-info">
+                                                <span class="lnr lnr-move"></span>
+                                                <p class="hover-text">Ver</p>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     }
                 </div>
             </section>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ingresar la cantidad -->
+<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addToCartModalLabel">Agregar al Carrito</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="modalQuantity"><b>Cantidad:</b></label>
+                <input type="number" id="modalQuantity" class="form-control" min="1" />
+                <input type="hidden" id="modalProductId" />
+                <input type="hidden" id="modalMaxQuantity" />
+                <input type="hidden" id="modalPrecioUnidad" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmAddToCart()">Agregar</button>
+            </div>
         </div>
     </div>
 </div>
@@ -150,27 +183,28 @@
                             detalleUrl = detalleUrl.replace("__ID__", producto.id);
 
                             var productHtml = `
-                            <div class="col-lg-4 col-md-6">
-                                <div class="single-product">
-                                    <img class="img-fluid" src="${producto.image_url}" alt="">
-                                    <div class="product-details">
-                                        <h6>${producto.nombre}</h6>
-                                        <div class="price">
-                                            <h6>Q.${producto.precioUnidad}</h6>
-                                        </div>
-                                        <div class="prd-bottom">
-                                            <a href="#" class="social-info">
-                                                <span class="ti-bag"></span>
-                                                <p class="hover-text">Agregar</p>
-                                            </a>
-                                            <a href="${detalleUrl}" class="social-info">
-                                                <span class="lnr lnr-move"></span>
-                                                <p class="hover-text">Ver</p>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`;
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="single-product">
+                                                        <img class="img-fluid" src="${producto.image_url}" alt="">
+                                                        <div class="product-details">
+                                                            <h6>${producto.nombre}</h6>
+                                                            <div class="price">
+                                                                <h6>Q.${producto.precioUnidad}</h6>
+                                                            </div>
+                                                            <div class="prd-bottom">
+                                                                <a href="#" class="social-info"
+                                                                   onclick="openAddToCartModal(${producto.id}, ${producto.existencia}, ${producto.precioUnidad})">
+                                                                    <span class="ti-bag"></span>
+                                                                    <p class="hover-text">Agregar</p>
+                                                                </a>
+                                                                <a href="${detalleUrl}" class="social-info">
+                                                                    <span class="lnr lnr-move"></span>
+                                                                    <p class="hover-text">Ver</p>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
                             $("#product-list .row").append(productHtml);
                         });
                     },
@@ -181,10 +215,43 @@
                 });
             }
         });
+
+        function openAddToCartModal(productId, maxQuantity, precioUnidad) {
+            $('#modalProductId').val(productId);
+            $('#modalMaxQuantity').val(maxQuantity);
+            $('#modalQuantity').attr('max', maxQuantity);
+            $('#modalQuantity').val(1);
+            $('#addToCartModal').modal('show');
+        }
+
+        function confirmAddToCart() {
+            var productId = $('#modalProductId').val().toString(); // Convertir el ID a cadena
+            var quantity = parseInt($('#modalQuantity').val(), 10);
+            var maxQuantity = parseInt($('#modalMaxQuantity').val(), 10);
+            var precioUnidad = parseFloat($('#modalPrecioUnidad').val());
+
+            if (isNaN(quantity) || quantity <= 0) {
+                showToast('error', 'Cantidad no válida.');
+                return;
+            }
+
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+            let productIndex = cart.findIndex(item => item.idProducto.toString() === productId); // Convertir el ID del carrito a cadena
+            let existingQuantity = productIndex !== -1 ? parseInt(cart[productIndex].quantity, 10) : 0;
+
+            if (quantity + existingQuantity > maxQuantity) {
+                showToast('error', `Ya tienes ${existingQuantity} en el carrito. La existencia total del producto es ${maxQuantity}.`);
+                return;
+            }
+
+            addToCart(productId, quantity, maxQuantity, precioUnidad);
+            $('#addToCartModal').modal('hide');
+        }
     </script>
 
     <!-- Campos ocultos para los filtros -->
     <input type="hidden" id="CategoriaId" name="CategoriaId" value="@Model.CategoriaId" />
     <input type="hidden" id="PrecioMin" name="PrecioMin" value="@Model.PrecioMin" />
     <input type="hidden" id="PrecioMax" name="PrecioMax" value="@Model.PrecioMax" />
+
 }
