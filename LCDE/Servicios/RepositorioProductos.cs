@@ -16,11 +16,10 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             int producto_id = await connection.QuerySingleAsync<int>(@"
-                EXEC SP_CRUD_PRODUCTOS 
+                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
-                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad 
-                ,@Operacion
-            ", new
+                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
+                ,@Nombre, @ImageUrl, @Operacion", new
             {
                 DetalleProducto = producto.Detalle,
                 Existencia = producto.Existencia,
@@ -29,6 +28,8 @@ namespace LCDE.Servicios
                 IdPromocion = producto.IdPromocion,
                 IdProducto = 0,
                 PrecioUnidad = producto.PrecioUnidad,
+                Nombre = producto.Nombre,
+                ImageUrl = producto.Image_url,
                 Operacion = "insert"
             });
             return producto_id;
@@ -52,11 +53,10 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 ProductoCreacionDTO producto = await connection.QuerySingleAsync<ProductoCreacionDTO>(@"
-                EXEC SP_CRUD_PRODUCTOS 
+                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
-                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad 
-                ,@Operacion
-                ", new
+                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
+                ,@Nombre, @ImageUrl, @Operacion", new
                 {
                     DetalleProducto = "",
                     Existencia = "",
@@ -65,6 +65,8 @@ namespace LCDE.Servicios
                     IdPromocion = "",
                     IdProducto = IdProducto,
                     PrecioUnidad = 0,
+                    Nombre = "",
+                    ImageUrl = "",
                     Operacion = "select"
                 });
                 return producto;
@@ -81,11 +83,10 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                EXEC SP_CRUD_PRODUCTOS 
+                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
-                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad 
-                ,@Operacion
-                ", new
+                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
+                ,@Nombre, @ImageUrl, @Operacion", new
                 {
                     DetalleProducto = producto.Detalle,
                     Existencia = producto.Existencia,
@@ -94,6 +95,8 @@ namespace LCDE.Servicios
                     IdPromocion = producto.IdPromocion,
                     IdProducto = producto.Id,
                     PrecioUnidad = producto.PrecioUnidad,
+                    Nombre = producto.Nombre,
+                    ImageUrl = producto.Image_url,
                     Operacion = "update"
 
                 });
@@ -113,9 +116,8 @@ namespace LCDE.Servicios
                 await connection.ExecuteAsync(@"
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
-                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad 
-                ,@Operacion
-                    ", new
+                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
+                ,@Nombre, @ImageUrl, @Operacion", new
                 {
                     DetalleProducto = "",
                     Existencia = "",
@@ -124,6 +126,8 @@ namespace LCDE.Servicios
                     IdPromocion = "",
                     IdProducto = IdProducto,
                     PrecioUnidad = 0,
+                    Nombre = "",
+                    ImageUrl = "",
                     Operacion = "delete"
                 });
                 return true;
@@ -140,9 +144,8 @@ namespace LCDE.Servicios
             IEnumerable<ProductoListarDTO> producto = await connection.QueryAsync<ProductoListarDTO>(@"
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
-                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad 
-                ,@Operacion
-                        ", new
+                ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
+                ,@Nombre, @ImageUrl, @Operacion", new
             {
                 DetalleProducto = "",
                 Existencia = "",
@@ -151,6 +154,8 @@ namespace LCDE.Servicios
                 IdPromocion = "",
                 IdProducto = 0,
                 PrecioUnidad = 0,
+                Nombre = "",
+                ImageUrl = "",
                 Operacion = "todo"
 
             });

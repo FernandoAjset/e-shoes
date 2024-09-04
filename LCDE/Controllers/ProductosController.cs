@@ -16,6 +16,9 @@ namespace LCDE.Controllers
         private readonly RepositorioProductos repositorioProductos;
         private readonly RepositorioCategorias repositorioCategorias;
         private readonly RepositorioProveedores repositorioProveedores;
+        private readonly IFileRepository fileRepository;
+
+        private readonly string CarpetaDeImg= "lcde-productos";
 
         /// <summary>
         /// Constructor de clase.
@@ -24,12 +27,14 @@ namespace LCDE.Controllers
         public ProductosController(
             RepositorioProductos repositorioProductos,
             RepositorioCategorias repositorioCategorias,
-            RepositorioProveedores repositorioProveedores
+            RepositorioProveedores repositorioProveedores,
+            IFileRepository fileRepository
             )
         {
             this.repositorioProductos = repositorioProductos;
             this.repositorioCategorias = repositorioCategorias;
             this.repositorioProveedores = repositorioProveedores;
+            this.fileRepository = fileRepository;
         }
         /// <summary>
         /// Enpoint para devolver la vista de listado de clientes.
@@ -97,6 +102,9 @@ namespace LCDE.Controllers
             {
                 return View(producto);
             }
+            //Enviar la imagen a Azure Storage
+            if (producto.Imagen != null) producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
+
             // Enviar los datos al repositorio para grabar en base de datos, si se crea el registro se obtiene el nuevo Id.
             if (await repositorioProductos.CrearProducto(producto) > 0)
             {
@@ -187,6 +195,13 @@ namespace LCDE.Controllers
 
                     return View(producto);
                 }
+
+                //Enviar la imagen a Azure Storage
+                if (producto.Imagen != null)
+                {
+                    await fileRepository.DeleteFile(producto.Image_url, CarpetaDeImg);
+                    producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
+                }
                 bool codigoResult = await repositorioProductos.ModificarProducto(producto);
                 if (codigoResult)
                 {
@@ -228,6 +243,7 @@ namespace LCDE.Controllers
 
             if (await repositorioProductos.BorrarProducto(id))
             {
+                await fileRepository.DeleteFile(producto.Image_url, CarpetaDeImg);
                 return Ok(new { success = true });
             }
             return BadRequest();
