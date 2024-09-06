@@ -53,14 +53,18 @@
                     </div>
 
                     <div class="mb-3 d-flex flex-column">
-                        <label asp-for="Image_url" class="form-label"></label>
+                        <label asp-for="Image_url" class="form-label"></label> 
                         <input asp-for="Image_url" class=" form-control" hidden />
                         <img src="@Model.Image_url" alt="Imagen Actual" class="img-thumbnail w-50 mx-auto" />
                     </div>
                     <div class="mb-3">
                         <label asp-for="Imagen" class="form-label"></label>
-                        <input asp-for="Imagen" type="file" class="form-control" />
+                        <input asp-for="Imagen" type="file" class="form-control" id="fileInput" accept="image/*" onchange="previewImage(event)" />
                         <span asp-validation-for="Imagen" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-center">
+                        <img id="imagePreview" src="" alt="Vista previa de la imagen" style="display:none; width: 150px; height: 150px; object-fit: cover;" />
                     </div>
 
                     <button class="btn btn-primary">Enviar</button>
@@ -74,3 +78,22 @@
 @section Scripts{
     <partial name="_ValidationScriptsPartial" />
 }
+
+<script>
+    function previewImage(event) {
+        var fileInput = event.target;
+        var file = fileInput.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block'; // Muestra la imagen
+            };
+
+            reader.readAsDataURL(file); // Convierte el archivo en una URL base64
+        }
+    }
+</script>
