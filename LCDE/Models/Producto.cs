@@ -13,6 +13,7 @@ namespace LCDE.Models
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Nombre producto")]
+        [RegularExpression(@"^(?![\d])(?=.*[A-Za-z])[A-Za-z0-9\s-]+[^\s\W]$", ErrorMessage = "El nombre del producto no es válido.")]
         public string Nombre { get; set; }
 
 

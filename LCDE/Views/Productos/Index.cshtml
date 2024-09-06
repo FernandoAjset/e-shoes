@@ -23,6 +23,7 @@
                     <table class="table table-bordered" id="tbdata" cellspacing="0" style="width:100%">
                         <thead>
                             <tr class="encabezado-tabla">
+                                <th scope="col">Imagen</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Descripcion</th>
                                 <th scope="col">Existencia</th>
@@ -36,6 +37,9 @@
                             @foreach (var producto in Model)
                             {
                                 <tr>
+                                    <th>
+                                        <img src="@producto.Image_url" alt="Imagen del producto" style="width:100px; height:100px; object-fit:cover" />
+                                    </th>
                                     <td>
                                         @producto.Nombre
                                     </td>
