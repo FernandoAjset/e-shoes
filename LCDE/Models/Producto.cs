@@ -13,14 +13,14 @@ namespace LCDE.Models
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Nombre producto")]
-        [RegularExpression(@"^(?![\d])(?=.*[A-Za-z])[A-Za-z0-9\s-]+[^\s\W]$", ErrorMessage = "El nombre del producto no es válido.")]
+        [RegularExpression(@"^(?!\d)[A-Za-z0-9\s]+(?<!\s)$", ErrorMessage = "El nombre no es válido.")]
         public string Nombre { get; set; }
 
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Descripcion del Producto")]
-        [Remote(action: "ProductoExiste", controller: "Productos",
-            AdditionalFields = nameof(Id))]
+        [Remote(action: "ProductoExiste", controller: "Productos", AdditionalFields = nameof(Id))]
+        [RegularExpression(@"^(?!\d)[A-Za-z0-9\s]+(?<!\s)$", ErrorMessage = "El nombre no es válido.")]
         public string Detalle { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Existencia inicial")]
