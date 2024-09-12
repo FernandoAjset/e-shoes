@@ -1,0 +1,67 @@
+﻿@model List<CarritoItemDTO>
+<div class="container order_area">
+    <div class="cart_inner">
+        <div class="billing_details">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h3>Detalles de facturación</h3>
+                    <form class="row contact_form" action="#" method="post" novalidate="novalidate">
+                        <div class="col-md-6 form-group p_star">
+                            <input type="text" class="form-control" id="first" name="name">
+                            <span class="placeholder" data-placeholder="First name"></span>
+                        </div>
+                        <div class="col-md-6 form-group p_star">
+                            <input type="text" class="form-control" id="last" name="name">
+                            <span class="placeholder" data-placeholder="Last name"></span>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="text" class="form-control" id="NIT" name="NIT" placeholder="NIT">
+                        </div>
+                        <div class="col-md-6 form-group p_star">
+                            <input type="text" class="form-control" id="number" name="number">
+                            <span class="placeholder" data-placeholder="Phone number"></span>
+                        </div>
+                        <div class="col-md-6 form-group p_star">
+                            <input type="text" class="form-control" id="email" name="compemailany">
+                            <span class="placeholder" data-placeholder="Email Address"></span>
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="add1" name="add1">
+                            <span class="placeholder" data-placeholder="Address line 01"></span>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <textarea class="form-control" name="message" id="message" rows="1" placeholder="Observaciones"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <div class="order_box">
+                        <h2>Tu Orden</h2>
+                        <ul class="list">
+                            <li><a href="#">Producto <span>Total</span></a></li>
+                            @foreach (var item in Model)
+                            {
+                                <li><a href="#">@item.NombreProducto<span class="middle">x @item.Cantidad</span> <span class="last">@("Q" + (item.Cantidad * item.PrecioUnidad).ToString("N2"))</span></a></li>
+                            }
+                        </ul>
+                        <ul class="list list_2">
+                            <li>
+                                <a href="#">
+                                    Total <span>
+                                        @("Q" + Model.Sum(x => x.Cantidad * x.PrecioUnidad).ToString("N2"))
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="creat_account">
+                            <input type="checkbox" id="f-option4" name="selector">
+                            <label for="f-option4">Acepto los </label>
+                            <a href="#">terminos y condiciones*</a>
+                        </div>
+                        <a class="primary-btn" href="#">Pagar con Paypal</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

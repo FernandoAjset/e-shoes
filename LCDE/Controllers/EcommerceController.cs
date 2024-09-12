@@ -40,6 +40,12 @@ namespace LCDE.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult ConfirmarOrden()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> ResumenCarrito([FromBody] List<CarritoItemDTO> carrito)
         {
@@ -66,6 +72,34 @@ namespace LCDE.Controllers
             }).ToList();
 
             return PartialView("_ResumenCarritoPartial", carritoDetalles);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmarOrden([FromBody] List<CarritoItemDTO> carrito)
+        {
+            if (carrito == null || !carrito.Any())
+            {
+                return PartialView("_DetalleOrdenPartial", new List<CarritoItemDTO>());
+            }
+
+            // Obtener los IDs de los productos en el carrito
+            var idsProductos = carrito.Select(c => c.IdProducto).ToList();
+
+            // Obtener los detalles de los productos desde el repositorio
+            var productos = await repositorioProductos.ObtenerDetallesProductos(idsProductos);
+
+            // Combinar la información del carrito con los detalles de los productos
+            var carritoDetalles = carrito.Join(productos, c => c.IdProducto, p => p.IdProducto, (c, p) => new CarritoItemDTO
+            {
+                ImageUrl = p.ImageUrl,
+                IdProducto = c.IdProducto,
+                NombreProducto = p.NombreProducto,
+                Cantidad = c.Cantidad,
+                PrecioUnidad = p.PrecioUnidad,
+                Existencia = p.Existencia
+            }).ToList();
+
+            return PartialView("_DetalleOrdenPartial", carritoDetalles);
         }
 
         public async Task<IActionResult> Home()
