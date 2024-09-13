@@ -58,7 +58,7 @@ function formatCliente(state) {
         return state.text;
     }
     var $state = $(
-        '<span>' + 'Nombre: ' + state.text + ', NIT: ' + state.nit + '</span>'
+        '<span>' + 'Nombre: ' + state.text + ', Nit: ' + state.nit + '</span>'
     );
     return $state;
 };
@@ -75,7 +75,7 @@ $("#cboBuscarCliente").select2({
                     {
                         id: item.id,
                         text: item.nombre,
-                        NIT: item.nit
+                        Nit: item.nit
                     }))
             }
         },

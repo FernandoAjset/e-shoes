@@ -16,6 +16,6 @@ namespace LCDE.Models
         [Remote(action: "ProveedorExiste", controller: "Proveedores",
     AdditionalFields = nameof(Id))]
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        public string NIT { get; set; }
+        public string Nit { get; set; }
     }
 }

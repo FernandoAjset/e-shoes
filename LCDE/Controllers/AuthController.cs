@@ -119,7 +119,7 @@ namespace LCDE.Controllers
 
                 var cliente = new Cliente()
                 {
-                    NIT = modelo.informacionCliente.Nit ?? "",
+                    Nit = modelo.informacionCliente.Nit ?? "",
                     Correo = modelo.informacionUsuario.Correo,
                     Nombre = modelo.informacionCliente.Nombre,
                     Direccion = modelo.informacionCliente.Direccion,

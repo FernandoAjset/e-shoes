@@ -16,10 +16,15 @@
     }
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname === '/Ecommerce/ConfirmarOrden') {
+        loadOrderView();
+    }
+});
+
 function loadOrderView() {
     let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     cart = cart.map(createCarritoItemDTO); // Crear objetos CarritoItemDTO con valores por defecto
-    console.log(cart); // Verificar los datos del carrito
     fetch('/Ecommerce/ConfirmarOrden', {
         method: 'POST',
         headers: {
@@ -31,12 +36,82 @@ function loadOrderView() {
         .then(response => response.text())
         .then(html => {
             document.querySelector('.order_area').innerHTML = html;
+
+            // Asegurarse de que el elemento 'pagar' exista antes de agregar el evento
+            const pagarButton = document.getElementById('pagar');
+            if (pagarButton) {
+                pagarButton.addEventListener('click', function () {
+                    // Obtener los datos del cliente desde los inputs
+                    const clienteInfo = {
+                        id: document.getElementById('id').value,
+                        id_usuario: 0,
+                        nit: document.getElementById('nit').value,
+                        nombre: document.getElementById('nombre').value,
+                        direccion: document.getElementById('direccion').value,
+                        telefono: document.getElementById('telefono').value,
+                        correo: document.getElementById('correo').value
+                    };
+
+                    // Obtener las observaciones
+                    const observaciones = document.getElementById('observaciones').value;
+
+                    // Obtener los detalles del carrito desde el localStorage
+                    let carrito = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+                    carrito = carrito.map(createCarritoItemDTO);
+
+                    // Crear el objeto ConfirmarOrdenDTO
+                    const confirmarOrdenDTO = {
+                        clienteInfo: clienteInfo,
+                        detallesCarrito: carrito,
+                        observaciones: observaciones
+                    };
+
+                    // Enviar la información al método CrearOrden del controlador
+                    fetch('/Ecommerce/CrearOrden', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(confirmarOrdenDTO)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(JSON.stringify(data));
+
+                            if (data.success) {
+                                showToast('success', 'Orden creada exitosamente');
+                                // Llamar a PayPal para realizar el pago
+                                return fetch('/Ecommerce/Paypal', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                    },
+                                    body: JSON.stringify({
+                                        precio: data.precio.toString(),
+                                        descripcion: data.descripcion,
+                                        idOrden: data.idOrden
+                                    })
+                                });
+                            } else {
+                                showToast('error', 'Error al crear la orden');
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status) {
+                                showToast('success', 'Pago realizado exitosamente');
+                                // Redirigir o realizar alguna acción adicional si es necesario
+                            } else {
+                                showToast('error', 'Error al realizar el pago');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            } else {
+                console.error('El botón "pagar" no se encontró en el DOM.');
+            }
         })
         .catch(error => console.error('Error:', error));
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname === '/Ecommerce/ConfirmarOrden') {
-        loadOrderView();
-    }
-});

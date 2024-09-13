@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using LCDE.Models;
 using Microsoft.Data.SqlClient;
-using System.Data;
 
 namespace LCDE.Servicios
 {
@@ -13,6 +12,48 @@ namespace LCDE.Servicios
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
 
         }
+
+        public async Task<EncabezadoFactura> ObtenerEncabezadoFacturaPorId(int idFactura)
+        {
+            using var connection = new SqlConnection(connectionString);
+            // Obtener datos del encabezado
+            return await connection
+                                    .QueryFirstOrDefaultAsync<EncabezadoFactura>
+                                     (@"EXEC SP_CRUD_FACTURA @IdEncabezado, @Serie,
+                                          @Fecha, @IdTipoPago, @IdCliente, @Operacion",
+                new
+                {
+                    IdEncabezado = idFactura,
+                    Serie = "",
+                    Fecha = DateTime.Now,
+                    IdTipoPago = 0,
+                    IdCliente = 0,
+                    Operacion = "select"
+                });
+        }
+
+        public async Task<IEnumerable<DetalleFactura>> ObtenerDetallesFactura(int idFactura)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            // Obtener datos de los detalles.
+            return await connection.QueryAsync<DetalleFactura>(@"
+                        EXEC SP_DETALLE_FACTURA 
+                        @IdDetalleFactura, @Subtotal, @Cantidad, 
+                        @IdProducto, @IdEncabezadoFactura, @DescuentoTotal,
+                        @Operacion
+                        ", new
+            {
+                IdDetalleFactura = 0,
+                Subtotal = 0,
+                Cantidad = 0,
+                IdProducto = 0,
+                IdEncabezadoFactura = idFactura,
+                DescuentoTotal = 0,
+                Operacion = "todo"
+            });
+        }
+
         public async Task<int> CrearVenta(VentaViewModel venta)
         {
             using var connection = new SqlConnection(connectionString);
@@ -24,14 +65,16 @@ namespace LCDE.Servicios
                 factura_id = await connection.QuerySingleAsync<int>(@"
                         EXEC SP_CRUD_FACTURA 
                         @IdEncabezado, @Serie, @Fecha,
-                        @IdTipoPago, @IdCliente, @Operacion
+                        @IdTipoPago, @IdCliente, 
+                        @EstadoFacturaId, @Operacion
                         ", new
                 {
                     IdEncabezado = 0,
-                    Serie = venta.EncabezadoFactura.Serie,
+                    venta.EncabezadoFactura.Serie,
                     Fecha = DateTime.Now,
-                    IdTipoPago = venta.EncabezadoFactura.IdTipoPago,
-                    IdCliente = venta.EncabezadoFactura.IdCliente,
+                    venta.EncabezadoFactura.IdTipoPago,
+                    venta.EncabezadoFactura.IdCliente,
+                    venta.EncabezadoFactura.EstadoFacturaId,
                     Operacion = "insert"
                 }, transaction);
                 foreach (var detalle in venta.DetallesFactura)
@@ -44,9 +87,9 @@ namespace LCDE.Servicios
                         ", new
                     {
                         IdDetalleFactura = 0,
-                        Subtotal = detalle.Subtotal,
-                        Cantidad = detalle.Cantidad,
-                        IdProducto = detalle.IdProducto,
+                        detalle.Subtotal,
+                        detalle.Cantidad,
+                        detalle.IdProducto,
                         IdEncabezadoFactura = factura_id,
                         DescuentoTotal = detalle.Descuento,
                         Operacion = "insert"
@@ -69,34 +112,34 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             Cliente cliente = await connection.QuerySingleAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT,@IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit,@IdCliente, @Operacion
                         ", new
             {
                 NombreCliente = "",
                 DireccionCliente = "",
                 TelefonoCliente = "",
                 CorreoCliente = "",
-                NIT = "",
-                IdCliente = IdCliente,
+                Nit = "",
+                IdCliente,
                 Operacion = "select"
             });
             return cliente;
         }
-        public async Task<Cliente> ObtenerClientePorNit(string NIT, int Id)
+        public async Task<Cliente> ObtenerClientePorNit(string Nit, int Id)
         {
             Cliente cliente = new();
             try
             {
                 using var connection = new SqlConnection(connectionString);
                 cliente = await connection.QueryFirstOrDefaultAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente,@Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente,@Operacion
                         ", new
                 {
                     NombreCliente = "",
                     DireccionCliente = "",
                     TelefonoCliente = 0,
                     CorreoCliente = "",
-                    NIT = NIT,
+                    Nit,
                     IdCliente = Id,
                     Operacion = "selectPorNit"
                 });
@@ -113,14 +156,14 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT,@IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit,@IdCliente, @Operacion
                         ", new
                 {
                     NombreCliente = cliente.Nombre,
                     DireccionCliente = cliente.Direccion,
                     TelefonoCliente = cliente.Telefono,
                     CorreoCliente = cliente.Correo,
-                    NIT = cliente.NIT,
+                    Nit = cliente.Nit,
                     IdCliente = cliente.Id,
                     Operacion = "update"
                 });
@@ -137,14 +180,14 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, @Operacion
                         ", new
                 {
                     NombreCliente = "",
                     DireccionCliente = "",
                     TelefonoCliente = "",
                     CorreoCliente = "",
-                    NIT = "",
+                    Nit = "",
                     IdCliente,
                     Operacion = "delete"
                 });
@@ -159,18 +202,29 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             IEnumerable<Cliente> clientes = await connection.QueryAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, @Operacion
                         ", new
             {
                 NombreCliente = "",
                 DireccionCliente = "",
                 TelefonoCliente = 0,
                 CorreoCliente = "",
-                NIT = "",
+                Nit = "",
                 IdCliente = 0,
                 Operacion = "todo"
             });
             return clientes;
+        }
+
+        public async Task<bool> ActualizarEstadoVenta(int facturaId, int estadoId)
+        {
+            using var connection = new SqlConnection(connectionString);
+            var result = await connection.ExecuteAsync(@"
+                UPDATE Facturas
+                SET estado_factura_id = @Estado
+                WHERE Id = @FacturaId", new { Estado = estadoId, FacturaId = facturaId });
+
+            return result > 0;
         }
     }
 }

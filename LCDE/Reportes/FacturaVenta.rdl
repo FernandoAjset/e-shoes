@@ -67,8 +67,8 @@
           <DataField>direccion</DataField>
           <rd:UserDefined>true</rd:UserDefined>
         </Field>
-        <Field Name="NIT">
-          <DataField>NIT</DataField>
+        <Field Name="Nit">
+          <DataField>Nit</DataField>
           <rd:UserDefined>true</rd:UserDefined>
         </Field>
         <Field Name="nombre">
@@ -550,7 +550,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=First(Fields!NIT.Value, "encabezado")</Value>
+                    <Value>=First(Fields!Nit.Value, "encabezado")</Value>
                     <Style />
                   </TextRun>
                 </TextRuns>
@@ -585,7 +585,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>NIT:</Value>
+                    <Value>Nit:</Value>
                     <Style>
                       <FontFamily>Calibri</FontFamily>
                       <FontSize>12pt</FontSize>

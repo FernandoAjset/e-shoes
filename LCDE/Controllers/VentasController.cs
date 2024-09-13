@@ -1,4 +1,5 @@
 ﻿using LCDE.Models;
+using LCDE.Models.Enums;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
@@ -96,6 +97,7 @@ public class VentasController : Controller
     {
         try
         {
+            modelo.EncabezadoFactura.EstadoFacturaId = (int)FacturaEstadoEnum.PendientePago;
             int IdNuevaFactura = await repositorioVentas.CrearVenta(modelo);
             if (IdNuevaFactura > 0)
             {
