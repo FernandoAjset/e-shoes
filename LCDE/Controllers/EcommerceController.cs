@@ -178,8 +178,8 @@ namespace LCDE.Controllers
 
             using (var client = new HttpClient())
             {
-                var userName = configuration.GetValue<string>("Paypal:User");
-                var passwd = configuration.GetValue<string>("Paypal:Password");
+                var userName = configuration.GetValue<string>("Paypal:USER");
+                var passwd = configuration.GetValue<string>("Paypal:PASSWORD");
 
                 client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com");
 
