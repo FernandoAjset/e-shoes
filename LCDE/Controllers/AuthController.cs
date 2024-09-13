@@ -210,7 +210,7 @@ namespace LCDE.Controllers
                 }
 
                 var resultado = await signInManager.PasswordSignInAsync(modelo.Email,
-                        modelo.Password, modelo.Recuerdame, lockoutOnFailure: false);
+                        modelo.Password,true, lockoutOnFailure: false);
 
                 if (resultado.Succeeded)
                 {

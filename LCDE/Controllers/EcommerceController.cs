@@ -99,7 +99,17 @@ namespace LCDE.Controllers
                 Existencia = p.Existencia
             }).ToList();
 
-            return PartialView("_DetalleOrdenPartial", carritoDetalles);
+            // Obtener datos del cliente
+            var idUsuario = sesionServicio.ObtenerIdUsuarioSesion();
+            Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(idUsuario);
+
+            Cliente cliente = await repositotioClientes.ObtenerClientePorIdUsuario(usuario.Id);
+            var data = new ConfirmarOrdenDTO()
+            {
+                ClienteInfo = cliente,
+                DetallesCarrito = carritoDetalles
+            };
+            return PartialView("_DetalleOrdenPartial", data);
         }
 
         public async Task<IActionResult> Home()
