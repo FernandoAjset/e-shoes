@@ -194,3 +194,16 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastType = '@TempData["ToastType"]';
+            var toastMessage = '@TempData["ToastMessage"]';
+
+            if (toastType && toastMessage) {
+                showToast(toastType, toastMessage);
+            }
+        });
+    </script>
+}

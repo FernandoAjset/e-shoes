@@ -1,5 +1,6 @@
 ﻿using LCDE.Models;
 using LCDE.Models.Enums;
+using LCDE.Models.Transaction;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -189,9 +190,9 @@ namespace LCDE.Controllers
                 var orden = new PaypalOrder()
                 {
                     intent = "CAPTURE",
-                    purchase_units = new List<PurchaseUnit>() {
-                    new PurchaseUnit() {
-                        amount = new Amount() {
+                    purchase_units = new List<Models.PurchaseUnit>() {
+                    new Models.PurchaseUnit() {
+                        amount = new Models.Amount() {
                             currency_code = "USD",
                             value = pagoData.Precio
                         },
@@ -200,11 +201,11 @@ namespace LCDE.Controllers
                 },
                     application_context = new ApplicationContext()
                     {
-                        brand_name = "E-shoes",
+                        brand_name = "Eshoes",
                         landing_page = "NO_PREFERENCE",
                         user_action = "PAY_NOW", // Accion para que paypal muestre el monto de pago
-                        return_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/Orden?idOrden={pagoData.IdOrden}", // cuando se aprovo la solicitud del cobro
-                        cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/Orden?idOrden={pagoData.IdOrden}" // cuando cancela la operacion
+                        return_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/ConfirmarPagoPayPal", // cuando se aprovo la solicitud del cobro
+                        cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/Home" // cuando cancela la operacion
                     }
                 };
 
@@ -218,10 +219,71 @@ namespace LCDE.Controllers
                 if (status)
                 {
                     respuesta = await response.Content.ReadAsStringAsync();
+                    // Obtener el token de la respuesta
+                    var objeto = JsonConvert.DeserializeObject<PaypalOrderResponse>(respuesta);
+                    if (objeto == null)
+                    {
+                        return Json(new { status = false, respuesta = "No se pudo completar el pago, intente más tarde" });
+                    }
+                    // Actualizar el token de pago en la factura
+                    await repositorioVentas.AgregarTokenPagoEnFactura(pagoData.IdOrden, objeto.id);
                 }
             }
 
             return Json(new { status = status, respuesta = respuesta });
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ConfirmarPagoPayPal([FromQuery] string token, [FromQuery] string PayerID)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(PayerID))
+            {
+                TempData["ToastType"] = "error";
+                TempData["ToastMessage"] = "No se pudo completar el pago, intente más tarde";
+                return RedirectToAction("Error", "Home");
+            }
+
+            bool status = false;
+
+            using (var client = new HttpClient())
+            {
+                var userName = configuration.GetValue<string>("Paypal:USER");
+                var passwd = configuration.GetValue<string>("Paypal:PASSWORD");
+
+                client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com");
+
+                var authToken = Encoding.ASCII.GetBytes($"{userName}:{passwd}");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
+
+                var data = new StringContent("{}", Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await client.PostAsync($"/v2/checkout/orders/{token}/capture", data);
+
+                status = response.IsSuccessStatusCode;
+
+                ViewData["Status"] = status;
+                if (status)
+                {
+                    // Actualizar estado factura a pagado
+                    await repositorioVentas.ActualizarEstadoVentaPagado(token);
+
+                    var jsonRespuesta = response.Content.ReadAsStringAsync().Result;
+
+                    PaypalTransaction objeto = JsonConvert.DeserializeObject<PaypalTransaction>(jsonRespuesta);
+
+                    ViewData["IdTransaccion"] = objeto.purchase_units[0].payments.captures[0].id;
+
+                    TempData["ToastType"] = "success";
+                    TempData["ToastMessage"] = "Pago realizado exitosamente";
+                }
+                else
+                {
+                    TempData["ToastType"] = "error";
+                    TempData["ToastMessage"] = "No se pudo completar el pago, intente más tarde";
+                }
+            }
+
+            return RedirectToAction("Home");
         }
 
         public async Task<IActionResult> Home()

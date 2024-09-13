@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LCDE.Models;
+using LCDE.Models.Enums;
 using Microsoft.Data.SqlClient;
 
 namespace LCDE.Servicios
@@ -215,14 +216,24 @@ namespace LCDE.Servicios
             });
             return clientes;
         }
-
-        public async Task<bool> ActualizarEstadoVenta(int facturaId, int estadoId)
+        public async Task<bool> AgregarTokenPagoEnFactura(int idFactura, string tokenPago)
         {
             using var connection = new SqlConnection(connectionString);
             var result = await connection.ExecuteAsync(@"
-                UPDATE Facturas
+                UPDATE encabezado_factura
+                SET token_pago = @tokenPago
+                WHERE id = @idFactura", new { idFactura, tokenPago });
+
+            return result > 0;
+        }
+
+        public async Task<bool> ActualizarEstadoVentaPagado(string tokenPago)
+        {
+            using var connection = new SqlConnection(connectionString);
+            var result = await connection.ExecuteAsync(@"
+                UPDATE encabezado_factura
                 SET estado_factura_id = @Estado
-                WHERE Id = @FacturaId", new { Estado = estadoId, FacturaId = facturaId });
+                WHERE token_pago = @tokenPago", new { Estado = (int)FacturaEstadoEnum.Pagada, tokenPago });
 
             return result > 0;
         }

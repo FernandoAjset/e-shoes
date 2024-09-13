@@ -101,10 +101,14 @@ function loadOrderView() {
                         .then(response => response.json())
                         .then(data => {
                             if (data.status) {
-                                showToast('success', 'Pago realizado exitosamente');
-                                // Redirigir o realizar alguna acción adicional si es necesario
+                                var jsonresult = JSON.parse(data.respuesta);
+                                var links = jsonresult.links;
+
+                                var resultado = links.find(item => item.rel === "approve")
+
+                                window.location.href = resultado.href
                             } else {
-                                showToast('error', 'Error al realizar el pago');
+                                showToast('error', 'No se pudo acceder a PayPal, vuelva a intentarlo más tarde');
                             }
                         })
                         .catch(error => console.error('Error:', error));
