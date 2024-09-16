@@ -21,27 +21,36 @@ namespace LCDE.Controllers
         private readonly RepositorioCategorias repositorioCategorias;
         private readonly RepositorioProductos repositorioProductos;
         private readonly RepositorioVentas repositorioVentas;
+        private readonly ReportesServicio reportesServicio;
+        private readonly IEmailService emailService;
+        private readonly IFileRepository fileRepository;
         private readonly IConfiguration configuration;
         private readonly UserManager<Usuario> userManager;
 
         public EcommerceController(
             IConfiguration configuration,
             UserManager<Usuario> userManager,
-            IRepositorioCliente pepe, //quien chingados le pone pepe a una interfaz no mameen xD
+            IRepositorioCliente repositorioClientes,
             ISesionServicio sesionServicio,
             IRepositorioUsuarios repositorioUsuarios,
             RepositorioCategorias repositorioCategorias,
             RepositorioProductos repositorioProductos,
-            RepositorioVentas repositorioVentas
+            RepositorioVentas repositorioVentas,
+            ReportesServicio reportesServicio,
+            IEmailService emailService,
+            IFileRepository fileRepository
             )
         {
 
-            this.repositotioClientes = pepe;
+            this.repositotioClientes = repositorioClientes;
             this.sesionServicio = sesionServicio;
             this.repositorioUsuarios = repositorioUsuarios;
             this.repositorioCategorias = repositorioCategorias;
             this.repositorioProductos = repositorioProductos;
             this.repositorioVentas = repositorioVentas;
+            this.reportesServicio = reportesServicio;
+            this.emailService = emailService;
+            this.fileRepository = fileRepository;
             this.configuration = configuration;
             this.userManager = userManager;
         }
@@ -127,47 +136,58 @@ namespace LCDE.Controllers
         [HttpPost]
         public async Task<IActionResult> CrearOrden([FromBody] ConfirmarOrdenDTO nuevaOrden)
         {
-            if (nuevaOrden == null)
+            try
             {
-                return Json(new { success = false, message = "Datos de la orden no válidos" });
-            }
-
-            // Crear la orden en estado pendiente de pago
-            var venta = new VentaViewModel
-            {
-                EncabezadoFactura = new EncabezadoFactura
+                if (nuevaOrden == null)
                 {
-                    Serie = "A",
-                    Fecha = DateTime.Now,
-                    IdTipoPago = (int)TipoPagoEnum.PayPal,
-                    IdCliente = nuevaOrden.ClienteInfo.Id,
-                    EstadoFacturaId = (int)FacturaEstadoEnum.PendientePago
-                },
-                DetallesFactura = nuevaOrden.DetallesCarrito.Select(item => new DetalleFactura
+                    return Json(new { success = false, message = "Datos de la orden no válidos" });
+                }
+
+                // Crear la orden en estado pendiente de pago
+                var venta = new VentaViewModel
                 {
-                    Subtotal = 0,
-                    Cantidad = item.Cantidad,
-                    IdProducto = item.IdProducto,
-                    Descuento = 0
-                }).ToList()
-            };
+                    EncabezadoFactura = new EncabezadoFactura
+                    {
+                        Serie = "A",
+                        Fecha = DateTime.Now,
+                        IdTipoPago = (int)TipoPagoEnum.PayPal,
+                        IdCliente = nuevaOrden.ClienteInfo.Id,
+                        EstadoFacturaId = (int)FacturaEstadoEnum.PendientePago
+                    },
+                    DetallesFactura = nuevaOrden.DetallesCarrito.Select(item => new DetalleFactura
+                    {
+                        Subtotal = 0,
+                        Cantidad = item.Cantidad,
+                        IdProducto = item.IdProducto,
+                        Descuento = 0
+                    }).ToList()
+                };
 
-            int facturaId = await repositorioVentas.CrearVenta(venta);
+                int facturaId = await repositorioVentas.CrearVenta(venta);
 
-            if (facturaId > 0)
-            {
-                // Obtener detalles de la factura y sumar el total
-                var detalles = await repositorioVentas.ObtenerDetallesFactura(facturaId);
-                decimal precioTotal = detalles.Sum(d => d.Subtotal);
+                if (facturaId > 0)
+                {
+                    var facturaUrl = await reportesServicio.CrearFactura(facturaId);
+                    await repositorioVentas.AgregarUrlFactura(facturaUrl, facturaId);
 
-                // Descripción para PayPal
-                var productoDescripcion = $"Pago de factura No.{facturaId}";
+                    // Obtener detalles de la factura y sumar el total
+                    var detalles = await repositorioVentas.ObtenerDetallesFactura(facturaId);
+                    decimal precioTotal = detalles.Sum(d => d.Subtotal);
 
-                return Json(new { success = true, precio = precioTotal, descripcion = productoDescripcion, idOrden = facturaId });
+                    // Descripción para PayPal
+                    var productoDescripcion = $"Pago de factura No.{facturaId}";
+
+                    return Json(new { success = true, precio = precioTotal, descripcion = productoDescripcion, idOrden = facturaId });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Error al crear la orden" });
+                }
             }
-            else
+            catch
             {
                 return Json(new { success = false, message = "Error al crear la orden" });
+
             }
         }
 
@@ -191,7 +211,7 @@ namespace LCDE.Controllers
                 {
                     intent = "CAPTURE",
                     purchase_units = new List<Models.PurchaseUnit>() {
-                    new Models.PurchaseUnit() {
+                    new() {
                         amount = new Models.Amount() {
                             currency_code = "USD",
                             value = pagoData.Precio
@@ -205,7 +225,7 @@ namespace LCDE.Controllers
                         landing_page = "NO_PREFERENCE",
                         user_action = "PAY_NOW", // Accion para que paypal muestre el monto de pago
                         return_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/ConfirmarPagoPayPal", // cuando se aprovo la solicitud del cobro
-                        cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/Home" // cuando cancela la operacion
+                        cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/HistorialOrdenes" // cuando cancela la operacion
                     }
                 };
 
@@ -230,7 +250,7 @@ namespace LCDE.Controllers
                 }
             }
 
-            return Json(new { status = status, respuesta = respuesta });
+            return Json(new { status, respuesta });
         }
 
         [HttpGet]
@@ -266,6 +286,28 @@ namespace LCDE.Controllers
                 {
                     // Actualizar estado factura a pagado
                     await repositorioVentas.ActualizarEstadoVentaPagado(token);
+                    try
+                    {
+                        // Enviar correo
+                        var factura = await repositorioVentas.ObtenerFacturaPorTokenPago(token);
+                        // Convertir a archivo adjunto basado en el url de la factura
+                        var facturaUrl = factura.Url;
+                        var attachment = await fileRepository.DownloadFileAsFormFileAsync(facturaUrl, $"Factura_{factura.Id}.pdf");
+                        List<IFormFile> attachments = new();
+                        if (attachment != null)
+                        {
+                            attachments.Add(attachment);
+                        }
+
+                        await emailService.SendEmailAsync(factura.CorreoCliente!, "Pago realizado",
+                                                          @$"Su pago ha sido realizado exitosamente. 
+                                      A continuación se adjunta su factura No.{factura.Id}.", attachments);
+                    }
+                    catch
+                    {
+                        TempData["ToastType"] = "error";
+                        TempData["ToastMessage"] = "El pago se realizó correctamente, pero no se pudo enviar la copia de su factura, por favor contacte con la tienda.";
+                    }
 
                     var jsonRespuesta = response.Content.ReadAsStringAsync().Result;
 

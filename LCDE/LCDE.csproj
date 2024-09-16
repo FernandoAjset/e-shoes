@@ -53,6 +53,7 @@
 	<ItemGroup>
 		<Folder Include="Data\" />
 		<Folder Include="PDFs\" />
+		<Folder Include="Servicios\Utils\" />
 	</ItemGroup>
 
 	<ItemGroup>

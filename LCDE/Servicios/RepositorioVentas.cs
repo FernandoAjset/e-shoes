@@ -33,6 +33,20 @@ namespace LCDE.Servicios
                 });
         }
 
+        public async Task<EncabezadoFactura> ObtenerFacturaPorTokenPago(string token)
+        {
+            using var connection = new SqlConnection(connectionString);
+            // Obtener datos del encabezado
+            return await connection
+                                    .QueryFirstOrDefaultAsync<EncabezadoFactura>
+                                    (@$"SELECT encabezado_factura.*, clientes.correo CorreoCliente
+                                        FROM encabezado_factura
+                                        INNER JOIN clientes
+                                        ON encabezado_factura.id_cliente=clientes.id
+                                        WHERE encabezado_factura.token_pago=@token",
+                                        new { token });
+        }
+
         public async Task<IEnumerable<DetalleFactura>> ObtenerDetallesFactura(int idFactura)
         {
             using var connection = new SqlConnection(connectionString);
@@ -109,6 +123,23 @@ namespace LCDE.Servicios
                 connection.Close();
             }
         }
+
+        public async Task AgregarUrlFactura(string url, int idFactura)
+        {
+            try
+            {
+                var connection = new SqlConnection(connectionString);
+                await connection.ExecuteAsync(@"
+                        UPDATE encabezado_factura
+                        SET url = @url
+                        WHERE id = @idFactura", new { url, idFactura });
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<Cliente> ObtenerCliente(int IdCliente)
         {
             using var connection = new SqlConnection(connectionString);
