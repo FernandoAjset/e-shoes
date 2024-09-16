@@ -21,7 +21,8 @@ namespace LCDE.Servicios
             return await connection
                                     .QueryFirstOrDefaultAsync<EncabezadoFactura>
                                      (@"EXEC SP_CRUD_FACTURA @IdEncabezado, @Serie,
-                                          @Fecha, @IdTipoPago, @IdCliente, @Operacion",
+                                          @Fecha, @IdTipoPago, @IdCliente, 
+                                          @EstadoFacturaId, @Operacion",
                 new
                 {
                     IdEncabezado = idFactura,
@@ -29,6 +30,7 @@ namespace LCDE.Servicios
                     Fecha = DateTime.Now,
                     IdTipoPago = 0,
                     IdCliente = 0,
+                    EstadoFacturaId = 0,
                     Operacion = "select"
                 });
         }
@@ -45,6 +47,37 @@ namespace LCDE.Servicios
                                         ON encabezado_factura.id_cliente=clientes.id
                                         WHERE encabezado_factura.token_pago=@token",
                                         new { token });
+        }
+
+        public async Task<IEnumerable<EncabezadoFactura>> ObtenerFacturasPorCliente(int idCliente)
+        {
+            using var connection = new SqlConnection(connectionString);
+            // Obtener datos del encabezado
+            return await connection
+                                    .QueryAsync<EncabezadoFactura>
+                                    (@"
+                                        SELECT 
+                                            encabezado_factura.*, 
+                                            factura_estado.nombre AS estado,
+	                                        encabezado_factura.estado_factura_id AS estadoFacturaId,
+	                                        tipo_pago.tipo AS tipoPago,
+                                            (SELECT SUM(detalle_factura.subtotal) 
+                                             FROM detalle_factura 
+                                             WHERE detalle_factura.id_encabezado_factura = encabezado_factura.id) AS total
+                                        FROM 
+                                            encabezado_factura
+                                        INNER JOIN 
+                                            factura_estado ON encabezado_factura.estado_factura_id = factura_estado.id
+                                        INNER JOIN
+	                                        tipo_pago ON tipo_pago.id=encabezado_factura.id_tipo_pago
+                                        WHERE 
+                                            encabezado_factura.id_cliente = @idCliente
+                                        ORDER BY fecha DESC;
+                                    ",
+                new
+                {
+                    idCliente
+                });
         }
 
         public async Task<IEnumerable<DetalleFactura>> ObtenerDetallesFactura(int idFactura)
@@ -247,13 +280,19 @@ namespace LCDE.Servicios
             });
             return clientes;
         }
-        public async Task<bool> AgregarTokenPagoEnFactura(int idFactura, string tokenPago)
+        public async Task<bool> AgregarInfoPagoFactura(int idFactura, PaypalOrderResponse data)
         {
             using var connection = new SqlConnection(connectionString);
             var result = await connection.ExecuteAsync(@"
                 UPDATE encabezado_factura
-                SET token_pago = @tokenPago
-                WHERE id = @idFactura", new { idFactura, tokenPago });
+                SET token_pago = @tokenPago,
+                url_pago = @urlPago
+                WHERE id = @idFactura", new
+            {
+                idFactura,
+                tokenPago = data.id,
+                urlPago = data.links.FirstOrDefault(l => l.rel == "approve")?.href ?? ""
+            });
 
             return result > 0;
         }

@@ -1,0 +1,81 @@
+﻿@model IEnumerable<EncabezadoFactura>
+@{
+    Layout = "~/Views/Shared/_layoutEcommerce.cshtml";
+}
+
+<section class="cart_area">
+    <div class="cart_inner px-4">
+        <div class="col-12">
+            <h2 class="h3 mb-3 page-title">Historial de compras</h2>
+            <table class="table border table-hover bg-white">
+                <thead>
+                    <tr role="row">
+                        <th>Numero</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Tipo de pago</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var factura in Model)
+                    {
+                        <tr>
+                            <td>@factura.Id</td>
+                            <td>@factura.Fecha?.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @("Q" + factura.Total.ToString("N2"))
+                            </td>
+                            <td>@factura.TipoPago</td>
+                            <td>
+                                @if (factura.EstadoFacturaId == 2)
+                                {
+                                    <span class="custom-badge custom-badge-success">Pagado</span>
+                                }
+                                else if (factura.EstadoFacturaId == 1)
+                                {
+                                    <span class="custom-badge custom-badge-info">Pendiente</span>
+                                }
+                                else
+                                {
+                                    <span class="custom-badge custom-badge-secondary">@factura.Estado</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="text-muted sr-only">Action</span>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        @if (factura.EstadoFacturaId == 1)
+                                        {
+                                            @if (!string.IsNullOrEmpty(factura.Url_pago))
+                                            {
+                                                <a class="dropdown-item" href="@factura.Url_pago">
+                                                    <i class="fas fa-dollar-sign fa-sm fa-fw mr-2 text-gray-400"></i>
+                                                    Pagar
+                                                </a>
+                                            }
+                                            <a class="dropdown-item" href="#">
+                                                <i class="fas fa-times fa-sm fa-fw mr-2 text-gray-400"></i>
+                                                Anular
+                                            </a>
+                                        }
+                                        @if (!string.IsNullOrEmpty(factura.Url) && factura.EstadoFacturaId == 2)
+                                        {
+                                            <a class="dropdown-item" asp-action="DescargarFactura" asp-route-id="@factura.Id">
+                                                <i class="fas fa-download fa-sm fa-fw mr-2 text-gray-400"></i>
+                                                Descargar
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

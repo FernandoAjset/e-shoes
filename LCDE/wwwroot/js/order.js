@@ -77,9 +77,11 @@ function loadOrderView() {
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(JSON.stringify(data));
 
                             if (data.success) {
+                                // Limpiar el localstorage
+                                localStorage.removeItem('shoppingCart');
+
                                 showToast('success', 'Orden creada exitosamente');
                                 // Llamar a PayPal para realizar el pago
                                 return fetch('/Ecommerce/Paypal', {

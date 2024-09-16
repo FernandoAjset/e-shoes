@@ -67,6 +67,30 @@ namespace LCDE.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> HistorialCompras()
+        {
+            try
+            {
+                var idUsuario = sesionServicio.ObtenerIdUsuarioSesion();
+                Usuario usuario = await repositorioUsuarios.BuscarUsuarioId(idUsuario);
+
+                Cliente cliente = await repositotioClientes.ObtenerClientePorIdUsuario(usuario.Id);
+
+                if (cliente is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                var facturas = await repositorioVentas.ObtenerFacturasPorCliente(cliente.Id);
+                return View(facturas);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> ResumenCarrito([FromBody] List<CarritoItemDTO> carrito)
         {
@@ -225,7 +249,7 @@ namespace LCDE.Controllers
                         landing_page = "NO_PREFERENCE",
                         user_action = "PAY_NOW", // Accion para que paypal muestre el monto de pago
                         return_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/ConfirmarPagoPayPal", // cuando se aprovo la solicitud del cobro
-                        cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/HistorialOrdenes" // cuando cancela la operacion
+                        cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/HistorialCompras" // cuando cancela la operacion
                     }
                 };
 
@@ -246,7 +270,7 @@ namespace LCDE.Controllers
                         return Json(new { status = false, respuesta = "No se pudo completar el pago, intente más tarde" });
                     }
                     // Actualizar el token de pago en la factura
-                    await repositorioVentas.AgregarTokenPagoEnFactura(pagoData.IdOrden, objeto.id);
+                    await repositorioVentas.AgregarInfoPagoFactura(pagoData.IdOrden, objeto);
                 }
             }
 
@@ -457,7 +481,29 @@ namespace LCDE.Controllers
             return await repositorioUsuarios.ObtenerRoles();
         }
 
-
-
+        public async Task<IActionResult> DescargarFactura(int id)
+        {
+            try
+            {
+                // Lógica para obtener la factura por id y generar el archivo
+                var factura = await repositorioVentas.ObtenerEncabezadoFacturaPorId(id);
+                if (factura == null)
+                {
+                    return NotFound();
+                }
+                // Convertir a archivo adjunto basado en el url de la factura
+                var facturaUrl = factura.Url;
+                var attachment = await fileRepository.DownloadFileAsFormFileAsync(facturaUrl, $"Factura_{factura.Id}.pdf");
+                if (attachment == null)
+                {
+                    return NotFound();
+                }
+                return File(attachment.OpenReadStream(), "application/pdf", $"Factura_{factura.Id}.pdf");
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
     }
 }

@@ -98,7 +98,7 @@ public class VentasController : Controller
     {
         try
         {
-            modelo.EncabezadoFactura.EstadoFacturaId = (int)FacturaEstadoEnum.PendientePago;
+            modelo.EncabezadoFactura.EstadoFacturaId = (int)FacturaEstadoEnum.Pagada;
             int IdNuevaFactura = await repositorioVentas.CrearVenta(modelo);
             if (IdNuevaFactura > 0)
             {

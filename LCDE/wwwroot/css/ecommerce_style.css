@@ -42,3 +42,27 @@
 .price-range-area .ui-slider-range {
     background: #007bff;
 }
+
+.custom-badge {
+    display: inline-block;
+    width: 150px;
+    text-align: center;
+    padding: 0.5em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+.custom-badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.custom-badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.custom-badge-secondary {
+    background-color: #6c757d;
+    color: white;
+}

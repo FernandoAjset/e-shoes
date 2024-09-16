@@ -93,7 +93,8 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 cliente = await connection.QueryFirstOrDefaultAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente,@Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente,
+                        @id_usuario, @Operacion
                         ", new
                 {
                     NombreCliente = "",
@@ -102,6 +103,7 @@ namespace LCDE.Servicios
                     CorreoCliente = "",
                     Nit = Nit,
                     IdCliente = Id,
+                    id_usuario=0,
                     Operacion = "selectPorNit"
                 });
                 return cliente;
@@ -146,7 +148,8 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, 
+                        @id_usuario,@Operacion
                         ", new
                 {
                     NombreCliente = "",
@@ -155,6 +158,7 @@ namespace LCDE.Servicios
                     CorreoCliente = "",
                     Nit = "",
                     IdCliente,
+                    id_usuario=0,
                     Operacion = "delete"
                 });
                 return true;
@@ -169,7 +173,8 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             IEnumerable<Cliente> clientes = await connection.QueryAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, 
+                        @id_usuario,@Operacion
                         ", new
             {
                 NombreCliente = "",
@@ -178,6 +183,7 @@ namespace LCDE.Servicios
                 CorreoCliente = "",
                 Nit = "",
                 IdCliente = 0,
+                id_usuario=0,
                 Operacion = "todo"
             });
             return clientes;

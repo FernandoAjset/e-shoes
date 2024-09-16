@@ -1,13 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LCDE.Servicios;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LCDE.Controllers
 {
     public class PDFController : Controller
     {
-        public IActionResult Show(string pdfFilePath)
+        private readonly IFileRepository fileRepository;
+
+        public PDFController(IFileRepository fileRepository)
         {
-            var fileBytes = System.IO.File.ReadAllBytes(pdfFilePath);
-            return File(fileBytes, "application/pdf");
+            this.fileRepository = fileRepository;
+        }
+        public async Task<IActionResult> Show(string pdfFilePath)
+        {
+            var attachment = await fileRepository.DownloadFileAsFormFileAsync(pdfFilePath, "venta.pdf");
+            if (attachment == null)
+            {
+                return NotFound();
+            }
+            return File(attachment.OpenReadStream(), "application/pdf");
         }
 
         public IActionResult ShowPDF(string filePath)
