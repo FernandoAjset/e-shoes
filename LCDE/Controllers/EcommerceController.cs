@@ -352,6 +352,25 @@ namespace LCDE.Controllers
             return RedirectToAction("Home");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> AnularFactura(int id)
+        {
+            try
+            {
+                var factura = await repositorioVentas.ObtenerEncabezadoFacturaPorId(id);
+                if (factura == null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+                await repositorioVentas.AnularFactura(id);
+                return RedirectToAction("HistorialCompras");
+            }
+            catch
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
         public async Task<IActionResult> Home()
         {
             var model = new EcommerceHomeViewModel();
@@ -481,6 +500,7 @@ namespace LCDE.Controllers
             return await repositorioUsuarios.ObtenerRoles();
         }
 
+        [HttpGet]
         public async Task<IActionResult> DescargarFactura(int id)
         {
             try

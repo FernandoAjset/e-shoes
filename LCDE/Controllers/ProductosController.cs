@@ -19,6 +19,7 @@ namespace LCDE.Controllers
         private readonly IFileRepository fileRepository;
 
         private readonly string CarpetaDeImg= "lcde-productos";
+        private readonly string rootDefaultImg = "https://schoolcampussur.blob.core.windows.net/lcde-productos/207396005-shoes-vector-thick-line-icon-for-personal-and-commercial-use.jpg";
 
         /// <summary>
         /// Constructor de clase.
@@ -104,7 +105,7 @@ namespace LCDE.Controllers
             }
             //Enviar la imagen a Azure Storage
             if (producto.Imagen != null) producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
-
+            else producto.Image_url = rootDefaultImg;
             // Enviar los datos al repositorio para grabar en base de datos, si se crea el registro se obtiene el nuevo Id.
             if (await repositorioProductos.CrearProducto(producto) > 0)
             {

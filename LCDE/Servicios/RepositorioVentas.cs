@@ -72,6 +72,7 @@ namespace LCDE.Servicios
 	                                        tipo_pago ON tipo_pago.id=encabezado_factura.id_tipo_pago
                                         WHERE 
                                             encabezado_factura.id_cliente = @idCliente
+                                        AND encabezado_factura.estado_factura_id!= 3 -- 3. Anulada
                                         ORDER BY fecha DESC;
                                     ",
                 new
@@ -306,6 +307,13 @@ namespace LCDE.Servicios
                 WHERE token_pago = @tokenPago", new { Estado = (int)FacturaEstadoEnum.Pagada, tokenPago });
 
             return result > 0;
+        }
+
+        public async Task AnularFactura(int idFactura)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"EXEC SP_ANULAR_FACTURA @IdEncabezado", new { IdEncabezado = idFactura });
+
         }
     }
 }
