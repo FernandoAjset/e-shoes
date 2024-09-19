@@ -100,6 +100,26 @@ namespace LCDE.Servicios
                     rdlcFilePath = Path.Combine(fileDirPath, "Reportes", "FacturaVenta.rdl").Replace("\\", "/");
                 }
 
+                // Registrar la ruta del archivo
+                logService.Log(new Log
+                {
+                    Type = "Info",
+                    Message = $"Ruta del archivo .rdl: {rdlcFilePath}",
+                    Date = DateTime.Now
+                });
+
+                if (!File.Exists(rdlcFilePath))
+                {
+                    // Registrar la ruta del archivo
+                    logService.Log(new Log
+                    {
+                        Type = "FileNotFoundException",
+                        Message = $"No se encontró la plantilla en: {rdlcFilePath}",
+                        Date = DateTime.Now
+                    });
+                    throw new FileNotFoundException("No se encontró el archivo .rdl en la ruta especificada.", rdlcFilePath);
+                }
+
                 using FileStream fileStream = new(rdlcFilePath, FileMode.Open, FileAccess.Read);
 
                 using StreamReader reportDefinition = new(fileStream);
@@ -114,7 +134,24 @@ namespace LCDE.Servicios
                 {
                     report.SetParameters(new[] { new ReportParameter(parametro.Key, parametro.Value) });
                 }
+
+                // Registrar antes de renderizar
+                logService.Log(new Log
+                {
+                    Type = "Info",
+                    Message = "Iniciando el renderizado del reporte",
+                    Date = DateTime.Now
+                });
+
                 byte[] invoiceBytes = report.Render("PDF");
+
+                // Registrar después de renderizar
+                logService.Log(new Log
+                {
+                    Type = "Info",
+                    Message = "Renderizado del reporte completado",
+                    Date = DateTime.Now
+                });
 
                 // Convertir de byte[] a IFormFile
                 using var ms = new MemoryStream(invoiceBytes);
