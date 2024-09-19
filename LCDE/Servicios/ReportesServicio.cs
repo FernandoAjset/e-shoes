@@ -1,7 +1,9 @@
 ﻿using Dapper;
+using LCDE.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Reporting.NETCore;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace LCDE.Servicios
 {
@@ -9,15 +11,18 @@ namespace LCDE.Servicios
     {
         private readonly IConfiguration configuration;
         private readonly IFileRepository fileRepository;
+        private readonly ILogService logService;
         private readonly string invoiceDir;
 
         public ReportesServicio(
             IConfiguration configuration,
-            IFileRepository fileRepository
+            IFileRepository fileRepository,
+            ILogService logService
             )
         {
             this.configuration = configuration;
             this.fileRepository = fileRepository;
+            this.logService = logService;
             this.invoiceDir = configuration.GetValue<string>("Storage:InvoiceDir");
         }
 
@@ -82,9 +87,19 @@ namespace LCDE.Servicios
                 parameters.Add("DescuentoTotal", "0");
                 parameters.Add("Operacion_detalle", "todo");
 
-                // Ruta del archivo .rdl
+                // Determinar la ruta del archivo .rdl según el sistema operativo
                 string fileDirPath = Assembly.GetExecutingAssembly().Location.Replace("LCDE.dll", string.Empty);
-                string rdlcFilePath = string.Format("{0}Reportes\\{1}.rdl", fileDirPath, "FacturaVenta");
+                string rdlcFilePath;
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    rdlcFilePath = Path.Combine(fileDirPath, "Reportes", "FacturaVenta.rdl");
+                }
+                else
+                {
+                    rdlcFilePath = Path.Combine(fileDirPath, "Reportes", "FacturaVenta.rdl").Replace("\\", "/");
+                }
+
                 using FileStream fileStream = new(rdlcFilePath, FileMode.Open, FileAccess.Read);
 
                 using StreamReader reportDefinition = new(fileStream);
@@ -113,8 +128,17 @@ namespace LCDE.Servicios
                 // Guardar archivo en Azure
                 return await fileRepository.AddFile(file, invoiceDir);
             }
-            catch
+            catch (Exception ex)
             {
+                var logError = new Log()
+                {
+                    Type = "Error",
+                    Message = "Error al leer la plantilla de factura",
+                    StackTrace = ex.StackTrace ?? "",
+                    Date = DateTime.Now
+                };
+
+                logService.Log(logError);
                 throw;
             }
         }
