@@ -287,7 +287,7 @@ public class VentasController : Controller
         IEnumerable<TipoPago> tipos = await repositorioTipoPago.ObtenerTodosTipoPago();
         if (tipos is not null)
         {
-            return StatusCode(StatusCodes.Status200OK, tipos);
+            return StatusCode(StatusCodes.Status200OK, tipos.Where(t => t.Tipo.ToUpper().Equals("EFECTIVO")));
         }
         return RedirectToAction("Error", "Home");
     }
