@@ -97,7 +97,7 @@ function loadOrderView() {
                                     })
                                 });
                             } else {
-                                showToast('error', 'Error al crear la orden');
+                                showToast('error', 'Error al generar enlace de pago para la orden');
                             }
                         })
                         .then(response => response.json())
