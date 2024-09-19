@@ -24,6 +24,7 @@ namespace LCDE.Controllers
         private readonly ReportesServicio reportesServicio;
         private readonly IEmailService emailService;
         private readonly IFileRepository fileRepository;
+        private readonly ILogService logService;
         private readonly IConfiguration configuration;
         private readonly UserManager<Usuario> userManager;
 
@@ -38,7 +39,8 @@ namespace LCDE.Controllers
             RepositorioVentas repositorioVentas,
             ReportesServicio reportesServicio,
             IEmailService emailService,
-            IFileRepository fileRepository
+            IFileRepository fileRepository,
+            ILogService logService
             )
         {
 
@@ -51,6 +53,7 @@ namespace LCDE.Controllers
             this.reportesServicio = reportesServicio;
             this.emailService = emailService;
             this.fileRepository = fileRepository;
+            this.logService = logService;
             this.configuration = configuration;
             this.userManager = userManager;
         }
@@ -205,36 +208,45 @@ namespace LCDE.Controllers
                 }
                 else
                 {
-                    return Json(new { success = false, message = "Error al crear la orden" });
+                    return Json(new { success = false, message = "Error al crear la factura" });
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error al crear la orden" });
-
+                var logError = new Log
+                {
+                    Type = "Error",
+                    Message = "Error durante la creación de la orden",
+                    StackTrace = ex.StackTrace ?? "",
+                    Date = DateTime.Now
+                };
+                logService.Log(logError);
+                return Json(new { success = false, message = "Error durante la creación de la orden" });
             }
         }
 
         [HttpPost]
         public async Task<JsonResult> Paypal([FromBody] PaypalDTO pagoData)
         {
-            bool status = false;
-            string respuesta = string.Empty;
-
-            using (var client = new HttpClient())
+            try
             {
-                var userName = configuration.GetValue<string>("Paypal:USER");
-                var passwd = configuration.GetValue<string>("Paypal:PASSWORD");
+                bool status = false;
+                string respuesta = string.Empty;
 
-                client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com");
-
-                var authToken = Encoding.ASCII.GetBytes($"{userName}:{passwd}");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
-
-                var orden = new PaypalOrder()
+                using (var client = new HttpClient())
                 {
-                    intent = "CAPTURE",
-                    purchase_units = new List<Models.PurchaseUnit>() {
+                    var userName = configuration.GetValue<string>("Paypal:USER");
+                    var passwd = configuration.GetValue<string>("Paypal:PASSWORD");
+
+                    client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com");
+
+                    var authToken = Encoding.ASCII.GetBytes($"{userName}:{passwd}");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
+
+                    var orden = new PaypalOrder()
+                    {
+                        intent = "CAPTURE",
+                        purchase_units = new List<Models.PurchaseUnit>() {
                     new() {
                         amount = new Models.Amount() {
                             currency_code = "USD",
@@ -243,38 +255,51 @@ namespace LCDE.Controllers
                         description = pagoData.Descripcion
                     }
                 },
-                    application_context = new ApplicationContext()
+                        application_context = new ApplicationContext()
+                        {
+                            brand_name = "Eshoes",
+                            landing_page = "NO_PREFERENCE",
+                            user_action = "PAY_NOW", // Accion para que paypal muestre el monto de pago
+                            return_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/ConfirmarPagoPayPal", // cuando se aprovo la solicitud del cobro
+                            cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/HistorialCompras" // cuando cancela la operacion
+                        }
+                    };
+
+                    var json = JsonConvert.SerializeObject(orden);
+                    var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await client.PostAsync("/v2/checkout/orders", data);
+
+                    status = response.IsSuccessStatusCode;
+
+                    if (status)
                     {
-                        brand_name = "Eshoes",
-                        landing_page = "NO_PREFERENCE",
-                        user_action = "PAY_NOW", // Accion para que paypal muestre el monto de pago
-                        return_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/ConfirmarPagoPayPal", // cuando se aprovo la solicitud del cobro
-                        cancel_url = $"{configuration.GetValue<string>("AppUrl")}/Ecommerce/HistorialCompras" // cuando cancela la operacion
+                        respuesta = await response.Content.ReadAsStringAsync();
+                        // Obtener el token de la respuesta
+                        var objeto = JsonConvert.DeserializeObject<PaypalOrderResponse>(respuesta);
+                        if (objeto == null)
+                        {
+                            return Json(new { status = false, respuesta = "No se pudo completar el pago, intente más tarde" });
+                        }
+                        // Actualizar el token de pago en la factura
+                        await repositorioVentas.AgregarInfoPagoFactura(pagoData.IdOrden, objeto);
                     }
-                };
-
-                var json = JsonConvert.SerializeObject(orden);
-                var data = new StringContent(json, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await client.PostAsync("/v2/checkout/orders", data);
-
-                status = response.IsSuccessStatusCode;
-
-                if (status)
-                {
-                    respuesta = await response.Content.ReadAsStringAsync();
-                    // Obtener el token de la respuesta
-                    var objeto = JsonConvert.DeserializeObject<PaypalOrderResponse>(respuesta);
-                    if (objeto == null)
-                    {
-                        return Json(new { status = false, respuesta = "No se pudo completar el pago, intente más tarde" });
-                    }
-                    // Actualizar el token de pago en la factura
-                    await repositorioVentas.AgregarInfoPagoFactura(pagoData.IdOrden, objeto);
                 }
-            }
 
-            return Json(new { status, respuesta });
+                return Json(new { status, respuesta });
+            }
+            catch (Exception ex)
+            {
+                var logError = new Log
+                {
+                    Type = "Error",
+                    Message = "Error durante el pago",
+                    StackTrace = ex.StackTrace ?? "",
+                    Date = DateTime.Now
+                };
+                logService.Log(logError);
+                return Json(new { status = false, respuesta = "Error durante el pago." });
+            }
         }
 
         [HttpGet]
