@@ -45,6 +45,8 @@ builder.Services.AddAuthentication(options =>
 {
     options.AccessDeniedPath = "/Auth/Unauthorized";
     options.LoginPath = "/Auth/login";
+    options.ExpireTimeSpan = TimeSpan.FromDays(1); // La cookie expirará en 1 días
+    options.SlidingExpiration = true; // La cookie se renovará si el usuario está activo
 });
 
 builder.Services.AddAuthorization(options =>

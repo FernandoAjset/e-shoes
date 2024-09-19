@@ -1,11 +1,10 @@
 ﻿using LCDE.Models;
+using LCDE.Models.Enums;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
-using System.Reflection;
 
 namespace LCDE.Controllers;
 
@@ -23,6 +22,7 @@ public class VentasController : Controller
     private readonly RepositorioVentas repositorioVentas;
     private readonly ReportesServicio reportesServicio;
     private readonly IHttpContextAccessor httpContextAccessor;
+    private readonly ILogService logService;
 
     /// <summary>
     /// Constructor de clase.
@@ -36,7 +36,8 @@ public class VentasController : Controller
         IRepositorioCliente repositotioClientes,
         RepositorioVentas repositorioVentas,
         ReportesServicio reportesServicio,
-        IHttpContextAccessor httpContextAccessor
+        IHttpContextAccessor httpContextAccessor,
+        ILogService logService
         )
     {
         this.repositorioProductos = repositorioProductos;
@@ -47,6 +48,7 @@ public class VentasController : Controller
         this.repositorioVentas = repositorioVentas;
         this.reportesServicio = reportesServicio;
         this.httpContextAccessor = httpContextAccessor;
+        this.logService = logService;
     }
     /// <summary>
     /// Enpoint para devolver la vista de listado de clientes.
@@ -84,7 +86,7 @@ public class VentasController : Controller
         modelo.Proveedores = resultadoProveedores;
 
         // Obtener la configuración de cultura desde la ViewBag
-        CultureInfo culture = new CultureInfo("en-US");
+        CultureInfo culture = new("en-US");
         culture.NumberFormat.NumberDecimalSeparator = ".";
         // Pasar la configuración de cultura a la vista
         ViewBag.Culture = culture;
@@ -96,28 +98,13 @@ public class VentasController : Controller
     {
         try
         {
+            modelo.EncabezadoFactura.EstadoFacturaId = (int)FacturaEstadoEnum.Pagada;
             int IdNuevaFactura = await repositorioVentas.CrearVenta(modelo);
             if (IdNuevaFactura > 0)
             {
-                string urlPromociones = "";
-                var connectionFeature = httpContextAccessor.HttpContext.Features.Get<IHttpConnectionFeature>();
-                string ipAddress = GetIPv4Address(connectionFeature?.RemoteIpAddress)?.ToString();
-
-                urlPromociones = ipAddress + @Url.Action("PromoFactura", "Promos");
-                byte[] facturaNuevaPdf = await reportesServicio.CrearFactura(IdNuevaFactura, $"{urlPromociones}?idFactura={IdNuevaFactura}");
-                if (facturaNuevaPdf is not null)
-                {
-                    // Ruta raiz del programa.
-                    string fileDirPath = Assembly.GetExecutingAssembly().Location.Replace("LCDE.dll", string.Empty);
-                    // Nombre del archivo
-                    string pdfFileName = $"Factura_No.{IdNuevaFactura}.pdf";
-                    // Nombre combinado con carpeta contenedora
-                    string pdfFilePath = Path.Combine("PDFs", pdfFileName);
-                    fileDirPath += pdfFilePath;
-                    System.IO.File.WriteAllBytes(fileDirPath, facturaNuevaPdf);
-                    return StatusCode(StatusCodes.Status200OK, new { filePath = fileDirPath });
-                }
-                return StatusCode(StatusCodes.Status200OK);
+                var facturaUrl = await reportesServicio.CrearFactura(IdNuevaFactura);
+                await repositorioVentas.AgregarUrlFactura(facturaUrl, IdNuevaFactura);
+                return StatusCode(StatusCodes.Status200OK, new { filePath = facturaUrl });
             }
             else
             {
@@ -126,6 +113,14 @@ public class VentasController : Controller
         }
         catch (Exception ex)
         {
+            var log = new Log()
+            {
+                Type = "Error",
+                Message = ex.Message,
+                StackTrace = ex.StackTrace ?? "",
+                Date = DateTime.Now
+            };
+            logService.Log(log);
             return StatusCode(StatusCodes.Status422UnprocessableEntity, ex);
         }
     }
@@ -198,7 +193,7 @@ public class VentasController : Controller
             // Validación de las validaciones del modelo.
             if (!ModelState.IsValid && producto.Id != 0)
             {
-                List<string> errores = new List<string>();
+                List<string> errores = new();
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
                     errores.Add(error.ErrorMessage);
@@ -292,7 +287,7 @@ public class VentasController : Controller
         IEnumerable<TipoPago> tipos = await repositorioTipoPago.ObtenerTodosTipoPago();
         if (tipos is not null)
         {
-            return StatusCode(StatusCodes.Status200OK, tipos);
+            return StatusCode(StatusCodes.Status200OK, tipos.Where(t => t.Tipo.ToUpper().Equals("EFECTIVO")));
         }
         return RedirectToAction("Error", "Home");
     }

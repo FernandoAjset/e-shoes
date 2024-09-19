@@ -15,7 +15,7 @@ namespace LCDE.Models
     {
         [Required(ErrorMessage = "El campo {0} es requerido, puede colocar CF")]
         [RegularExpression(@"^(?![-]+$)(?!0+$)[a-zA-Z0-9-]+$", ErrorMessage = "El campo solo puede contener letras, números y guiones")]
-        public string NIT { get; set; }
+        public string Nit { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten letras.")]
