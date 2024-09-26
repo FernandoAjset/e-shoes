@@ -1,0 +1,27 @@
+﻿@{
+    Layout = "~/Views/Shared/_layoutEcommerce.cshtml";
+}
+
+<section class="order_area py-3">
+    <div class="container">
+        <div class="cart_inner">
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Acciones</th>
+                        </tr>s
+                    </thead>
+                    <tbody id="cart-items">
+                        <!-- El contenido se actualizará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

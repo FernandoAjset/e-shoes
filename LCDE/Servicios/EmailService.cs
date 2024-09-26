@@ -8,7 +8,7 @@ namespace LCDE.Servicios
 {
     public interface IEmailService
     {
-        Task SendEmailAsync(string email, string subject, string message);
+        Task SendEmailAsync(string email, string subject, string message, List<IFormFile>? attachments = null);
     }
 
     public class EmailService : IEmailService
@@ -24,7 +24,7 @@ namespace LCDE.Servicios
             this.configuration = configuration;
         }
 
-        public async Task SendEmailAsync(string email, string subject, string message)
+        public async Task SendEmailAsync(string email, string subject, string message, List<IFormFile>? attachments = null)
         {
             try
             {
@@ -33,11 +33,24 @@ namespace LCDE.Servicios
                 newEmail.To.Add(MailboxAddress.Parse(email));
                 newEmail.Subject = subject;
 
-                // Crear el cuerpo del correo con formato HTML
-                newEmail.Body = new TextPart("html")
+                var bodyBuilder = new BodyBuilder
                 {
-                    Text = message
+                    HtmlBody = message
                 };
+
+                // Agregar archivos adjuntos si existen
+                if (attachments != null && attachments.Any())
+                {
+                    foreach (var attachment in attachments)
+                    {
+                        using var stream = new MemoryStream();
+                        await attachment.CopyToAsync(stream);
+                        stream.Position = 0;
+                        bodyBuilder.Attachments.Add(attachment.FileName, stream.ToArray(), ContentType.Parse(attachment.ContentType));
+                    }
+                }
+
+                newEmail.Body = bodyBuilder.ToMessageBody();
 
                 using var smtp = new SmtpClient();
 

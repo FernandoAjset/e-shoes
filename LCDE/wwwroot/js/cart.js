@@ -124,7 +124,6 @@ function createCarritoItemDTO(item) {
 function loadCartView() {
     let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     cart = cart.map(createCarritoItemDTO); // Crear objetos CarritoItemDTO con valores por defecto
-    console.log(cart); // Verificar los datos del carrito
     fetch('/Ecommerce/ResumenCarrito', {
         method: 'POST',
         headers: {

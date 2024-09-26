@@ -146,12 +146,12 @@ namespace LCDE.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ClienteExiste(string NIT, int Id)
+        public async Task<IActionResult> ClienteExiste(string Nit, int Id)
         {
-            Cliente respuesta = await repositotioClientes.ObtenerClientePorNit(NIT, Id);
+            Cliente respuesta = await repositotioClientes.ObtenerClientePorNit(Nit, Id);
             if (respuesta is not null)
             {
-                return Json($"Ya existe un cliente con NIT {NIT}");
+                return Json($"Ya existe un cliente con Nit {Nit}");
             }
             return Json(true);
         }

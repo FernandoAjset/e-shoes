@@ -106,7 +106,6 @@ namespace LCDE.Controllers
             //Enviar la imagen a Azure Storage
             if (producto.Imagen != null) producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
             else producto.Image_url = rootDefaultImg;
-
             // Enviar los datos al repositorio para grabar en base de datos, si se crea el registro se obtiene el nuevo Id.
             if (await repositorioProductos.CrearProducto(producto) > 0)
             {

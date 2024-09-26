@@ -1,0 +1,57 @@
+﻿@model ConfirmarOrdenDTO
+<div class="container order_area">
+    <div class="cart_inner">
+        <div class="billing_details">
+            <div class="row">
+                <form class="row contact_form">
+                    <input type="text" hidden id="id" name="ClienteInfo.Id" value="@Model.ClienteInfo?.Id">
+                    <div class="col-lg-8">
+                        <h3>Detalles de facturación</h3>
+                        <input type="text" class="form-control" hidden placeholder="Nombre completo" id="nombre" name="ClienteInfo.Nombre" value="@Model.ClienteInfo?.Nombre">
+                        <div class="col-md-12 form-group">
+                            <label>Dirección de entrega</label>
+                            <input type="text" class="form-control" placeholder="Dirección de entrega" id="direccion" name="ClienteInfo.Direccion" value="@Model.ClienteInfo?.Direccion">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Nit</label>
+                            <input type="text" class="form-control" placeholder="Nit" id="nit" name="ClienteInfo.Nit" value="@Model.ClienteInfo?.Nit">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Teléfono</label>
+                            <input type="text" class="form-control" placeholder="Teléfono" id="telefono" name="ClienteInfo.Telefono" value="@Model.ClienteInfo?.Telefono">
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>E-mail</label>
+                            <input type="text" class="form-control" placeholder="E-mail" id="correo" name="ClienteInfo.Correo" value="@Model.ClienteInfo?.Correo">
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <textarea class="form-control" name="Observaciones" placeholder="Observaciones" id="observaciones">@Model.Observaciones</textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="order_box">
+                            <h2>Tu Orden</h2>
+                            <ul class="list">
+                                <li><a href="#">Producto <span>Total</span></a></li>
+                                @foreach (var item in Model.DetallesCarrito)
+                                {
+                                    <li><a href="#">@item.NombreProducto<span class="middle">x @item.Cantidad</span> <span class="last">@("Q" + (item.Cantidad * item.PrecioUnidad).ToString("N2"))</span></a></li>
+                                }
+                            </ul>
+                            <ul class="list list_2">
+                                <li>
+                                    <a href="#">
+                                        Total <span>
+                                            @("Q" + Model.DetallesCarrito.Sum(x => x.Cantidad * x.PrecioUnidad).ToString("N2"))
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <button id="pagar" class="primary-btn" type="button"><i class="fab fa-paypal"></i> Realizar Pago</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
