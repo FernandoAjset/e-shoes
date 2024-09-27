@@ -34,7 +34,11 @@
                         <input asp-for="Existencia" class="form-control" />
                         <span asp-validation-for="Existencia" class="text-danger"></span>
                     </div>
-
+                    <div class="mb-3">
+                        <label asp-for="Stock_Minimo" class="form-label"></label>
+                        <input asp-for="Stock_Minimo" class="form-control" />
+                        <span asp-validation-for="Stock_Minimo" class="text-danger"></span>
+                    </div>
                     <div class="mb-3">
                         <label asp-for="Id_Categoria" class="form-label"></label>
                         <select asp-for="Id_Categoria" asp-items="Model.Categorias" class="form-select"></select>

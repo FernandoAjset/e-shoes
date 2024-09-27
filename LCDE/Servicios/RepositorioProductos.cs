@@ -19,7 +19,7 @@ namespace LCDE.Servicios
                  EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion", new
+                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
             {
                 DetalleProducto = producto.Detalle,
                 Existencia = producto.Existencia,
@@ -30,7 +30,8 @@ namespace LCDE.Servicios
                 PrecioUnidad = producto.PrecioUnidad,
                 Nombre = producto.Nombre,
                 ImageUrl = producto.Image_url,
-                Operacion = "insert"
+                Operacion = "insert",
+                minimum = producto.Stock_Minimo
             });
             return producto_id;
         }
@@ -56,7 +57,7 @@ namespace LCDE.Servicios
                  EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion", new
+                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
                 {
                     DetalleProducto = "",
                     Existencia = "",
@@ -67,7 +68,8 @@ namespace LCDE.Servicios
                     PrecioUnidad = 0,
                     Nombre = "",
                     ImageUrl = "",
-                    Operacion = "select"
+                    Operacion = "select",
+                    minimum = ""
                 });
                 return producto;
             }
@@ -86,7 +88,7 @@ namespace LCDE.Servicios
                  EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion", new
+                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
                 {
                     DetalleProducto = producto.Detalle,
                     Existencia = producto.Existencia,
@@ -97,7 +99,8 @@ namespace LCDE.Servicios
                     PrecioUnidad = producto.PrecioUnidad,
                     Nombre = producto.Nombre,
                     ImageUrl = producto.Image_url,
-                    Operacion = "update"
+                    Operacion = "update",
+                    minimum = producto.Stock_Minimo
 
                 });
                 return true;
@@ -117,7 +120,7 @@ namespace LCDE.Servicios
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion", new
+                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
                 {
                     DetalleProducto = "",
                     Existencia = "",
@@ -128,7 +131,8 @@ namespace LCDE.Servicios
                     PrecioUnidad = 0,
                     Nombre = "",
                     ImageUrl = "",
-                    Operacion = "delete"
+                    Operacion = "delete",
+                    minimum = ""
                 });
                 return true;
             }
@@ -145,7 +149,7 @@ namespace LCDE.Servicios
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion", new
+                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
             {
                 DetalleProducto = "",
                 Existencia = "",
@@ -156,8 +160,8 @@ namespace LCDE.Servicios
                 PrecioUnidad = 0,
                 Nombre = "",
                 ImageUrl = "",
-                Operacion = "todo"
-
+                Operacion = "todo",
+                minimum = ""
             });
             return producto;
         }
@@ -170,7 +174,7 @@ namespace LCDE.Servicios
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad 
-                ,@Operacion
+                ,@Operacion, @minimum
                 ", new
                 {
                     DetalleProducto = nombre,
@@ -180,7 +184,8 @@ namespace LCDE.Servicios
                     IdPromocion = "",
                     IdProducto = idProducto,
                     PrecioUnidad = 0,
-                    Operacion = "selectPorNombre"
+                    Operacion = "selectPorNombre",
+                    minimum = ""
                 });
                 return producto;
             }

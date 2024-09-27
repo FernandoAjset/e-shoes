@@ -1,0 +1,149 @@
+﻿@model IEnumerable<FacturaDTOViewModel>
+@{
+    ViewData["Title"] = "Reporte";
+}
+<style>
+    .select2 {
+        width: 100% !important;
+    }
+
+    .details-row {
+        display: none; /* Ocultar filas de detalles inicialmente */
+    }
+
+    /* Transición suave para el cambio de ícono */
+    .toggle-details i {
+        transition: transform 3s ease; /* Agregar una transición de 0.3s para el cambio de icono */
+    }
+
+    /* Rotar el ícono hacia la derecha cuando está desplegado */
+    .rotate-icon {
+        transform: rotate(90deg); /* Rotación para mostrar la transición al cambiar el icono */
+    }
+
+</style>
+
+<!-- URL de acciones -->
+<input type="hidden" id="CorteCajaPorTurno" value="@Url.Action("CorteCajaPorTurno", "Reportes")" />
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 encabezado-card">
+                            <h6 class="m-0 font-weight-bold text-white">Registro de facturas</h6>
+                        </div>
+                        <div class="card-body">
+                            <input type="text" id="searchInput" placeholder="Buscar por No. Factura" class="form-control mb-3" />
+
+                            <div class="row mt-5">
+                                <div class="col-sm-12">
+                                    <table class="table table-sm" id="tbProducto">
+                                        <thead>
+                                            <tr class="encabezado-tabla">
+                                                <th>No. Factura</th>
+                                                <th>Fecha</th>
+                                                <th>Serie</th>
+                                                <th>Cliente</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="facturaTableBody">
+                                            @foreach (var data in Model)
+                                            {
+                                                <tr class="clickable-row">
+                                                    <td>@data.IdFactura</td>
+                                                    <td>@data.Fecha.ToString("dd/MM/yyyy")</td>
+                                                    <td>@data.Serie</td>
+                                                    <td>@data.Cliente.Nombre</td>
+                                                    <td>@data.Estado</td>
+                                                    <td>
+                                                        <button class="btn btn-info btn-sm toggle-details" data-id="@data.IdFactura">
+                                                            Detalles
+                                                        </button>
+                                                        <button class="btn btn-success btn-sm" onclick="window.open('@data.Url', '_blank')">
+                                                            Imprimir
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-file-earmark-arrow-down" viewBox="0 0 16 16">
+                                                                <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z" />
+                                                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+                                                            </svg>
+                                                        </button>
+                                                        @if (data.Estado.ToString() == "PendientePago")
+                                                        {
+                                                            <a class="btn btn-sm btn-danger" asp-action="AnularFactura" asp-route-id="@data.IdFactura" title="Anular">
+                                                                Anular <i class="fas fa-times fa-sm fa-fw text-gray-400"></i>
+                                                            </a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                <tr class="details-row" id="details-@data.IdFactura">
+                                                    <td colspan="5">
+                                                        <div class="container border mx-auto">
+                                                            <strong>Subtotal:</strong> @data.Subtotal<br />
+                                                            <strong>Detalles del Producto:</strong>
+                                                            <table class="table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th scope="col">Producto</th>
+                                                                        <th scope="col">Categoria</th>
+                                                                        <th scope="col">Cantidad</th>
+                                                                        <th scope="col">Precio Unitario</th>
+                                                                        <th scope="col">Subtotal</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var detalle in data.Detalles)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>@detalle.NombreProducto</td>
+                                                                            <td>@detalle.Categoria</td>
+                                                                            <td>@detalle.Cantidad</td>
+                                                                            <td>@detalle.PrecioUnidad</td>
+                                                                            <td>@detalle.Subtotal</td>
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- /.container-fluid -->
+@section Scripts {
+    <script src="~/js/vistas/corteCajaPorTurno.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Mostrar/Ocultar detalles al hacer clic en el botón
+            $('.toggle-details').on('click', function () {
+                var id = $(this).data('id');
+                $('#details-' + id).toggle();
+            });
+
+            // Filtro de búsqueda
+            $('#searchInput').on('keyup', function () {
+                var value = $(this).val().toLowerCase();
+                $('#facturaTableBody tr.clickable-row').filter(function () {
+                    $(this).toggle($(this).find('td:nth-child(1)').text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+        });
+    </script>
+
+}

@@ -21,6 +21,6 @@ namespace LCDE.Models
 
         public IEnumerable<SelectListItem>? Categorias { get; set; }
         public IEnumerable<SelectListItem>? Proveedores { get; set; }
-
     }
+
 }

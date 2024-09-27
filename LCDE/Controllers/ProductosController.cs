@@ -99,8 +99,27 @@ namespace LCDE.Controllers
                 producto.PrecioUnidad = cantidad;
             }
             // Validación de las validaciones del modelo.
-            if (!ModelState.IsValid && producto.Id != 0)
+            if ( (!ModelState.IsValid && producto.Id != 0) || producto.Existencia < producto.Stock_Minimo )
             {
+                if (producto.Existencia < producto.Stock_Minimo) {
+                    ModelState.AddModelError(nameof(producto.Stock_Minimo), "El stock mínimo no puede ser mayor que la existencia actual.");
+                }
+
+                // Obtener listado de categorías
+                var categorias = await repositorioCategorias.ObtenerTodosCategorias();
+                var resultadoCategorias = categorias
+                        .Select(x => new SelectListItem(x.Nombre, x.Id.ToString())).ToList();
+                var opcionPorDefectoCategoria = new SelectListItem("-- Seleccione una categoría --", "0", true);
+                resultadoCategorias.Insert(0, opcionPorDefectoCategoria);
+                producto.Categorias = resultadoCategorias;
+
+                // Obtener listado de proveedores
+                var proveedores = await repositorioProveedores.ObtenerTodosProveedores();
+                var resultadoProveedores = proveedores
+                        .Select(x => new SelectListItem(x.Nombre, x.Id.ToString())).ToList();
+                var opcionPorDefectoProveedor = new SelectListItem("-- Seleccione una categoría --", "0", true);
+                resultadoProveedores.Insert(0, opcionPorDefectoProveedor);
+                producto.Proveedores = resultadoProveedores;
                 return View(producto);
             }
             //Enviar la imagen a Azure Storage
@@ -187,6 +206,10 @@ namespace LCDE.Controllers
                 // Validación de las validaciones del modelo.
                 if (!ModelState.IsValid && producto.Id != 0)
                 {
+                    if (producto.Existencia < producto.Stock_Minimo)
+                    {
+                        ModelState.AddModelError(nameof(producto.Stock_Minimo), "El stock mínimo no puede ser mayor que la existencia actual.");
+                    }
                     List<string> errores = new List<string>();
                     foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                     {

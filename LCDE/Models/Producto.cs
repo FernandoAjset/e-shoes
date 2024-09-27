@@ -31,6 +31,11 @@ namespace LCDE.Models
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una categoría")]
         public int Id_Categoria { get; set; }
+
+        [Display(Name = "Stock Minimo")]
+        [Range(1, int.MaxValue, ErrorMessage = "Debe ingresar una cantidad válida")]
+        public int Stock_Minimo { get; set; }
+
         [Display(Name = "Proveedor")]
         [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar un proveedor")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
