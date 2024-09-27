@@ -146,12 +146,12 @@ namespace LCDE.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProveedorExiste(string NIT, int Id)
+        public async Task<IActionResult> ProveedorExiste(string Nit, int Id)
         {
-            Proveedor respuesta = await repositorioProveedores.ObtenerProveedorPorNit(NIT, Id);
+            Proveedor respuesta = await repositorioProveedores.ObtenerProveedorPorNit(Nit, Id);
             if (respuesta is not null)
             {
-                return Json($"Ya existe un proveedor con NIT {NIT}");
+                return Json($"Ya existe un proveedor con Nit {Nit}");
             }
             return Json(true);
         }

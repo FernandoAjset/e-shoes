@@ -12,7 +12,7 @@ namespace LCDE.Servicios
         Task<bool> ModificarCliente(Cliente cliente);
         Task<Cliente> ObtenerCliente(int IdCliente);
         Task<Cliente> ObtenerClientePorIdUsuario(int IdUsuario);
-        Task<Cliente> ObtenerClientePorNit(string NIT, int Id);
+        Task<Cliente> ObtenerClientePorNit(string Nit, int Id);
         Task<IEnumerable<Cliente>> ObtenerTodosClientes();
     }
     public class RepositotioClientes : IRepositorioCliente// clase
@@ -32,7 +32,7 @@ namespace LCDE.Servicios
             parameters.Add("@DireccionCliente", cliente.Direccion);
             parameters.Add("@TelefonoCliente", cliente.Telefono);
             parameters.Add("@CorreoCliente", cliente.Correo);
-            parameters.Add("@NIT", cliente.NIT);
+            parameters.Add("@Nit", cliente.Nit);
             parameters.Add("@IdCliente", 0);
             parameters.Add("@id_usuario", cliente.Id_usuario);
             parameters.Add("@Operacion", "insert");
@@ -47,7 +47,7 @@ namespace LCDE.Servicios
                         EXEC SP_CRUD_CLIENTES 
                         @NombreCliente, 
                         @DireccionCliente, @TelefonoCliente, 
-                        @CorreoCliente, @NIT,
+                        @CorreoCliente, @Nit,
                         @IdCliente, @id_usuario,@Operacion
                         ", new
             {
@@ -55,7 +55,7 @@ namespace LCDE.Servicios
                 DireccionCliente = "",
                 TelefonoCliente = 0,
                 CorreoCliente = "",
-                NIT = "",
+                Nit = "",
                 IdCliente = 0,
                 id_usuario = IdUsuario,
                 Operacion = "selectPorUsuarioId"
@@ -70,7 +70,7 @@ namespace LCDE.Servicios
                         EXEC SP_CRUD_CLIENTES 
                         @NombreCliente, 
                         @DireccionCliente, @TelefonoCliente, 
-                        @CorreoCliente, @NIT,
+                        @CorreoCliente, @Nit,
                         @IdCliente, @id_usuario,@Operacion
                         ", new
             {
@@ -78,7 +78,7 @@ namespace LCDE.Servicios
                 DireccionCliente = "",
                 TelefonoCliente = 0,
                 CorreoCliente = "",
-                NIT = "",
+                Nit = "",
                 IdCliente = IdCliente,
                 id_usuario = 0,
                 Operacion = "select"
@@ -86,22 +86,24 @@ namespace LCDE.Servicios
             return cliente;
         }
 
-        public async Task<Cliente> ObtenerClientePorNit(string NIT, int Id)
+        public async Task<Cliente> ObtenerClientePorNit(string Nit, int Id)
         {
             Cliente cliente = new();
             try
             {
                 using var connection = new SqlConnection(connectionString);
                 cliente = await connection.QueryFirstOrDefaultAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente,@Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente,
+                        @id_usuario, @Operacion
                         ", new
                 {
                     NombreCliente = "",
                     DireccionCliente = "",
                     TelefonoCliente = 0,
                     CorreoCliente = "",
-                    NIT = NIT,
+                    Nit = Nit,
                     IdCliente = Id,
+                    id_usuario=0,
                     Operacion = "selectPorNit"
                 });
                 return cliente;
@@ -120,14 +122,14 @@ namespace LCDE.Servicios
                 await connection.ExecuteAsync(@"
                         EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, 
                         @TelefonoCliente, @CorreoCliente, 
-                        @NIT, @IdCliente, @id_usuario, @Operacion
+                        @Nit, @IdCliente, @id_usuario, @Operacion
                         ", new
                 {
                     NombreCliente = cliente.Nombre,
                     DireccionCliente = cliente.Direccion,
                     TelefonoCliente = cliente.Telefono,
                     CorreoCliente = cliente.Correo,
-                    NIT = cliente.NIT,
+                    Nit = cliente.Nit,
                     IdCliente = cliente.Id,
                     id_usuario=cliente.Id_usuario,
                     Operacion = "update"
@@ -146,15 +148,17 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, 
+                        @id_usuario,@Operacion
                         ", new
                 {
                     NombreCliente = "",
                     DireccionCliente = "",
                     TelefonoCliente = "",
                     CorreoCliente = "",
-                    NIT = "",
+                    Nit = "",
                     IdCliente,
+                    id_usuario=0,
                     Operacion = "delete"
                 });
                 return true;
@@ -169,15 +173,17 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             IEnumerable<Cliente> clientes = await connection.QueryAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, 
+                        @id_usuario,@Operacion
                         ", new
             {
                 NombreCliente = "",
                 DireccionCliente = "",
                 TelefonoCliente = 0,
                 CorreoCliente = "",
-                NIT = "",
+                Nit = "",
                 IdCliente = 0,
+                id_usuario=0,
                 Operacion = "todo"
             });
             return clientes;

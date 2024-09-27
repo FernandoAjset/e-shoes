@@ -58,7 +58,7 @@ function formatCliente(state) {
         return state.text;
     }
     var $state = $(
-        '<span>' + 'Nombre: ' + state.text + ', NIT: ' + state.nit + '</span>'
+        '<span>' + 'Nombre: ' + state.text + ', Nit: ' + state.nit + '</span>'
     );
     return $state;
 };
@@ -75,7 +75,7 @@ $("#cboBuscarCliente").select2({
                     {
                         id: item.id,
                         text: item.nombre,
-                        NIT: item.nit
+                        Nit: item.nit
                     }))
             }
         },
@@ -265,6 +265,9 @@ $("#btnTerminarVenta").click(function () {
     };
     $("#btnTerminarVenta").LoadingOverlay("show");
 
+    // Abrir una nueva ventana antes de la solicitud fetch
+    var newTab = window.open('', '_blank');
+
     fetch(urlRegistrarVenta, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -290,7 +293,12 @@ $("#btnTerminarVenta").click(function () {
             var tempFilePath = data.filePath; // Obtener el valor de tempFilePath de la respuesta JSON
 
             var url = urlPDFShowPDF + "?filePath=" + tempFilePath;
-            var newTab = window.open(url, '_blank');
+            // Cambiar la ubicación de la nueva ventana
+            newTab.location.href = url;
             newTab.focus();
+        })
+        .catch(error => {
+            // Cerrar la ventana si hay un error
+            newTab.close();
         });
 });

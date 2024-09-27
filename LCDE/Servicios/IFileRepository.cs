@@ -7,6 +7,7 @@ namespace LCDE.Servicios
     {
         public Task<string> AddFile(IFormFile file, string contenedor);
         public Task DeleteFile(string ruta, string contenedor);
+        Task<IFormFile?> DownloadFileAsFormFileAsync(string fileUrl, string fileName);
     }
 
     public class AzureFileRepository : IFileRepository
@@ -79,6 +80,23 @@ namespace LCDE.Servicios
             var blob = cliente.GetBlobClient(archivo);
             await blob.DeleteIfExistsAsync();
         }
-    }
 
+        public async Task<IFormFile?> DownloadFileAsFormFileAsync(string fileUrl, string fileName)
+        {
+            using var client = new HttpClient();
+            var response = await client.GetAsync(fileUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsByteArrayAsync();
+                var stream = new MemoryStream(content);
+                var formFile = new FormFile(stream, 0, content.Length, null, fileName)
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = response.Content.Headers.ContentType.ToString()
+                };
+                return formFile;
+            }
+            return null;
+        }
+    }
 }

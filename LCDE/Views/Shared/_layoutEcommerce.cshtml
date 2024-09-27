@@ -134,6 +134,12 @@
                                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                                 Perfil
                                             </a>
+                                            <a class="dropdown-item user-info" 
+                                            asp-controller="Ecommerce"
+                                            asp-action="HistorialCompras">
+                                                <i class="fas fa-history fa-sm fa-fw mr-2 text-gray-400"></i>
+                                                Historial de compras
+                                            </a>
                                             <form class="form-inline" asp-action="logout" asp-controller="usuarios">
                                                 <button type="submit" class="btn btn-link text-dark user-info">
                                                     Salir
@@ -306,6 +312,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script src="~/js/cart.js"></script>
+    <script src="~/js/order.js"></script>
     <script>
         // Función para actualizar el contador del carrito
         function updateCartCount() {

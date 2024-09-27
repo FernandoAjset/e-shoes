@@ -119,7 +119,7 @@ namespace LCDE.Controllers
 
                 var cliente = new Cliente()
                 {
-                    NIT = modelo.informacionCliente.Nit ?? "",
+                    Nit = modelo.informacionCliente.Nit ?? "",
                     Correo = modelo.informacionUsuario.Correo,
                     Nombre = modelo.informacionCliente.Nombre,
                     Direccion = modelo.informacionCliente.Direccion,
@@ -210,7 +210,7 @@ namespace LCDE.Controllers
                 }
 
                 var resultado = await signInManager.PasswordSignInAsync(modelo.Email,
-                        modelo.Password, modelo.Recuerdame, lockoutOnFailure: false);
+                        modelo.Password,true, lockoutOnFailure: false);
 
                 if (resultado.Succeeded)
                 {

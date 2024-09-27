@@ -1,0 +1,71 @@
+﻿@model IEnumerable<EncabezadoFactura>
+@{
+    Layout = "~/Views/Shared/_layoutEcommerce.cshtml";
+}
+
+<section class="cart_area">
+    <div class="cart_inner px-4">
+        <div class="col-12">
+            <h2 class="h3 mb-3 page-title">Historial de compras</h2>
+            <table class="table border table-hover bg-white">
+                <thead>
+                    <tr role="row">
+                        <th>Numero</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Tipo de pago</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var factura in Model)
+                    {
+                        <tr>
+                            <td>@factura.Id</td>
+                            <td>@factura.Fecha?.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @("Q" + factura.Total.ToString("N2"))
+                            </td>
+                            <td>@factura.TipoPago</td>
+                            <td>
+                                @if (factura.EstadoFacturaId == 2)
+                                {
+                                    <span class="custom-badge custom-badge-success">Pagado</span>
+                                }
+                                else if (factura.EstadoFacturaId == 1)
+                                {
+                                    <span class="custom-badge custom-badge-info">Pendiente</span>
+                                }
+                                else
+                                {
+                                    <span class="custom-badge custom-badge-secondary">@factura.Estado</span>
+                                }
+                            </td>
+                            <td>
+                                @if (factura.EstadoFacturaId == 1)
+                                {
+                                    @if (!string.IsNullOrEmpty(factura.Url_pago))
+                                    {
+                                        <a class="btn btn-sm" href="@factura.Url_pago" title="Pagar">
+                                            <i class="fas fa-dollar-sign fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                    }
+                                    <a class="btn btn-sm" asp-action="AnularFactura" asp-route-id="@factura.Id" title="Anular">
+                                        <i class="fas fa-times fa-sm fa-fw text-gray-400"></i>
+                                    </a>
+                                }
+                                @if (!string.IsNullOrEmpty(factura.Url) && factura.EstadoFacturaId == 2)
+                                {
+                                    <a class="btn btn-sm" asp-action="DescargarFactura" asp-route-id="@factura.Id" title="Descargar">
+                                        <i class="fas fa-download fa-sm fa-fw text-gray-400"></i>
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

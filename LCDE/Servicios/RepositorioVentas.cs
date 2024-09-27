@@ -1,18 +1,110 @@
 ﻿using Dapper;
 using LCDE.Models;
+using LCDE.Models.Enums;
 using Microsoft.Data.SqlClient;
-using System.Data;
 
 namespace LCDE.Servicios
 {
     public class RepositorioVentas
     {
         private readonly string connectionString;
-        public RepositorioVentas(IConfiguration configuration)
+        private readonly IEmailService emailService;
+
+        public RepositorioVentas(IConfiguration configuration, IEmailService emailService)
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
-
+            this.emailService = emailService;
         }
+
+        public async Task<EncabezadoFactura> ObtenerEncabezadoFacturaPorId(int idFactura)
+        {
+            using var connection = new SqlConnection(connectionString);
+            // Obtener datos del encabezado
+            return await connection
+                                    .QueryFirstOrDefaultAsync<EncabezadoFactura>
+                                     (@"EXEC SP_CRUD_FACTURA @IdEncabezado, @Serie,
+                                          @Fecha, @IdTipoPago, @IdCliente, 
+                                          @EstadoFacturaId, @Operacion",
+                new
+                {
+                    IdEncabezado = idFactura,
+                    Serie = "",
+                    Fecha = DateTime.Now,
+                    IdTipoPago = 0,
+                    IdCliente = 0,
+                    EstadoFacturaId = 0,
+                    Operacion = "select"
+                });
+        }
+
+        public async Task<EncabezadoFactura> ObtenerFacturaPorTokenPago(string token)
+        {
+            using var connection = new SqlConnection(connectionString);
+            // Obtener datos del encabezado
+            return await connection
+                                    .QueryFirstOrDefaultAsync<EncabezadoFactura>
+                                    (@$"SELECT encabezado_factura.*, clientes.correo CorreoCliente
+                                        FROM encabezado_factura
+                                        INNER JOIN clientes
+                                        ON encabezado_factura.id_cliente=clientes.id
+                                        WHERE encabezado_factura.token_pago=@token",
+                                        new { token });
+        }
+
+        public async Task<IEnumerable<EncabezadoFactura>> ObtenerFacturasPorCliente(int idCliente)
+        {
+            using var connection = new SqlConnection(connectionString);
+            // Obtener datos del encabezado
+            return await connection
+                                    .QueryAsync<EncabezadoFactura>
+                                    (@"
+                                        SELECT 
+                                            encabezado_factura.*, 
+                                            factura_estado.nombre AS estado,
+	                                        encabezado_factura.estado_factura_id AS estadoFacturaId,
+	                                        tipo_pago.tipo AS tipoPago,
+                                            (SELECT SUM(detalle_factura.subtotal) 
+                                             FROM detalle_factura 
+                                             WHERE detalle_factura.id_encabezado_factura = encabezado_factura.id) AS total
+                                        FROM 
+                                            encabezado_factura
+                                        INNER JOIN 
+                                            factura_estado ON encabezado_factura.estado_factura_id = factura_estado.id
+                                        INNER JOIN
+	                                        tipo_pago ON tipo_pago.id=encabezado_factura.id_tipo_pago
+                                        WHERE 
+                                            encabezado_factura.id_cliente = @idCliente
+                                        AND encabezado_factura.estado_factura_id!= 3 -- 3. Anulada
+                                        ORDER BY fecha DESC;
+                                    ",
+                new
+                {
+                    idCliente
+                });
+        }
+
+        public async Task<IEnumerable<DetalleFactura>> ObtenerDetallesFactura(int idFactura)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            // Obtener datos de los detalles.
+            return await connection.QueryAsync<DetalleFactura>(@"
+                        EXEC SP_DETALLE_FACTURA 
+                        @IdDetalleFactura, @Subtotal, @Cantidad, 
+                        @IdProducto, @IdEncabezadoFactura, @DescuentoTotal,
+                        @Operacion
+                        ", new
+            {
+                IdDetalleFactura = 0,
+                Subtotal = 0,
+                Cantidad = 0,
+                IdProducto = 0,
+                IdEncabezadoFactura = idFactura,
+                DescuentoTotal = 0,
+                Operacion = "todo"
+            });
+        }
+
         public async Task<int> CrearVenta(VentaViewModel venta)
         {
             using var connection = new SqlConnection(connectionString);
@@ -24,14 +116,16 @@ namespace LCDE.Servicios
                 factura_id = await connection.QuerySingleAsync<int>(@"
                         EXEC SP_CRUD_FACTURA 
                         @IdEncabezado, @Serie, @Fecha,
-                        @IdTipoPago, @IdCliente, @Operacion
+                        @IdTipoPago, @IdCliente, 
+                        @EstadoFacturaId, @Operacion
                         ", new
                 {
                     IdEncabezado = 0,
-                    Serie = venta.EncabezadoFactura.Serie,
+                    venta.EncabezadoFactura.Serie,
                     Fecha = DateTime.Now,
-                    IdTipoPago = venta.EncabezadoFactura.IdTipoPago,
-                    IdCliente = venta.EncabezadoFactura.IdCliente,
+                    venta.EncabezadoFactura.IdTipoPago,
+                    venta.EncabezadoFactura.IdCliente,
+                    venta.EncabezadoFactura.EstadoFacturaId,
                     Operacion = "insert"
                 }, transaction);
                 foreach (var detalle in venta.DetallesFactura)
@@ -44,15 +138,17 @@ namespace LCDE.Servicios
                         ", new
                     {
                         IdDetalleFactura = 0,
-                        Subtotal = detalle.Subtotal,
-                        Cantidad = detalle.Cantidad,
-                        IdProducto = detalle.IdProducto,
+                        detalle.Subtotal,
+                        detalle.Cantidad,
+                        detalle.IdProducto,
                         IdEncabezadoFactura = factura_id,
                         DescuentoTotal = detalle.Descuento,
                         Operacion = "insert"
                     }, transaction);
                 }
                 await transaction.CommitAsync();
+                
+                await this.CheckStock( venta.DetallesFactura );
                 return factura_id;
             }
             catch (Exception ex)
@@ -65,38 +161,55 @@ namespace LCDE.Servicios
                 connection.Close();
             }
         }
+
+        public async Task AgregarUrlFactura(string url, int idFactura)
+        {
+            try
+            {
+                var connection = new SqlConnection(connectionString);
+                await connection.ExecuteAsync(@"
+                        UPDATE encabezado_factura
+                        SET url = @url
+                        WHERE id = @idFactura", new { url, idFactura });
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<Cliente> ObtenerCliente(int IdCliente)
         {
             using var connection = new SqlConnection(connectionString);
             Cliente cliente = await connection.QuerySingleAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT,@IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit,@IdCliente, @Operacion
                         ", new
             {
                 NombreCliente = "",
                 DireccionCliente = "",
                 TelefonoCliente = "",
                 CorreoCliente = "",
-                NIT = "",
-                IdCliente = IdCliente,
+                Nit = "",
+                IdCliente,
                 Operacion = "select"
             });
             return cliente;
         }
-        public async Task<Cliente> ObtenerClientePorNit(string NIT, int Id)
+        public async Task<Cliente> ObtenerClientePorNit(string Nit, int Id)
         {
             Cliente cliente = new();
             try
             {
                 using var connection = new SqlConnection(connectionString);
                 cliente = await connection.QueryFirstOrDefaultAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente,@Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente,@Operacion
                         ", new
                 {
                     NombreCliente = "",
                     DireccionCliente = "",
                     TelefonoCliente = 0,
                     CorreoCliente = "",
-                    NIT = NIT,
+                    Nit,
                     IdCliente = Id,
                     Operacion = "selectPorNit"
                 });
@@ -113,14 +226,14 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT,@IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit,@IdCliente, @Operacion
                         ", new
                 {
                     NombreCliente = cliente.Nombre,
                     DireccionCliente = cliente.Direccion,
                     TelefonoCliente = cliente.Telefono,
                     CorreoCliente = cliente.Correo,
-                    NIT = cliente.NIT,
+                    Nit = cliente.Nit,
                     IdCliente = cliente.Id,
                     Operacion = "update"
                 });
@@ -137,14 +250,14 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 await connection.ExecuteAsync(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, @Operacion
                         ", new
                 {
                     NombreCliente = "",
                     DireccionCliente = "",
                     TelefonoCliente = "",
                     CorreoCliente = "",
-                    NIT = "",
+                    Nit = "",
                     IdCliente,
                     Operacion = "delete"
                 });
@@ -159,18 +272,84 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             IEnumerable<Cliente> clientes = await connection.QueryAsync<Cliente>(@"
-                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @NIT, @IdCliente, @Operacion
+                        EXEC SP_CRUD_CLIENTES @NombreCliente, @DireccionCliente, @TelefonoCliente, @CorreoCliente, @Nit, @IdCliente, @Operacion
                         ", new
             {
                 NombreCliente = "",
                 DireccionCliente = "",
                 TelefonoCliente = 0,
                 CorreoCliente = "",
-                NIT = "",
+                Nit = "",
                 IdCliente = 0,
                 Operacion = "todo"
             });
             return clientes;
+        }
+        public async Task<bool> AgregarInfoPagoFactura(int idFactura, PaypalOrderResponse data)
+        {
+            using var connection = new SqlConnection(connectionString);
+            var result = await connection.ExecuteAsync(@"
+                UPDATE encabezado_factura
+                SET token_pago = @tokenPago,
+                url_pago = @urlPago
+                WHERE id = @idFactura", new
+            {
+                idFactura,
+                tokenPago = data.id,
+                urlPago = data.links.FirstOrDefault(l => l.rel == "approve")?.href ?? ""
+            });
+
+            return result > 0;
+        }
+
+        public async Task<bool> ActualizarEstadoVentaPagado(string tokenPago)
+        {
+            using var connection = new SqlConnection(connectionString);
+            var result = await connection.ExecuteAsync(@"
+                UPDATE encabezado_factura
+                SET estado_factura_id = @Estado
+                WHERE token_pago = @tokenPago", new { Estado = (int)FacturaEstadoEnum.Pagada, tokenPago });
+
+            return result > 0;
+        }
+
+        public async Task AnularFactura(int idFactura)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"EXEC SP_ANULAR_FACTURA @IdEncabezado", new { IdEncabezado = idFactura });
+
+        }
+
+        private async Task CheckStock( List<DetalleFactura> detalles ) {
+
+            using var connection = new SqlConnection(connectionString);
+
+            var admins = (await connection.QueryAsync<Usuario>(@"
+                    select * from usuarios where Id_role = 1;")).ToList();
+
+            foreach (var item in detalles) {
+
+                var producto = (await connection.QuerySingleAsync<Producto>(@"
+                    select * from productos where id = @IdProducto;", item.IdProducto));
+
+                if (producto.Existencia <= producto.Stock_Minimo) {
+
+
+                    string asunto = $"Alerta de stock bajo para el producto {producto.Nombre}";
+                    string mensaje = $@"
+                    <h1>Alerta de stock</h1>
+                    <p>El stock del producto <strong>{producto.Nombre}</strong> es menor al recomendado.</p>
+                    <p>Stock actual: {producto.Existencia}</p>
+                    <p>Stock mínimo recomendado: {producto.Stock_Minimo}</p>";
+
+                    foreach (var admin in admins) {
+                        await emailService.SendEmailAsync( admin.Correo, asunto, mensaje );
+                    }
+                }
+            }
+
+
+
         }
     }
 }

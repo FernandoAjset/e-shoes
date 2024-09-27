@@ -24,7 +24,7 @@ namespace LCDE.Servicios
                 DireccionProveedor = proveedor.Direccion,
                 TelefonoProveedor = proveedor.Telefono,
                 CorreoProveedor = proveedor.Correo,
-                NITProveedor = proveedor.NIT,
+                NITProveedor = proveedor.Nit,
                 IdProveedor = 0,
                 Operacion = "insert"
             });
@@ -64,7 +64,7 @@ namespace LCDE.Servicios
                     DireccionProveedor = proveedor.Direccion,
                     TelefonoProveedor = proveedor.Telefono,
                     CorreoProveedor = proveedor.Correo,
-                    NITProveedor = proveedor.NIT,
+                    NITProveedor = proveedor.Nit,
                     IdProveedor = proveedor.Id,
                     Operacion = "update"
 
@@ -124,7 +124,7 @@ namespace LCDE.Servicios
             return proveedor;
         }
 
-        public async Task<Proveedor> ObtenerProveedorPorNit(string NIT, int Id)
+        public async Task<Proveedor> ObtenerProveedorPorNit(string Nit, int Id)
         {
             Proveedor proveedor = new();
             try
@@ -139,7 +139,7 @@ namespace LCDE.Servicios
                     DireccionProveedor = "",
                     TelefonoProveedor = "",
                     CorreoProveedor = "",
-                    NITProveedor = NIT,
+                    NITProveedor = Nit,
                     IdProveedor = Id,
                     Operacion = "selectPorNit"
                 });

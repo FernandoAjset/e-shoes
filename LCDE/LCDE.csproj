@@ -53,10 +53,18 @@
 	<ItemGroup>
 		<Folder Include="Data\" />
 		<Folder Include="PDFs\" />
+		<Folder Include="Servicios\Utils\" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Include="appsettings.Development.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="Views\Ecommerce\ConfirmarOrden.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>
