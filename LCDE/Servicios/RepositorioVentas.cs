@@ -8,10 +8,12 @@ namespace LCDE.Servicios
     public class RepositorioVentas
     {
         private readonly string connectionString;
-        public RepositorioVentas(IConfiguration configuration)
+        private readonly IEmailService emailService;
+
+        public RepositorioVentas(IConfiguration configuration, IEmailService emailService)
         {
             connectionString = configuration.GetConnectionString("ConnectionLCDE");
-
+            this.emailService = emailService;
         }
 
         public async Task<EncabezadoFactura> ObtenerEncabezadoFacturaPorId(int idFactura)
@@ -145,6 +147,8 @@ namespace LCDE.Servicios
                     }, transaction);
                 }
                 await transaction.CommitAsync();
+                
+                await this.CheckStock( venta.DetallesFactura );
                 return factura_id;
             }
             catch (Exception ex)
@@ -313,6 +317,38 @@ namespace LCDE.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync(@"EXEC SP_ANULAR_FACTURA @IdEncabezado", new { IdEncabezado = idFactura });
+
+        }
+
+        private async Task CheckStock( List<DetalleFactura> detalles ) {
+
+            using var connection = new SqlConnection(connectionString);
+
+            var admins = (await connection.QueryAsync<Usuario>(@"
+                    select * from usuarios where Id_role = 1;")).ToList();
+
+            foreach (var item in detalles) {
+
+                var producto = (await connection.QuerySingleAsync<Producto>(@"
+                    select * from productos where id = @IdProducto;", item.IdProducto));
+
+                if (producto.Existencia <= producto.Stock_Minimo) {
+
+
+                    string asunto = $"Alerta de stock bajo para el producto {producto.Nombre}";
+                    string mensaje = $@"
+                    <h1>Alerta de stock</h1>
+                    <p>El stock del producto <strong>{producto.Nombre}</strong> es menor al recomendado.</p>
+                    <p>Stock actual: {producto.Existencia}</p>
+                    <p>Stock mínimo recomendado: {producto.Stock_Minimo}</p>";
+
+                    foreach (var admin in admins) {
+                        await emailService.SendEmailAsync( admin.Correo, asunto, mensaje );
+                    }
+                }
+            }
+
+
 
         }
     }
