@@ -1,4 +1,4 @@
-﻿using LCDE.Models;
+using LCDE.Models;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
