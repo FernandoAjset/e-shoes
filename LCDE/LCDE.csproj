@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IncludeSymbols>False</IncludeSymbols>
-		<PublishReadyToRun>true</PublishReadyToRun>
+		<PublishReadyToRun>false</PublishReadyToRun>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,9 +13,8 @@
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 
-
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <Optimize>True</Optimize>
+		<Optimize>True</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,7 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Remove="appsettings.Development.json" />
+		<Content Remove="appsettings.Development.json" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.21.2" />
@@ -57,23 +56,23 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="appsettings.Development.json" />
+		<None Include="appsettings.Development.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="Views\Ecommerce\ConfirmarOrden.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
+		<Content Update="Views\Ecommerce\ConfirmarOrden.cshtml">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Data\confirmar-registro.html">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Data\notificacion_cambio_contraseña.html">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<None Update="Data\confirmar-registro.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="Data\notificacion_cambio_contraseña.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>
