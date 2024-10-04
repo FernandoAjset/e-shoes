@@ -108,17 +108,16 @@ namespace LCDE.Servicios
         public async Task<int> CrearVenta(VentaViewModel venta)
         {
             using var connection = new SqlConnection(connectionString);
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
+            await connection.OpenAsync();
+            using var transaction = await connection.BeginTransactionAsync();
             try
             {
-                int factura_id = 0;
-                factura_id = await connection.QuerySingleAsync<int>(@"
-                        EXEC SP_CRUD_FACTURA 
-                        @IdEncabezado, @Serie, @Fecha,
-                        @IdTipoPago, @IdCliente, 
-                        @EstadoFacturaId, @Operacion
-                        ", new
+                int factura_id = await connection.QuerySingleAsync<int>(@"
+                    EXEC SP_CRUD_FACTURA 
+                    @IdEncabezado, @Serie, @Fecha,
+                    @IdTipoPago, @IdCliente, 
+                    @EstadoFacturaId, @Operacion
+                    ", new
                 {
                     IdEncabezado = 0,
                     venta.EncabezadoFactura.Serie,
@@ -128,6 +127,7 @@ namespace LCDE.Servicios
                     venta.EncabezadoFactura.EstadoFacturaId,
                     Operacion = "insert"
                 }, transaction);
+
                 foreach (var detalle in venta.DetallesFactura)
                 {
                     await connection.ExecuteAsync(@"
@@ -146,19 +146,14 @@ namespace LCDE.Servicios
                         Operacion = "insert"
                     }, transaction);
                 }
+
                 await transaction.CommitAsync();
-                
-                await this.CheckStock( venta.DetallesFactura );
+                await this.CheckStock(venta.DetallesFactura);
                 return factura_id;
             }
-            catch (Exception ex)
+            catch
             {
-                await transaction.RollbackAsync();
-                return 0;
-            }
-            finally
-            {
-                connection.Close();
+                throw;
             }
         }
 
@@ -320,36 +315,44 @@ namespace LCDE.Servicios
 
         }
 
-        private async Task CheckStock( List<DetalleFactura> detalles ) {
+        private async Task CheckStock(List<DetalleFactura> detalles)
+        {
+            try
+            {
 
-            using var connection = new SqlConnection(connectionString);
+                using var connection = new SqlConnection(connectionString);
 
-            var admins = (await connection.QueryAsync<Usuario>(@"
+                var admins = (await connection.QueryAsync<Usuario>(@"
                     select * from usuarios where Id_role = 1;")).ToList();
 
-            foreach (var item in detalles) {
+                foreach (var item in detalles)
+                {
 
-                var producto = (await connection.QuerySingleAsync<Producto>(@"
-                    select * from productos where id = @IdProducto;", item.IdProducto));
+                    var producto = (await connection.QuerySingleAsync<Producto>(@"
+                    select * from productos where id = @IdProducto;", new { item.IdProducto }));
 
-                if (producto.Existencia <= producto.Stock_Minimo) {
+                    if (producto.Existencia <= producto.Stock_Minimo)
+                    {
 
 
-                    string asunto = $"Alerta de stock bajo para el producto {producto.Nombre}";
-                    string mensaje = $@"
+                        string asunto = $"Alerta de stock bajo para el producto {producto.Nombre}";
+                        string mensaje = $@"
                     <h1>Alerta de stock</h1>
                     <p>El stock del producto <strong>{producto.Nombre}</strong> es menor al recomendado.</p>
                     <p>Stock actual: {producto.Existencia}</p>
                     <p>Stock mínimo recomendado: {producto.Stock_Minimo}</p>";
 
-                    foreach (var admin in admins) {
-                        await emailService.SendEmailAsync( admin.Correo, asunto, mensaje );
+                        foreach (var admin in admins)
+                        {
+                            await emailService.SendEmailAsync(admin.Correo, asunto, mensaje);
+                        }
                     }
                 }
             }
-
-
-
+            catch
+            {
+                throw;
+            }
         }
     }
 }
