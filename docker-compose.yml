@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  eshoes:
+    image: eshoes:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:80"
+      - "4443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - .:/app
