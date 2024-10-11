@@ -1,6 +1,7 @@
 ﻿using LCDE.Models;
 using LCDE.Servicios;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LCDE.Controllers
 {
@@ -9,6 +10,7 @@ namespace LCDE.Controllers
         private readonly RepositorioProductos repositorioProductos;
         private readonly RepositorioCategorias repositorioCategorias;
 
+        private readonly string rootDefaultImg = "https://schoolcampussur.blob.core.windows.net/lcde-productos/652f9c99-a286-43d9-b7a5-28be1e376fbc.jpg";
 
         public EcommerceProductoController(
 
@@ -25,6 +27,11 @@ namespace LCDE.Controllers
                 if (producto == null)
                 {
                     return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                if (producto.Image_url == null)
+                {
+                    producto.Image_url = rootDefaultImg;
                 }
                 return View(producto);
 
@@ -59,7 +66,25 @@ namespace LCDE.Controllers
             obj.PrecioMin = 0;
             obj.PrecioMax = await repositorioProductos.PrecioMaximo();
             obj.NombreProducto = "";
-            obj.productosListarDTO = await repositorioProductos.ObtenerProductoFiltrado(obj);
+            var productos = await repositorioProductos.ObtenerProductoFiltrado(obj);
+
+
+            foreach (var producto in productos)
+            {
+                if (producto.Image_url == null)
+                {
+                    producto.Image_url = rootDefaultImg;
+                }
+            }
+
+            // Obtener listado de proveedores
+            var Tallas = await repositorioProductos.ObtenerTallas( obj.CategoriaId );
+            var resultadoProveedores = Tallas
+                    .Select(x => new SelectListItem(x.ToString(), x.ToString() )).ToList();
+            obj.Tallas= resultadoProveedores;
+            obj.Talla= Tallas.FirstOrDefault();
+            obj.productosListarDTO = productos.OrderBy(x => x.Nombre).ToList();
+
             return View(obj);
         }
 
@@ -69,6 +94,13 @@ namespace LCDE.Controllers
             try
             {
                 List<ProductoListarDTO> productos = await repositorioProductos.ObtenerProductoFiltrado(productoFiltrar);
+                foreach (var producto in productos)
+                {
+                    if (producto.Image_url == null)
+                    {
+                        producto.Image_url = rootDefaultImg;
+                    }
+                }
                 return Json(productos);
             }
             catch (Exception ex)

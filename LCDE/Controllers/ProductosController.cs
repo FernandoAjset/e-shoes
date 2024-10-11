@@ -19,7 +19,7 @@ namespace LCDE.Controllers
         private readonly IFileRepository fileRepository;
 
         private readonly string CarpetaDeImg= "lcde-productos";
-        private readonly string rootDefaultImg = "https://schoolcampussur.blob.core.windows.net/lcde-productos/207396005-shoes-vector-thick-line-icon-for-personal-and-commercial-use.jpg";
+        private readonly string rootDefaultImg = "schoolcampussur.blob.core.windows.net/lcde-productos/652f9c99-a286-43d9-b7a5-28be1e376fbc.jpg";
 
         /// <summary>
         /// Constructor de clase.
@@ -44,8 +44,34 @@ namespace LCDE.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var productos = await repositorioProductos.ObtenerTodosProductos();
-            return View(productos);
+            try
+            {
+                IEnumerable<ProductoListarDTO> productos = await repositorioProductos.ObtenerTodosProductos();
+
+                foreach (var producto in productos)
+                {
+                    if (producto.Image_url == null)
+                    {
+                        producto.Image_url = rootDefaultImg;
+                    }
+                }
+                // Agrupar productos por el nombre
+                List<ProductosAgrupadosDTO> agrupados = productos.GroupBy(x => x.Nombre)
+                                         .Select(grupo => new ProductosAgrupadosDTO
+                                         {
+                                             Nombre = grupo.Key,
+                                             Detalle = grupo.First().Detalle, // Suponiendo que el detalle es el mismo para todos
+                                             Image_url = grupo.First().Image_url, // Suponiendo que la URL de la imagen es la misma
+                                             NombreCategoria = grupo.First().NombreCategoria, // Suponiendo la misma categoría
+                                             NombreProveedor = grupo.First().NombreProveedor, // Suponiendo el mismo proveedor
+                                             Productos = grupo.ToList() // Todos los productos en este grupo
+                                         }).ToList();
+                return View(agrupados);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         /// <summary>
@@ -124,7 +150,7 @@ namespace LCDE.Controllers
             }
             //Enviar la imagen a Azure Storage
             if (producto.Imagen != null) producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
-            else producto.Image_url = rootDefaultImg;
+
             // Enviar los datos al repositorio para grabar en base de datos, si se crea el registro se obtiene el nuevo Id.
             if (await repositorioProductos.CrearProducto(producto) > 0)
             {
@@ -221,7 +247,7 @@ namespace LCDE.Controllers
                 }
 
                 //Enviar la imagen a Azure Storage
-                if (producto.Imagen != null)
+                if (producto.Imagen != null && producto.Image_url != this.rootDefaultImg)
                 {
                     await fileRepository.DeleteFile(producto.Image_url, CarpetaDeImg);
                     producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
@@ -265,7 +291,7 @@ namespace LCDE.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-            if (await repositorioProductos.BorrarProducto(id))
+            if (await repositorioProductos.BorrarProducto(id) && producto.Image_url != this.rootDefaultImg)
             {
                 await fileRepository.DeleteFile(producto.Image_url, CarpetaDeImg);
                 return Ok(new { success = true });
@@ -297,6 +323,202 @@ namespace LCDE.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest, $"La existencia del producto {respuesta.Detalle} no es suficiente, existencia actual: {respuesta.Existencia}");
             }
             return StatusCode(StatusCodes.Status200OK, true);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CrearTalla(int Id)
+        {
+            ProductoCreacionDTO producto = await repositorioProductos.ObtenerProducto(Id);
+            if (producto == null)
+            {
+                return NotFound();
+            }
+
+            producto.Existencia = 0;
+            producto.Stock_Minimo = 0;
+            producto.talla = 0;
+            producto.PrecioUnidad = 0;
+            producto.PrecioUnidadString = "0";
+            return View(producto);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearTalla(ProductoCreacionDTO Product)
+        {
+            try
+            {
+                ProductoCreacionDTO producto = new ProductoCreacionDTO();
+
+                producto.talla = Product.talla;
+                producto.Id_Categoria = Product.Id_Categoria;
+                producto.Id_Proveedor = Product.Id_Proveedor;
+                producto.Detalle = Product.Detalle;
+                producto.Existencia = Product.Existencia;
+                producto.Stock_Minimo = Product.Stock_Minimo;
+                producto.PrecioUnidad = Product.PrecioUnidad;
+                producto.PrecioUnidadString = Product.PrecioUnidadString;
+                producto.Image_url = Product.Image_url;
+                producto.IdPrecio = Product.IdPrecio;
+                producto.IdPromocion = Product.IdPromocion;
+                producto.Proveedores = Product.Proveedores;
+                producto.Categorias = Product.Categorias;
+                producto.Image_url = Product.Image_url;
+                producto.Nombre = Product.Nombre;
+                producto.Imagen = Product.Imagen;
+
+
+                CultureInfo culture = CultureInfo.InvariantCulture;
+                decimal cantidad;
+                string valorIngresado = producto.PrecioUnidadString; // Valor ingresado en el campo de texto
+
+                if (decimal.TryParse(valorIngresado, NumberStyles.Number, culture, out cantidad))
+                {
+                    producto.PrecioUnidad = cantidad;
+                }
+                // Validación de las validaciones del modelo.
+                if ((!ModelState.IsValid && producto.Id != 0) || producto.Existencia < producto.Stock_Minimo)
+                {
+                    if (producto.Existencia < producto.Stock_Minimo)
+                    {
+                        ModelState.AddModelError(nameof(producto.Stock_Minimo), "El stock mínimo no puede ser mayor que la existencia actual.");
+                    }
+
+                    // Obtener listado de categorías
+                    var categorias = await repositorioCategorias.ObtenerTodosCategorias();
+                    var resultadoCategorias = categorias
+                            .Select(x => new SelectListItem(x.Nombre, x.Id.ToString())).ToList();
+                    var opcionPorDefectoCategoria = new SelectListItem("-- Seleccione una categoría --", "0", true);
+                    resultadoCategorias.Insert(0, opcionPorDefectoCategoria);
+                    producto.Categorias = resultadoCategorias;
+
+                    // Obtener listado de proveedores
+                    var proveedores = await repositorioProveedores.ObtenerTodosProveedores();
+                    var resultadoProveedores = proveedores
+                            .Select(x => new SelectListItem(x.Nombre, x.Id.ToString())).ToList();
+                    var opcionPorDefectoProveedor = new SelectListItem("-- Seleccione una categoría --", "0", true);
+                    resultadoProveedores.Insert(0, opcionPorDefectoProveedor);
+                    producto.Proveedores = resultadoProveedores;
+                    return View(producto);
+                }
+                //Enviar la imagen a Azure Storage
+                if (producto.Imagen != null) producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
+
+                else producto.Image_url = rootDefaultImg;
+
+                if (await repositorioProductos.CrearProducto(producto) > 0)
+                {
+                    // Si la operación es correcta se retorna al index.
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    // Si ocurre un error se retorna a la vista de error.
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditarGroup(int Id)
+        {
+            try
+            {
+                ProductoCreacionDTO producto = await repositorioProductos.ObtenerProducto(Id);
+                if (producto == null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+                // Obtener listado de categorías
+                var categorias = await repositorioCategorias.ObtenerTodosCategorias();
+                var resultadoCategorias = categorias
+                        .Select(x => new SelectListItem(x.Nombre, x.Id.ToString())).ToList();
+                if (producto.Id_Categoria == 0)
+                {
+                    var opcionPorDefectoCategoria = new SelectListItem("-- Seleccione una categoría --", "0", true);
+                    resultadoCategorias.Insert(0, opcionPorDefectoCategoria);
+                }
+                producto.Categorias = resultadoCategorias;
+
+                // Obtener listado de proveedores
+                var proveedores = await repositorioProveedores.ObtenerTodosProveedores();
+                var resultadoProveedores = proveedores
+                        .Select(x => new SelectListItem(x.Nombre, x.Id.ToString())).ToList();
+                if (producto.Id_Proveedor == 0)
+                {
+                    var opcionPorDefectoProveedor = new SelectListItem("-- Seleccione una categoría --", "0", true);
+                    resultadoProveedores.Insert(0, opcionPorDefectoProveedor);
+                }
+                producto.Proveedores = resultadoProveedores;
+
+                // Obtener la configuración de cultura desde la ViewBag
+                CultureInfo culture = new CultureInfo("en-US");
+                culture.NumberFormat.NumberDecimalSeparator = ".";
+                // Pasar la configuración de cultura a la vista
+                ViewBag.Culture = culture;
+                return View(producto);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditarGroup(ProductoCreacionDTO producto)
+        {
+            try
+            {
+                CultureInfo culture = CultureInfo.InvariantCulture;
+                decimal cantidad;
+                string valorIngresado = producto.PrecioUnidadString; // Valor ingresado en el campo de texto
+
+                if (decimal.TryParse(valorIngresado, NumberStyles.Number, culture, out cantidad))
+                {
+                    producto.PrecioUnidad = cantidad;
+                }
+                // Validación de las validaciones del modelo.
+                if (!ModelState.IsValid && producto.Id != 0)
+                {
+                    if (producto.Existencia < producto.Stock_Minimo)
+                    {
+                        ModelState.AddModelError(nameof(producto.Stock_Minimo), "El stock mínimo no puede ser mayor que la existencia actual.");
+                    }
+                    List<string> errores = new List<string>();
+                    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        errores.Add(error.ErrorMessage);
+                    }
+                    ViewData["Errores"] = errores;
+
+                    return View(producto);
+                }
+
+                //Enviar la imagen a Azure Storage
+                if (producto.Imagen != null && producto.Image_url != this.rootDefaultImg)
+                {
+                    await fileRepository.DeleteFile(producto.Image_url, CarpetaDeImg);
+                    producto.Image_url = await fileRepository.AddFile(producto.Imagen, CarpetaDeImg);
+                }
+                int affectedRows = await repositorioProductos.ActualizarGrupoProductos(producto);
+                if (affectedRows > 0)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            catch
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
     }
 }

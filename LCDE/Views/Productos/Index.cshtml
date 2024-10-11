@@ -1,4 +1,4 @@
-﻿@model List<ProductoListarDTO>
+﻿@model List<ProductosAgrupadosDTO>
 
 @{
     ViewData["Title"] = "Productos";
@@ -26,52 +26,94 @@
                                 <th scope="col">Imagen</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Descripcion</th>
-                                <th scope="col">Existencia</th>
-                                <th scope="col">Stok Minimo</th>
                                 <th scope="col">Categoria</th>
                                 <th scope="col">Proveedor</th>
-                                <th scope="col">Precio Unidad</th>
+@*                                 <th scope="col">Talla</th>
+                                <th scope="col">Existencia</th>
+                                <th scope="col">Stok Minimo</th>
+                                <th scope="col">Precio Unidad</th> *@
                                 <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var producto in Model)
+                            @foreach (var grupo in Model)
                             {
                                 <tr>
                                     <th>
-                                        <img src="@producto.Image_url" alt="Imagen del producto" style="width:100px; height:100px; object-fit:cover" />
+                                        <img src="@grupo.Image_url" alt="Imagen del producto" style="width:100px; height:100px; object-fit:cover" />
                                     </th>
                                     <td>
-                                        @producto.Nombre
+                                        @grupo.Nombre
                                     </td>
                                     <td>
-                                        @producto.Detalle
+                                        @grupo.Detalle
                                     </td>
                                     <td>
-                                        @producto.Existencia
+                                        @grupo.NombreCategoria
                                     </td>
                                     <td>
-                                        @producto.Stock_Minimo
+                                        @grupo.NombreProveedor
                                     </td>
                                     <td>
-                                        @producto.NombreCategoria
-                                    </td>
-                                    <td>
-                                        @producto.NombreProveedor
-                                    </td>
-                                    <td>
-                                        Q. @producto.PrecioUnidad
-                                    </td>
-
-                                    <td>
-                                        <a class="btn btn-primary" asp-action="Editar" asp-route-id="@producto.Id">
+                                        <!-- Botón para mostrar/ocultar productos -->
+                                        <button class="btn btn-info w-75" data-toggle="collapse" data-target="#productos-@grupo.Nombre.Replace(' ', '-')"
+                                                aria-expanded="false" aria-controls="productos-@grupo.Nombre.Replace(' ', '-')">
+                                            Ver Tallas
+                                        </button>
+                                        <a class="btn btn-success my-2 w-75" asp-action="CrearTalla" asp-controller="Productos" asp-route-id="@grupo.Productos.First().Id">
+                                            Añadir Talla
+                                        </a>
+                                        <a class="btn btn-primary w-75" asp-action="EditarGroup" asp-route-id="@grupo.Productos.First().Id">
                                             <i class="bi bi-pencil-fill" style="font-size:1rem; color: white; margin-right:10px"></i>
                                             Editar
                                         </a>
-                                        <button class="btn btn-danger" onclick="showDeleteConfirmation(@producto.Id,'producto')">
-                                            <i class="bi bi-trash" style="font-size:1rem; color: white; margin-right:10px"></i>
-                                            Borrar
-                                        </button>
+                                    </td>
+
+                                </tr>
+
+                                <tr class="collapse" id="productos-@grupo.Nombre.Replace(" ", "-")">
+                                    <td></td>
+                                    <td colspan="4">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Talla</th>
+                                                    <th scope="col">Existencia</th>
+                                                    <th scope="col">Stock Minimo</th>
+                                                    <th scope="col">Precio Unidad</th>
+                                                    <th scope="col">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var producto in grupo.Productos)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @producto.talla
+                                                        </td>
+                                                        <td>
+                                                            @producto.Existencia
+                                                        </td>
+                                                        <td>
+                                                            @producto.Stock_Minimo
+                                                        </td>
+                                                        <td>
+                                                            Q. @producto.PrecioUnidad
+                                                        </td>
+                                                        <td>
+                                                            <a class="btn btn-primary" asp-action="Editar" asp-route-id="@producto.Id">
+                                                                <i class="bi bi-pencil-fill" style="font-size:1rem; color: white; margin-right:10px"></i>
+                                                                Editar
+                                                            </a>
+                                                            <button class="btn btn-danger" onclick="showDeleteConfirmation(@producto.Id,'producto')">
+                                                                <i class="bi bi-trash" style="font-size:1rem; color: white; margin-right:10px"></i>
+                                                                Borrar
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                             }

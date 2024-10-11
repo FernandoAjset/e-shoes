@@ -265,8 +265,14 @@ public class VentasController : Controller
         IEnumerable<ProductoListarDTO> productos = await repositorioProductos.ObtenerTodosProductos();
         if (productos is not null)
         {
+            foreach (var product in productos)
+            {
+                product.Detalle = $" {product.Nombre} - Talla: {product.talla}";
+            }
+
             return StatusCode(StatusCodes.Status200OK, productos);
         }
+
         return RedirectToAction("Error", "Home");
     }
 
