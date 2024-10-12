@@ -23,10 +23,12 @@ namespace LCDE.Models
             AdditionalFields = nameof(Id))]
         [RegularExpression(@"^(?!\d)[A-Za-z0-9\s]+(?<!\s)$", ErrorMessage = "El nombre no es válido.")]
         public string Detalle { get; set; }
+
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Display(Name = "Existencia inicial")]
         [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe ingresar una cantidad válida")]
         public int Existencia { get; set; }
+
         [Display(Name = "Categoria")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar una categoría")]
@@ -40,6 +42,10 @@ namespace LCDE.Models
         [Range(1, maximum: int.MaxValue, ErrorMessage = "Debe seleccionar un proveedor")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public int? Id_Proveedor { get; set; }
+
+        [Display(Name = "Talla")]
+        [Required(ErrorMessage = "El campo {0} es requerido")]
+        public float talla { get; set; }
         public int? IdPrecio { get; set; }
         public int? IdPromocion { get; set; }
     }

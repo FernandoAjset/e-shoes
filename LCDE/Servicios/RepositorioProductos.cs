@@ -19,7 +19,7 @@ namespace LCDE.Servicios
                  EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
+                ,@Nombre, @ImageUrl, @talla, @Operacion, @minimum", new
             {
                 DetalleProducto = producto.Detalle,
                 Existencia = producto.Existencia,
@@ -29,6 +29,7 @@ namespace LCDE.Servicios
                 IdProducto = 0,
                 PrecioUnidad = producto.PrecioUnidad,
                 Nombre = producto.Nombre,
+                talla = producto.talla,
                 ImageUrl = producto.Image_url,
                 Operacion = "insert",
                 minimum = producto.Stock_Minimo
@@ -57,7 +58,7 @@ namespace LCDE.Servicios
                  EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
+                ,@Nombre, @ImageUrl, @talla, @Operacion, @minimum", new
                 {
                     DetalleProducto = "",
                     Existencia = "",
@@ -68,6 +69,7 @@ namespace LCDE.Servicios
                     PrecioUnidad = 0,
                     Nombre = "",
                     ImageUrl = "",
+                    talla = 0.0,
                     Operacion = "select",
                     minimum = ""
                 });
@@ -88,7 +90,7 @@ namespace LCDE.Servicios
                  EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
+                ,@Nombre, @ImageUrl, @talla, @Operacion, @minimum", new
                 {
                     DetalleProducto = producto.Detalle,
                     Existencia = producto.Existencia,
@@ -99,6 +101,7 @@ namespace LCDE.Servicios
                     PrecioUnidad = producto.PrecioUnidad,
                     Nombre = producto.Nombre,
                     ImageUrl = producto.Image_url,
+                    talla = producto.talla,
                     Operacion = "update",
                     minimum = producto.Stock_Minimo
 
@@ -120,7 +123,7 @@ namespace LCDE.Servicios
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
+                ,@Nombre, @ImageUrl, @talla, @Operacion, @minimum", new
                 {
                     DetalleProducto = "",
                     Existencia = "",
@@ -131,6 +134,7 @@ namespace LCDE.Servicios
                     PrecioUnidad = 0,
                     Nombre = "",
                     ImageUrl = "",
+                    talla = 0.0,
                     Operacion = "delete",
                     minimum = ""
                 });
@@ -149,7 +153,7 @@ namespace LCDE.Servicios
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad
-                ,@Nombre, @ImageUrl, @Operacion, @minimum", new
+                ,@Nombre, @ImageUrl, @talla, @Operacion, @minimum", new
             {
                 DetalleProducto = "",
                 Existencia = "",
@@ -160,11 +164,13 @@ namespace LCDE.Servicios
                 PrecioUnidad = 0,
                 Nombre = "",
                 ImageUrl = "",
+                talla = 0.0,
                 Operacion = "todo",
                 minimum = ""
             });
             return producto;
         }
+
         public async Task<Producto> ObtenerProductoPorNombre(int idProducto, string nombre)
         {
             try
@@ -174,7 +180,7 @@ namespace LCDE.Servicios
                 EXEC SP_CRUD_PRODUCTOS 
                  @DetalleProducto, @Existencia, @IdCategoria
                 ,@IdProveedor,@IdPromocion, @IdProducto,@PrecioUnidad 
-                ,@Operacion, @minimum
+                , @talla,@Operacion, @minimum
                 ", new
                 {
                     DetalleProducto = nombre,
@@ -184,6 +190,7 @@ namespace LCDE.Servicios
                     IdPromocion = "",
                     IdProducto = idProducto,
                     PrecioUnidad = 0,
+                    talla = 0.0,
                     Operacion = "selectPorNombre",
                     minimum = ""
                 });
@@ -216,13 +223,9 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 ProductoListarDTO producto = await connection.QueryFirstOrDefaultAsync<ProductoListarDTO>(@"
-             EXEC sp_ObtenerDetalleProducto 
-              @IdProducto
-                     ", new
-                {
-                    IdProducto = idProducto,
-
-                });
+                 EXEC sp_ObtenerDetalleProducto 
+                  @IdProducto
+                         ", new { IdProducto = idProducto });
                 return producto;
             }
             catch (Exception ex)
@@ -238,13 +241,14 @@ namespace LCDE.Servicios
             {
                 using var connection = new SqlConnection(connectionString);
                 List<ProductoListarDTO> ListaFiltrada = (await connection.QueryAsync<ProductoListarDTO>(@"
-                EXEC sp_FiltrarProductos @categoriaId, @nombreProducto, @precioMin, @precioMax
+                EXEC sp_FiltrarProductos @categoriaId, @nombreProducto, @precioMin, @precioMax, @talla
                 ", new
                 {
                     categoriaId = productoFiltrar.CategoriaId,
                     nombreProducto = productoFiltrar.NombreProducto,
                     precioMin = productoFiltrar.PrecioMin,
                     precioMax = productoFiltrar.PrecioMax,
+                    talla = productoFiltrar.Talla
                 })).ToList();
                 return ListaFiltrada;
             }
@@ -252,6 +256,43 @@ namespace LCDE.Servicios
             {
                 return null;
             }
+        }
+
+        public async Task<int> ActualizarGrupoProductos(ProductoCreacionDTO producto)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            // Ejecutar el procedimiento almacenado para actualizar los campos
+            int affectedRows = await connection.ExecuteScalarAsync<int>(@"
+                EXEC SP_CRUD_PRODUCTOS 
+                @DetalleProducto, @Existencia, @IdCategoria,
+                @IdProveedor, @IdPromocion, @IdProducto,
+                @PrecioUnidad, @Nombre, @ImageUrl, @talla, 
+                @Operacion, @minimum", new
+                    {
+                        DetalleProducto = producto.Detalle,
+                        Existencia = producto.Existencia, // Aunque no se modifica en esta operación, lo envías.
+                        IdCategoria = producto.Id_Categoria,
+                        IdProveedor = producto.Id_Proveedor,
+                        IdPromocion = producto.IdPromocion, // Este puede no ser requerido en este contexto.
+                        IdProducto = producto.Id, // Se utilizará este para buscar el producto base.
+                        PrecioUnidad = producto.PrecioUnidad, // Igual que existencia, se envía pero no se usa aquí.
+                        Nombre = producto.Nombre,
+                        ImageUrl = producto.Image_url,
+                        talla = producto.talla, // Aunque no se actualiza, se sigue enviando.
+                        Operacion = "updatePorNombre",
+                        minimum = producto.Stock_Minimo // Este también es enviado por consistencia.
+                    });
+
+            return affectedRows; // Devuelve el número de filas afectadas.
+        }
+
+        public async Task<List<float>> ObtenerTallas(int CategoriaId) {
+            using var connection = new SqlConnection(connectionString);
+            List<float> tallas = (await connection.QueryAsync<float>(@"
+                select talla from productos where id_categoria = @CategoriaId group by talla;", new { CategoriaId })).ToList();
+        
+            return tallas;
         }
     }
 }
