@@ -44,13 +44,16 @@
                         <select asp-for="Id_Categoria" asp-items="Model.Categorias" class="form-select"></select>
                         <span asp-validation-for="Id_Categoria" class="text-danger"></span>
                     </div>
-
                     <div class="mb-3">
                         <label asp-for="Id_Proveedor" class="form-label"></label>
                         <select asp-for="Id_Proveedor" asp-items="Model.Proveedores" class="form-select"></select>
                         <span asp-validation-for="Id_Proveedor" class="text-danger"></span>
                     </div>
-
+                    <div class="mb-3">
+                        <label asp-for="talla" class="form-label"></label>
+                        <input asp-for="talla" class="form-control" />
+                        <span asp-validation-for="talla" class="text-danger"></span>
+                    </div>
                     <div class="mb-3">
                         <label asp-for="PrecioUnidadString" class="form-label"></label>
                         <input asp-for="PrecioUnidadString" class="form-control" />

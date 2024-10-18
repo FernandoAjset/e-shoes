@@ -19,7 +19,7 @@ namespace LCDE.Controllers
         private readonly IFileRepository fileRepository;
 
         private readonly string CarpetaDeImg= "lcde-productos";
-        private readonly string rootDefaultImg = "schoolcampussur.blob.core.windows.net/lcde-productos/652f9c99-a286-43d9-b7a5-28be1e376fbc.jpg";
+        private readonly string rootDefaultImg = "https://schoolcampussur.blob.core.windows.net/lcde-productos/652f9c99-a286-43d9-b7a5-28be1e376fbc.jpg";
 
         /// <summary>
         /// Constructor de clase.
